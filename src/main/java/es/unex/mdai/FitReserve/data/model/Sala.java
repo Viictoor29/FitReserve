@@ -65,6 +65,4 @@ public class Sala {
         this.descripcion = descripcion;
     }
 
-
-
 }
