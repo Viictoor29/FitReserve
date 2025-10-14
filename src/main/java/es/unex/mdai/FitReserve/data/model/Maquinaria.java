@@ -1,5 +1,7 @@
 package es.unex.mdai.FitReserve.data.model;
 
+import es.unex.mdai.FitReserve.data.enume.TipoActividad;
+import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -17,6 +19,11 @@ public class Maquinaria {
     @NotNull
     @Column(nullable = false)
     int cantidad_total;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoActividad tipo_actividad;
 
     @Column(length = 255)
     private String descripcion;
