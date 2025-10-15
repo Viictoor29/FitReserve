@@ -25,10 +25,6 @@ public class Actividad {
     @Column(nullable = false)
     private TipoActividad tipo_actividad;
 
-    @NotNull
-    @Column(nullable = false)
-    private int duracion; //Duracion en minutos
-
     //Crear enum para la nivel
     @NotNull
     @Enumerated(EnumType.STRING)
