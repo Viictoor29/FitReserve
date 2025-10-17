@@ -8,11 +8,11 @@ public class Sala {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_sala;
+    private long idSala;
 
     @NotNull
     @Column(unique = true, nullable = false, length = 30)
-    String nombre;
+    private String nombre;
 
     @NotNull
     @Column(nullable = false)
@@ -25,12 +25,27 @@ public class Sala {
     @Column(length = 255)
     private String descripcion;
 
-    public long getId_sala() {
-        return id_sala;
+    public Sala() {}
+
+    public Sala(String nombre, int capacidad, String ubicacion, String descripcion) {
+        this.nombre = nombre;
+        this.capacidad = capacidad;
+        this.ubicacion = ubicacion;
+        this.descripcion = descripcion;
     }
 
-    public void setId_sala(long id_sala) {
-        this.id_sala = id_sala;
+    public Sala(String nombre, int capacidad, String ubicacion) {
+        this.nombre = nombre;
+        this.capacidad = capacidad;
+        this.ubicacion = ubicacion;
+    }
+
+    public long getIdSala() {
+        return idSala;
+    }
+
+    public void setIdSala(long idSala) {
+        this.idSala = idSala;
     }
 
     public String getNombre() {
@@ -64,5 +79,4 @@ public class Sala {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-
 }
