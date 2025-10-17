@@ -3,6 +3,7 @@ package es.unex.mdai.FitReserve.data.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+//Hace falta para que ReservaMaquinaria detecte que la clave primaria es compuesta
 public class ReservaMaquinariaId implements Serializable {
 
     private long idReserva;
