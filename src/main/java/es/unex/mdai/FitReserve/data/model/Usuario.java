@@ -2,25 +2,31 @@ package es.unex.mdai.FitReserve.data.model;
 
 import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_usuario;
+    private Long idUsuario;
 
     @NotNull
     @Column(nullable = false, length = 20)
     private String nombre;
 
     @NotNull
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     private String apellidos;
 
     @NotNull
-    @Column(nullable = false, length = 45, unique = true)
+    @Email(message = "El correo no tiene un formato válido")
+    @Column(nullable = false, length = 100, unique = true)
     private String email;
 
     @NotNull
@@ -30,30 +36,49 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(nullable = false)
-    private TipoUsuario tipo_usuario;
+    private TipoUsuario tipoUsuario;
 
-    public TipoUsuario getTipo_usuario() {
-        return tipo_usuario;
-    }
+    @NotNull
+    @Pattern(regexp = "\\d{9}", message = "El teléfono debe contener exactamente 9 dígitos")
+    @Column(nullable = false, length = 9)
+    private String telefono;
 
-    public void setTipo_usuario(TipoUsuario tipo_usuario) {
-        this.tipo_usuario = tipo_usuario;
-    }
+    @NotNull
+    @Column(nullable = false, updatable = false,
+            insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime fechaCreacion;
 
-    public String getContrasenia() {
-        return contrasenia;
-    }
+    //Constructores
 
-    public void setContrasenia(String contrasenia) {
-        this.contrasenia = contrasenia;
-    }
+    public Usuario() {}
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
+    public Usuario(String nombre, String apellidos, String email, String contrasenia,
+                   TipoUsuario tipoUsuario, String telefono) {
+        this.nombre = nombre;
+        this.apellidos = apellidos;
         this.email = email;
+        this.contrasenia = contrasenia;
+        this.tipoUsuario = tipoUsuario;
+        this.telefono = telefono;
+    }
+
+    //Getters y Setters
+
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getApellidos() {
@@ -64,20 +89,44 @@ public class Usuario {
         this.apellidos = apellidos;
     }
 
-    public Long getId_usuario() {
-        return id_usuario;
+    public String getEmail() {
+        return email;
     }
 
-    public void setId_usuario(Long id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getContrasenia() {
+        return contrasenia;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setContrasenia(String contrasenia) {
+        this.contrasenia = contrasenia;
+    }
+
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 }
 
