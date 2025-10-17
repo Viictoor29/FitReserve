@@ -10,7 +10,7 @@ public class Maquinaria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id_maquinaria;
+    private long idMaquinaria;
 
     @NotNull
     @Column(unique = true, nullable = false, length = 20)
@@ -18,18 +18,37 @@ public class Maquinaria {
 
     @NotNull
     @Column(nullable = false)
-    int cantidad_total;
+    private int cantidadTotal;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoActividad tipo_actividad;
+    private TipoActividad tipoActividad;
 
     @Column(length = 255)
     private String descripcion;
 
-    public long getId_maquinaria() {
-        return id_maquinaria;
+    public Maquinaria() {}
+
+    public Maquinaria(String nombre, int cantidadTotal, TipoActividad tipoActividad, String descripcion) {
+        this.nombre = nombre;
+        this.cantidadTotal = cantidadTotal;
+        this.tipoActividad = tipoActividad;
+        this.descripcion = descripcion;
+    }
+
+    public Maquinaria(String nombre, int cantidadTotal, TipoActividad tipoActividad) {
+        this.nombre = nombre;
+        this.cantidadTotal = cantidadTotal;
+        this.tipoActividad = tipoActividad;
+    }
+
+    public long getIdMaquinaria() {
+        return idMaquinaria;
+    }
+
+    public void setIdMaquinaria(long idMaquinaria) {
+        this.idMaquinaria = idMaquinaria;
     }
 
     public String getNombre() {
@@ -40,12 +59,20 @@ public class Maquinaria {
         this.nombre = nombre;
     }
 
-    public int getCantidad_total() {
-        return cantidad_total;
+    public TipoActividad getTipoActividad() {
+        return tipoActividad;
     }
 
-    public void setCantidad_total(int cantidad_total) {
-        this.cantidad_total = cantidad_total;
+    public void setTipoActividad(TipoActividad tipoActividad) {
+        this.tipoActividad = tipoActividad;
+    }
+
+    public int getCantidadTotal() {
+        return cantidadTotal;
+    }
+
+    public void setCantidadTotal(int cantidadTotal) {
+        this.cantidadTotal = cantidadTotal;
     }
 
     public String getDescripcion() {
