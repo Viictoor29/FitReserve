@@ -11,12 +11,20 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idReserva;
 
+    @NotNull
+    @Column(nullable = false)
     private long idCliente;
 
+    @NotNull
+    @Column(nullable = false)
     private long idSala;
 
+    @NotNull
+    @Column(nullable = false)
     private long idActividad;
 
+    @NotNull
+    @Column(nullable = false)
     private long idEntrenador;
 
     @NotNull
