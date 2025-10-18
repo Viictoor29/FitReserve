@@ -18,7 +18,7 @@ public class Cliente {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
     private Genero genero;
 
     @Column(length = 255)
@@ -30,6 +30,11 @@ public class Cliente {
         this.fechaNacimiento = fechaNacimiento;
         this.genero = genero;
         this.objetivos = objetivos;
+    }
+
+    public Cliente(LocalDate fechaNacimiento, Genero genero) {
+        this.fechaNacimiento = fechaNacimiento;
+        this.genero = genero;
     }
 
     public long getIdCliente() {
