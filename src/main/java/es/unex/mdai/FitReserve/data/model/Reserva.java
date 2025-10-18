@@ -11,6 +11,14 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idReserva;
 
+    private long idCliente;
+
+    private long idSala;
+
+    private long idActividad;
+
+    private long idEntrenador;
+
     @NotNull
     @Column(nullable = false)
     private LocalDateTime fechaHoraInicio;
