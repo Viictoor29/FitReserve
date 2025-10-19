@@ -3,28 +3,36 @@ package es.unex.mdai.FitReserve.data.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-//Hace falta para que ReservaMaquinaria detecte que la clave primaria es compuesta
 public class ReservaMaquinariaId implements Serializable {
 
-    private long idReserva;
-    private long idMaquinaria;
+    // Los nombres deben coincidir con las propiedades @Id de la entidad:
+    private Long reserva;
+    private Long maquinaria;
 
     public ReservaMaquinariaId() {}
 
-    public ReservaMaquinariaId(long idReserva, long idMaquinaria) {
-        this.idReserva = idReserva;
-        this.idMaquinaria = idMaquinaria;
+    public ReservaMaquinariaId(Long reserva, Long maquinaria) {
+        this.reserva = reserva;
+        this.maquinaria = maquinaria;
     }
+
+    public Long getReserva() { return reserva; }
+    public void setReserva(Long reserva) { this.reserva = reserva; }
+
+    public Long getMaquinaria() { return maquinaria; }
+    public void setMaquinaria(Long maquinaria) { this.maquinaria = maquinaria; }
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ReservaMaquinariaId that = (ReservaMaquinariaId) o;
-        return idReserva == that.idReserva && idMaquinaria == that.idMaquinaria;
+        return Objects.equals(reserva, that.reserva) &&
+                Objects.equals(maquinaria, that.maquinaria);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idReserva, idMaquinaria);
+        return Objects.hash(reserva, maquinaria);
     }
 }

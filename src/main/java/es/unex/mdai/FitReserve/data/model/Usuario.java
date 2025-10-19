@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,8 +31,8 @@ public class Usuario {
     @Column(nullable = false, length = 20)
     private String contrasenia;
 
-    @Enumerated(EnumType.STRING)
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoUsuario tipoUsuario;
 
@@ -43,23 +41,22 @@ public class Usuario {
     @Column(nullable = false, length = 9)
     private String telefono;
 
+    /**
+     * Campo de creación automática en base de datos.
+     * Se marca como no insertable ni actualizable para que el valor lo gestione la BD.
+     */
     @NotNull
-    @Column(nullable = false, updatable = false,
-            insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false, insertable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
 
-    @OneToOne(mappedBy = "usuario",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cliente cliente;
 
-    @OneToOne(mappedBy = "usuario",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Entrenador entrenador;
 
-    //Constructores
-
+    // Constructores
     public Usuario() {}
 
     public Usuario(String nombre, String apellidos, String email, String contrasenia,
@@ -72,9 +69,7 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    //Getters y Setters
-
-
+    // Getters y Setters
     public Long getIdUsuario() {
         return idUsuario;
     }
@@ -155,4 +150,3 @@ public class Usuario {
         this.entrenador = entrenador;
     }
 }
-

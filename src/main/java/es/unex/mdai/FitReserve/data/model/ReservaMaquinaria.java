@@ -2,54 +2,71 @@ package es.unex.mdai.FitReserve.data.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @IdClass(ReservaMaquinariaId.class)
 public class ReservaMaquinaria {
 
     @Id
-    @NotNull
-    @Column(nullable = false)
-    private long idReserva;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idReserva", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Reserva reserva;
 
     @Id
-    @NotNull
-    @Column(nullable = false)
-    private long idMaquinaria;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "idMaquinaria", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Maquinaria maquinaria;
 
     @NotNull
     @Column(nullable = false)
-    private int cantidad;
+    private Integer cantidad;
 
     public ReservaMaquinaria() {}
 
-    public ReservaMaquinaria(long idReserva, long idMaquinaria, int cantidad) {
-        this.idReserva = idReserva;
-        this.idMaquinaria = idMaquinaria;
+    // Constructor de conveniencia con entidades
+    public ReservaMaquinaria(Reserva reserva, Maquinaria maquinaria, Integer cantidad) {
+        this.reserva = reserva;
+        this.maquinaria = maquinaria;
         this.cantidad = cantidad;
     }
 
-    public long getIdReserva() {
-        return idReserva;
+    // --- Getters/Setters ---
+    public Reserva getReserva() {
+        return reserva;
     }
 
-    public void setIdReserva(long idReserva) {
-        this.idReserva = idReserva;
+    public void setReserva(Reserva reserva) {
+        this.reserva = reserva;
     }
 
-    public long getIdMaquinaria() {
-        return idMaquinaria;
+    public Maquinaria getMaquinaria() {
+        return maquinaria;
     }
 
-    public void setIdMaquinaria(long idMaquinaria) {
-        this.idMaquinaria = idMaquinaria;
+    public void setMaquinaria(Maquinaria maquinaria) {
+        this.maquinaria = maquinaria;
     }
 
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
+    }
+
+    // Getters de IDs por comodidad (no mapean columnas)
+    @Transient
+    public Long getIdReserva() {
+        return reserva != null ? reserva.getIdReserva() : null;
+    }
+
+    @Transient
+    public Long getIdMaquinaria() {
+        return maquinaria != null ? maquinaria.getIdMaquinaria() : null;
     }
 }

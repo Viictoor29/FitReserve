@@ -7,12 +7,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Entrenador {
 
     @Id
-    private long idEntrenador;
+    private Long idEntrenador;
 
     @NotNull
     @Column(nullable = false, length = 50)
@@ -37,8 +39,13 @@ public class Entrenador {
     @NotNull
     @OneToOne
     @MapsId
-    @JoinColumn(name = "idEntrenador", referencedColumnName = "idUsuario")
+    @JoinColumn(name = "idEntrenador", referencedColumnName = "idUsuario", nullable = false)
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "entrenador",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Reserva> reservas = new ArrayList<>();
 
     public Entrenador() {}
 
@@ -50,11 +57,11 @@ public class Entrenador {
         this.usuario = usuario;
     }
 
-    public long getIdEntrenador() {
+    public Long getIdEntrenador() {
         return idEntrenador;
     }
 
-    public void setIdEntrenador(long idEntrenador) {
+    public void setIdEntrenador(Long idEntrenador) {
         this.idEntrenador = idEntrenador;
     }
 
@@ -96,5 +103,13 @@ public class Entrenador {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 }

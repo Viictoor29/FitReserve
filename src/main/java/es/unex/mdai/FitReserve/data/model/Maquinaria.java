@@ -1,16 +1,17 @@
 package es.unex.mdai.FitReserve.data.model;
 
 import es.unex.mdai.FitReserve.data.enume.TipoActividad;
-import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Maquinaria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idMaquinaria;
+    private Long idMaquinaria;
 
     @NotNull
     @Column(unique = true, nullable = false, length = 20)
@@ -28,6 +29,11 @@ public class Maquinaria {
     @Column(length = 255)
     private String descripcion;
 
+    @OneToMany(mappedBy = "maquinaria",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<ReservaMaquinaria> reservas = new ArrayList<>();
+
     public Maquinaria() {}
 
     public Maquinaria(String nombre, int cantidadTotal, TipoActividad tipoActividad, String descripcion) {
@@ -43,11 +49,11 @@ public class Maquinaria {
         this.tipoActividad = tipoActividad;
     }
 
-    public long getIdMaquinaria() {
+    public Long getIdMaquinaria() {
         return idMaquinaria;
     }
 
-    public void setIdMaquinaria(long idMaquinaria) {
+    public void setIdMaquinaria(Long idMaquinaria) {
         this.idMaquinaria = idMaquinaria;
     }
 
@@ -59,14 +65,6 @@ public class Maquinaria {
         this.nombre = nombre;
     }
 
-    public TipoActividad getTipoActividad() {
-        return tipoActividad;
-    }
-
-    public void setTipoActividad(TipoActividad tipoActividad) {
-        this.tipoActividad = tipoActividad;
-    }
-
     public int getCantidadTotal() {
         return cantidadTotal;
     }
@@ -75,11 +73,27 @@ public class Maquinaria {
         this.cantidadTotal = cantidadTotal;
     }
 
+    public TipoActividad getTipoActividad() {
+        return tipoActividad;
+    }
+
+    public void setTipoActividad(TipoActividad tipoActividad) {
+        this.tipoActividad = tipoActividad;
+    }
+
     public String getDescripcion() {
         return descripcion;
     }
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public List<ReservaMaquinaria> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<ReservaMaquinaria> reservas) {
+        this.reservas = reservas;
     }
 }

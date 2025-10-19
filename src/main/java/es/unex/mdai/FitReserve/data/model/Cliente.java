@@ -4,12 +4,14 @@ import es.unex.mdai.FitReserve.data.enume.Genero;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Cliente {
 
     @Id
-    private long idCliente;
+    private Long idCliente;
 
     @NotNull
     @Column(nullable = false)
@@ -26,9 +28,13 @@ public class Cliente {
     @NotNull
     @OneToOne
     @MapsId
-    @JoinColumn(name = "idCliente", referencedColumnName = "idUsuario")
+    @JoinColumn(name = "idCliente", referencedColumnName = "idUsuario", nullable = false)
     private Usuario usuario;
 
+    @OneToMany(mappedBy = "cliente",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Reserva> reservas = new ArrayList<>();
 
     public Cliente() {}
 
@@ -45,11 +51,11 @@ public class Cliente {
         this.usuario = usuario;
     }
 
-    public long getIdCliente() {
+    public Long getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(long idCliente) {
+    public void setIdCliente(Long idCliente) {
         this.idCliente = idCliente;
     }
 
@@ -83,5 +89,13 @@ public class Cliente {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 }

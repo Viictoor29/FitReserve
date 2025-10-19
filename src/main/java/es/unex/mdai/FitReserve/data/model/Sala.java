@@ -2,13 +2,15 @@ package es.unex.mdai.FitReserve.data.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Sala {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idSala;
+    private Long idSala;
 
     @NotNull
     @Column(unique = true, nullable = false, length = 30)
@@ -25,6 +27,11 @@ public class Sala {
     @Column(length = 255)
     private String descripcion;
 
+    @OneToMany(mappedBy = "sala",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Reserva> reservas = new ArrayList<>();
+
     public Sala() {}
 
     public Sala(String nombre, int capacidad, String ubicacion, String descripcion) {
@@ -40,11 +47,11 @@ public class Sala {
         this.ubicacion = ubicacion;
     }
 
-    public long getIdSala() {
+    public Long getIdSala() {
         return idSala;
     }
 
-    public void setIdSala(long idSala) {
+    public void setIdSala(Long idSala) {
         this.idSala = idSala;
     }
 
@@ -78,5 +85,13 @@ public class Sala {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
     }
 }
