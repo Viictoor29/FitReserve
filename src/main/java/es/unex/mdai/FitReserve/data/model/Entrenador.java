@@ -35,6 +35,11 @@ public class Entrenador {
     @Column(nullable = false, length = 10)
     private LocalTime horaFinTrabajo;
 
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "idEntrenador", referencedColumnName = "idUsuario")
+    private Usuario usuario;
+
     public Entrenador() {}
 
     public Entrenador(String especialidad, int experiencia, LocalTime horaInicioTrabajo, LocalTime horaFinTrabajo) {
@@ -82,5 +87,13 @@ public class Entrenador {
 
     public void setHoraFinTrabajo(LocalTime horaFinTrabajo) {
         this.horaFinTrabajo = horaFinTrabajo;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

@@ -24,6 +24,12 @@ public class Cliente {
     @Column(length = 255)
     private String objetivos;
 
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "idCliente", referencedColumnName = "idUsuario")
+    private Usuario usuario;
+
+
     public Cliente() {}
 
     public Cliente(LocalDate fechaNacimiento, Genero genero, String objetivos) {
@@ -67,5 +73,13 @@ public class Cliente {
 
     public void setObjetivos(String objetivos) {
         this.objetivos = objetivos;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }
