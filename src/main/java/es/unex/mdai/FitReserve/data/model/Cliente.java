@@ -9,7 +9,6 @@ import java.time.LocalDate;
 public class Cliente {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idCliente;
 
     @NotNull
@@ -24,6 +23,7 @@ public class Cliente {
     @Column(length = 255)
     private String objetivos;
 
+    @NotNull
     @OneToOne
     @MapsId
     @JoinColumn(name = "idCliente", referencedColumnName = "idUsuario")
@@ -32,15 +32,17 @@ public class Cliente {
 
     public Cliente() {}
 
-    public Cliente(LocalDate fechaNacimiento, Genero genero, String objetivos) {
+    public Cliente(LocalDate fechaNacimiento, Genero genero, String objetivos, Usuario usuario) {
         this.fechaNacimiento = fechaNacimiento;
         this.genero = genero;
         this.objetivos = objetivos;
+        this.usuario = usuario;
     }
 
-    public Cliente(LocalDate fechaNacimiento, Genero genero) {
+    public Cliente(LocalDate fechaNacimiento, Genero genero, Usuario usuario) {
         this.fechaNacimiento = fechaNacimiento;
         this.genero = genero;
+        this.usuario = usuario;
     }
 
     public long getIdCliente() {

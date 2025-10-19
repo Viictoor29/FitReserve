@@ -12,7 +12,6 @@ import java.time.LocalTime;
 public class Entrenador {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idEntrenador;
 
     @NotNull
@@ -35,6 +34,7 @@ public class Entrenador {
     @Column(nullable = false, length = 10)
     private LocalTime horaFinTrabajo;
 
+    @NotNull
     @OneToOne
     @MapsId
     @JoinColumn(name = "idEntrenador", referencedColumnName = "idUsuario")
@@ -42,11 +42,12 @@ public class Entrenador {
 
     public Entrenador() {}
 
-    public Entrenador(String especialidad, int experiencia, LocalTime horaInicioTrabajo, LocalTime horaFinTrabajo) {
+    public Entrenador(String especialidad, int experiencia, LocalTime horaInicioTrabajo, LocalTime horaFinTrabajo, Usuario usuario) {
         this.especialidad = especialidad;
         this.experiencia = experiencia;
         this.horaInicioTrabajo = horaInicioTrabajo;
         this.horaFinTrabajo = horaFinTrabajo;
+        this.usuario = usuario;
     }
 
     public long getIdEntrenador() {
