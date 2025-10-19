@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.model;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -36,15 +37,16 @@ public class Reserva {
     private LocalDateTime fechaHoraFin;
 
     @NotNull
-    @Column(nullable = false, length = 20)
-    private String estado;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Estado estado;
 
     @Column(length = 255)
     private String comentarios;
 
     public Reserva() {}
 
-    public Reserva(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, String estado, String comentarios) {
+    public Reserva(LocalDateTime fechaHoraInicio, LocalDateTime fechaHoraFin, Estado estado, String comentarios) {
         this.fechaHoraInicio = fechaHoraInicio;
         this.fechaHoraFin = fechaHoraFin;
         this.estado = estado;
@@ -75,11 +77,11 @@ public class Reserva {
         this.fechaHoraFin = fechaHoraFin;
     }
 
-    public String getEstado() {
+    public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
