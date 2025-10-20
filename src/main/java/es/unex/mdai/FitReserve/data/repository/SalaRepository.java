@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.repository;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Actividad;
 import es.unex.mdai.FitReserve.data.model.Sala;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,9 +16,8 @@ import java.util.Optional;
 @Repository
 public interface SalaRepository extends JpaRepository<Sala,Long> {
 
-    Optional<Sala> findByIdEntrenador(Long idEntrenador);
+    Optional<Sala> findByIdSala(Long idSala);
 
-    // Salas libres en un intervalo
     @Query("""
       SELECT s FROM Sala s
       WHERE NOT EXISTS (
@@ -28,9 +28,9 @@ public interface SalaRepository extends JpaRepository<Sala,Long> {
           AND r.fechaHoraFin  > :inicio
       )
     """)
-    List<Sala> findDisponibles(LocalDateTime inicio,
-                               LocalDateTime fin,
-                               @Param("estadosOcupados") Collection<String> estadosOcupados);
+    List<Sala> findDisponibles(@Param("inicio") LocalDateTime inicio,
+                               @Param("fin") LocalDateTime fin,
+                               @Param("estadosOcupados") Collection<Estado> estadosOcupados);
 
     List<Sala> findAll();
 

@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.repository;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.ReservaMaquinaria;
 import es.unex.mdai.FitReserve.data.model.ReservaMaquinariaId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,13 +12,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface ReservaMaquinariaRepository extends JpaRepository<ReservaMaquinaria, ReservaMaquinariaId> {
-    // Listar toda la maquinaria usada en una reserva concreta
-    List<ReservaMaquinaria> findByReservaIdReserva(Long idReserva);
 
-    // Borrar todos los registros de maquinaria asociados a una reserva
+    List<ReservaMaquinaria> findByReservaIdReserva(Long idReserva);
     void deleteByReservaIdReserva(Long idReserva);
 
-    // Calcular cuánta cantidad de una máquina está reservada en un intervalo
     @Query("""
         SELECT COALESCE(SUM(rm.cantidad), 0)
         FROM ReservaMaquinaria rm
@@ -30,5 +28,6 @@ public interface ReservaMaquinariaRepository extends JpaRepository<ReservaMaquin
     Integer totalReservadoEnIntervalo(@Param("maquinariaId") Long maquinariaId,
                                       @Param("inicio") LocalDateTime inicio,
                                       @Param("fin") LocalDateTime fin,
-                                      @Param("estadosActivos") Collection<String> estadosActivos);
+                                      @Param("estadosActivos") Collection<Estado> estadosActivos);
 }
+

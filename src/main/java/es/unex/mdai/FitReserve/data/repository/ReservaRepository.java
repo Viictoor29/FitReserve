@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.repository;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Actividad;
 import es.unex.mdai.FitReserve.data.model.Reserva;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +32,10 @@ public interface ReservaRepository extends JpaRepository<Reserva,Long> {
         AND r.fechaHoraInicio < :fin
         AND r.fechaHoraFin    > :inicio
     """)
-    boolean existeSolapeSala(Long salaId, LocalDateTime inicio, LocalDateTime fin,
-                             @Param("estadosOcupados") Collection<String> estadosOcupados);
+    boolean existeSolapeSala(@Param("salaId") Long salaId,
+                             @Param("inicio") LocalDateTime inicio,
+                             @Param("fin") LocalDateTime fin,
+                             @Param("estadosOcupados") Collection<Estado> estadosOcupados);
 
     @Query("""
       SELECT COUNT(r) > 0
@@ -42,8 +45,10 @@ public interface ReservaRepository extends JpaRepository<Reserva,Long> {
         AND r.fechaHoraInicio < :fin
         AND r.fechaHoraFin    > :inicio
     """)
-    boolean existeSolapeEntrenador(Long entrenadorId, LocalDateTime inicio, LocalDateTime fin,
-                                   @Param("estadosOcupados") Collection<String> estadosOcupados);
+    boolean existeSolapeEntrenador(@Param("entrenadorId") Long entrenadorId,
+                                   @Param("inicio") LocalDateTime inicio,
+                                   @Param("fin") LocalDateTime fin,
+                                   @Param("estadosOcupados") Collection<Estado> estadosOcupados);
 
     // Para “mi reserva actual o siguiente”
     @Query("""
@@ -62,5 +67,5 @@ public interface ReservaRepository extends JpaRepository<Reserva,Long> {
     """)
     List<Reserva> proximaClaseEntrenador(Long entrenadorId, LocalDateTime desde, Pageable top1);
 
-    void deleteReservaById(Long idReserva);
+    void deleteByIdReserva(Long idReserva);
 }

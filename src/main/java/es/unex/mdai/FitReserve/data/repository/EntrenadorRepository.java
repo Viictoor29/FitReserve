@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.repository;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Actividad;
 import es.unex.mdai.FitReserve.data.model.Entrenador;
 import es.unex.mdai.FitReserve.data.model.Sala;
@@ -17,10 +18,9 @@ import java.util.Optional;
 public interface EntrenadorRepository extends JpaRepository<Entrenador,Long> {
 
     Optional<Entrenador> findByUsuarioIdUsuario(Long idUsuario);
-
     Optional<Entrenador> findByIdEntrenador(Long idEntrenador);
+    List<Entrenador> findByEspecialidad(String especialidad);
 
-    // Entrenadores disponibles en un intervalo (y opcional por especialidad)
     @Query("""
       SELECT e FROM Entrenador e
       WHERE (:especialidad IS NULL OR e.especialidad = :especialidad)
@@ -32,10 +32,9 @@ public interface EntrenadorRepository extends JpaRepository<Entrenador,Long> {
             AND r.fechaHoraFin  > :inicio
         )
     """)
-    List<Entrenador> findDisponibles(LocalDateTime inicio,
-                                     LocalDateTime fin,
-                                     @Param("estadosOcupados") Collection<String> estadosOcupados,
+    List<Entrenador> findDisponibles(@Param("inicio") LocalDateTime inicio,
+                                     @Param("fin") LocalDateTime fin,
+                                     @Param("estadosOcupados") Collection<Estado> estadosOcupados,
                                      @Param("especialidad") String especialidad);
-
-    List<Entrenador> findByEspecialidad(String especialidad);
 }
+

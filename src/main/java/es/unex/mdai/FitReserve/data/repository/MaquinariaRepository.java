@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.repository;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Actividad;
 import es.unex.mdai.FitReserve.data.model.Maquinaria;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,6 @@ public interface MaquinariaRepository extends JpaRepository<Maquinaria,Long> {
 
     Optional<Maquinaria> findByIdMaquinaria(Long id);
 
-    // Consultar maquinaria disponible entre dos fechas
     @Query("""
         SELECT m FROM Maquinaria m
         WHERE (m.cantidadTotal -
@@ -33,10 +33,5 @@ public interface MaquinariaRepository extends JpaRepository<Maquinaria,Long> {
     """)
     List<Maquinaria> findDisponibles(@Param("inicio") LocalDateTime inicio,
                                      @Param("fin") LocalDateTime fin,
-                                     @Param("estadosActivos") Collection<String> estadosActivos);
-
-    List<Maquinaria> findAll();
-
-    void deleteByIdMaquinaria(Long idMaquinaria);
-
+                                     @Param("estadosActivos") Collection<Estado> estadosActivos);
 }
