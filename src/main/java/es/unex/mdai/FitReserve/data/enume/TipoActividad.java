@@ -5,6 +5,7 @@ public enum TipoActividad {
     FUERZA,
     FLEXIBILIDAD,
     EQUILIBRIO,
-    RESISTENCIA
+    RESISTENCIA,
+    COMPLETA
 }
 
