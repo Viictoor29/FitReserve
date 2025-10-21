@@ -1,7 +1,7 @@
 package es.unex.mdai.FitReserve.data.enume;
 
 public enum Estado {
-    Compeltada,
+    Completada,
     Pendiente,
     Cancelada
 }

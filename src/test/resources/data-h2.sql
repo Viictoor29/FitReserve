@@ -35,7 +35,7 @@ INSERT INTO maquinaria (nombre, cantidad_total, tipo_actividad, descripcion) VAL
 INSERT INTO reserva
 (fecha_hora_inicio, fecha_hora_fin, estado, comentarios, id_cliente, id_entrenador, id_actividad, id_sala)
 VALUES
-    ('2025-10-21 09:00:00','2025-10-21 10:00:00','Compeltada','Primera clase',
+    ('2025-10-21 09:00:00','2025-10-21 10:00:00','Completada','Primera clase',
      (SELECT id_usuario FROM usuario WHERE email='admin@gym.test'),
      (SELECT id_usuario FROM usuario WHERE email='sofia@gym.test'),
      (SELECT id_actividad FROM actividad WHERE nombre='Yoga Vinyasa'),

@@ -13,6 +13,5 @@ public interface ClienteRepository extends JpaRepository<Cliente,Long> {
     Optional<Cliente> findByIdCliente(Long idCliente);            // PK=FK a Usuario
     Optional<Cliente> findByUsuarioIdUsuario(Long idUsuario);     // por id de usuario
 
-    // Listado/gestión
     List<Cliente> findAll();
 }

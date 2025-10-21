@@ -45,7 +45,6 @@ public class Usuario {
      * Campo de creación automática en base de datos.
      * Se marca como no insertable ni actualizable para que el valor lo gestione la BD.
      */
-    @NotNull
     @Column(nullable = false, updatable = false, insertable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
