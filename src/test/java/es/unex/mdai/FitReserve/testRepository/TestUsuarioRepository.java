@@ -93,7 +93,7 @@ class UsuarioRepositoryTest {
     }
 
     /* =======================
-       CRUD SEGURO (CREATE/DELETE)
+       CRUD (CREATE/DELETE)
        ======================= */
 
     @Test

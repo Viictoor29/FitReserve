@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface MaquinariaRepository extends JpaRepository<Maquinaria,Long> {
 
     Optional<Maquinaria> findByIdMaquinaria(Long id);
+    Optional<Maquinaria> findByNombre(String nombre);
 
     @Query("""
         SELECT m FROM Maquinaria m

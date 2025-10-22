@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface SalaRepository extends JpaRepository<Sala,Long> {
 
     Optional<Sala> findByIdSala(Long idSala);
+    Optional<Sala> findByNombre(String nombre);
 
     @Query("""
       SELECT s FROM Sala s

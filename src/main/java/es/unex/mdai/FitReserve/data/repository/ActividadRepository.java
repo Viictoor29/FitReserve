@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ActividadRepository extends JpaRepository<Actividad,Long> {
 
     Optional<Actividad> findByIdActividad(Long idActividad);
-    
+    Optional<Actividad> findByNombre(String nombre);
     List<Actividad> findByTipoActividad(TipoActividad tipoActividad);
     List<Actividad> findByNivel(NivelActividad nivel);
 
