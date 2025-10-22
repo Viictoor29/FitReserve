@@ -50,6 +50,7 @@ class FitReserveIntegrationTest {
     private SalaRepository repoSala;
 
     @Test
+    @Order(0)
     void testRepositoriesNotNull() {
         assertThat(repoCliente).isNotNull();
         assertThat(repoEntrnador).isNotNull();
@@ -145,7 +146,7 @@ class FitReserveIntegrationTest {
     @Test
     @Order(2)
     @Commit
-    void anadirActividad_Sala_Maquinaria () {
+    void testanadirActividad_Sala_Maquinaria () {
 
         // ==== ACTIVIDAD ========================================================
         Actividad act = new Actividad(
@@ -183,7 +184,7 @@ class FitReserveIntegrationTest {
     @Test
     @Order(3)
     @Commit
-    void hacerReserva_ReservaMaquinaria() {
+    void testhacerReserva_ReservaMaquinaria() {
 
         // ==== RESERVA ==========================================================
         Reserva reserva = new Reserva(
@@ -259,5 +260,434 @@ class FitReserveIntegrationTest {
         assertThat(rm.getIdReserva()).isEqualTo(reserva.getIdReserva());
         assertThat(rm.getIdMaquinaria()).isEqualTo(maqSolicitada.getIdMaquinaria());
         assertThat(rm.getCantidad()).isEqualTo(cantidadSolicitada);
+    }
+
+    @Test
+    @Order(4)
+    void eliminarUsuarioCliente_cascade() {
+        // 1) Localiza el Usuario cliente
+        Usuario uCliente = repoUsuario.findByEmail("cliente@test.com")
+                .orElseThrow(() -> new IllegalStateException("No existe usuario cliente@test.com"));
+        Long idUsuario = uCliente.getIdUsuario();
+
+        // 2) Verifica que existe la entidad Cliente (MapsId)
+        assertThat(repoCliente.findById(idUsuario)).isPresent();
+
+        // 3) Verifica si hay reservas del cliente antes de borrar (opcional)
+        long reservasAntes = repoReserva.findAll().stream()
+                .filter(r -> r.getCliente().getIdCliente().equals(idUsuario))
+                .count();
+
+        // 4) Elimina el Usuario (cascade + orphanRemoval debe borrar Cliente)
+        repoUsuario.delete(uCliente);
+        repoUsuario.flush();
+
+        // 5) Aserciones: Usuario y Cliente desaparecen
+        assertThat(repoUsuario.findById(idUsuario)).isNotPresent();
+        assertThat(repoCliente.findById(idUsuario)).isNotPresent();
+
+        // 6) Sus reservas deben caer por @OnDelete(CASCADE) en Reserva.cliente
+        long reservasDespues = repoReserva.findAll().stream()
+                .filter(r -> r.getCliente() != null && idUsuario.equals(r.getCliente().getIdCliente()))
+                .count();
+        assertThat(reservasDespues).isZero();
+
+        // 7) Y también sus ReservaMaquinaria
+        boolean tieneRM = repoReservaMaquinaria.findAll().stream()
+                .anyMatch(rm -> rm.getReserva().getCliente() != null
+                        && idUsuario.equals(rm.getReserva().getCliente().getIdCliente()));
+        assertThat(tieneRM).isFalse();
+    }
+
+    @Test
+    @Order(5)
+    void eliminarUsuarioEntrenador_cascade() {
+        Usuario uEntr = repoUsuario.findByEmail("entrenador@test.com")
+                .orElseThrow(() -> new IllegalStateException("No existe usuario entrenador@test.com"));
+        Long idUsuario = uEntr.getIdUsuario();
+
+        // Debe existir Entrenador con el mismo id (MapsId)
+        assertThat(repoEntrnador.findById(idUsuario)).isPresent();
+
+        // Contar reservas del entrenador
+        long reservasAntes = repoReserva.findAll().stream()
+                .filter(r -> r.getEntrenador().getIdEntrenador().equals(idUsuario))
+                .count();
+
+        // Borrar usuario -> cascada borra Entrenador; DB @OnDelete borra Reservas + RM
+        repoUsuario.delete(uEntr);
+        repoUsuario.flush();
+
+        assertThat(repoUsuario.findById(idUsuario)).isNotPresent();
+        assertThat(repoEntrnador.findById(idUsuario)).isNotPresent();
+
+        long reservasDespues = repoReserva.findAll().stream()
+                .filter(r -> r.getEntrenador() != null && idUsuario.equals(r.getEntrenador().getIdEntrenador()))
+                .count();
+        assertThat(reservasDespues).isZero();
+
+        boolean tieneRM = repoReservaMaquinaria.findAll().stream()
+                .anyMatch(rm -> rm.getReserva().getEntrenador() != null
+                        && idUsuario.equals(rm.getReserva().getEntrenador().getIdEntrenador()));
+        assertThat(tieneRM).isFalse();
+    }
+
+    @Test
+    @Order(6)
+    void eliminarActividad_cascade() {
+        Actividad act = repoActividad.findByNombre("Act1")
+                .orElseThrow(() -> new IllegalStateException("No existe actividad Act1"));
+        Long idAct = act.getIdActividad();
+
+        // Algunas reservas podrían apuntar a esta actividad
+        long reservasAntes = repoReserva.findAll().stream()
+                .filter(r -> r.getActividad().getIdActividad().equals(idAct))
+                .count();
+
+        repoActividad.delete(act);
+        repoActividad.flush();
+
+        assertThat(repoActividad.findById(idAct)).isNotPresent();
+
+        long reservasDespues = repoReserva.findAll().stream()
+                .filter(r -> r.getActividad() != null && idAct.equals(r.getActividad().getIdActividad()))
+                .count();
+        assertThat(reservasDespues).isZero();
+
+        boolean tieneRM = repoReservaMaquinaria.findAll().stream()
+                .anyMatch(rm -> rm.getReserva().getActividad() != null
+                        && idAct.equals(rm.getReserva().getActividad().getIdActividad()));
+        assertThat(tieneRM).isFalse();
+    }
+
+    @Test
+    @Order(7)
+    void eliminarSala_cascade() {
+        Sala sala = repoSala.findByNombre("Sala1")
+                .orElseThrow(() -> new IllegalStateException("No existe sala Sala1"));
+        // Si tu PK se llama distinto, ajusta:
+        Long idSala = sala.getIdSala();
+
+        long reservasAntes = repoReserva.findAll().stream()
+                .filter(r -> r.getSala().getIdSala().equals(idSala))
+                .count();
+
+        repoSala.delete(sala);
+        repoSala.flush();
+
+        assertThat(repoSala.findById(idSala)).isNotPresent();
+
+        long reservasDespues = repoReserva.findAll().stream()
+                .filter(r -> r.getSala() != null && idSala.equals(r.getSala().getIdSala()))
+                .count();
+        assertThat(reservasDespues).isZero();
+
+        boolean tieneRM = repoReservaMaquinaria.findAll().stream()
+                .anyMatch(rm -> rm.getReserva().getSala() != null
+                        && idSala.equals(rm.getReserva().getSala().getIdSala()));
+        assertThat(tieneRM).isFalse();
+    }
+
+    @Test
+    @Order(8)
+    void eliminarMaquinaria_cascadeReservaYReservaMaquinaria() {
+        // 1) Localiza la maquinaria
+        Maquinaria maq = repoMaquinaria.findByNombre("Maquina1")
+                .orElseThrow(() -> new IllegalStateException("No existe Maquina1"));
+        Long idMaq = maq.getIdMaquinaria();
+
+        // 2) ReservaMaquinaria asociadas a esa maquinaria
+        var rmAsociadas = repoReservaMaquinaria.findAll().stream()
+                .filter(rm -> rm.getMaquinaria() != null && idMaq.equals(rm.getMaquinaria().getIdMaquinaria()))
+                .toList();
+
+        // 3) IDs de Reservas afectadas (para comprobar después del borrado)
+        var idsReservasAfectadas = rmAsociadas.stream()
+                .map(rm -> rm.getReserva().getIdReserva())
+                .distinct()
+                .toList();
+
+        // Sanity checks: hay algo que borrar
+        assertThat(rmAsociadas).isNotEmpty();
+        assertThat(idsReservasAfectadas).isNotEmpty();
+
+        // 4) Borra la maquinaria
+        repoMaquinaria.delete(maq);
+        repoMaquinaria.flush();
+
+        // 5) La maquinaria desaparece
+        assertThat(repoMaquinaria.findById(idMaq)).isNotPresent();
+
+        // 6) Las ReservaMaquinaria asociadas desaparecen
+        boolean quedanRMAso = repoReservaMaquinaria.findAll().stream()
+                .anyMatch(rm -> rm.getMaquinaria() != null && idMaq.equals(rm.getMaquinaria().getIdMaquinaria()));
+        assertThat(quedanRMAso).isFalse();
+
+        // 7) Y también deben desaparecer las Reservas que estaban vinculadas a esa maquinaria
+        var reservasPost = repoReserva.findAllById(idsReservasAfectadas);
+        assertThat(reservasPost)
+                .as("Las Reservas no deben borrarse al eliminar solo la Maquinaria")
+                .isNotEmpty();
+    }
+
+    @Test
+    @Order(20)
+    void update_Usuario() {
+        Usuario u = new Usuario(
+                "Nombre"+System.nanoTime(), "Apellidos", "upd_user@test.com", "oldpass",
+                TipoUsuario.CLIENTE, "600111111"
+        );
+        u = repoUsuario.save(u);
+
+        // UPDATE
+        u.setContrasenia("newpass");
+        u.setTelefono("600222222");
+        repoUsuario.saveAndFlush(u);
+
+        Usuario again = repoUsuario.findById(u.getIdUsuario()).orElseThrow();
+        assertThat(again.getContrasenia()).isEqualTo("newpass");
+        assertThat(again.getTelefono()).isEqualTo("600222222");
+    }
+
+    @Test
+    @Order(21)
+    void update_Cliente() {
+        // Usuario base + Cliente (MapsId)
+        Usuario u = repoUsuario.save(new Usuario(
+                "Clara","Update","upd_cliente@test.com","pass",
+                TipoUsuario.CLIENTE,"600333333"
+        ));
+        Cliente c = new Cliente(
+                java.time.LocalDate.of(1990,1,1),
+                Genero.FEMENINO,
+                "Objetivo inicial",
+                u
+        );
+        c = repoCliente.save(c);
+
+        // UPDATE
+        c.setObjetivos("Objetivo actualizado");
+        repoCliente.saveAndFlush(c);
+
+        Cliente again = repoCliente.findById(u.getIdUsuario()).orElseThrow();
+        assertThat(again.getObjetivos()).isEqualTo("Objetivo actualizado");
+    }
+
+    @Test
+    @Order(22)
+    void update_Entrenador() {
+        // Usuario base + Entrenador (MapsId)
+        Usuario u = repoUsuario.save(new Usuario(
+                "Enrique","Update","upd_entrenador@test.com","pass",
+                TipoUsuario.ENTRENADOR,"600444444"
+        ));
+        Entrenador e = new Entrenador(
+                "Fuerza", 5,
+                java.time.LocalTime.of(8,0),
+                java.time.LocalTime.of(16,0),
+                u
+        );
+        e = repoEntrnador.save(e);
+
+        // UPDATE
+        e.setEspecialidad("Resistencia");
+        e.setExperiencia(7);
+        repoEntrnador.saveAndFlush(e);
+
+        Entrenador again = repoEntrnador.findById(u.getIdUsuario()).orElseThrow();
+        assertThat(again.getEspecialidad()).isEqualTo("Resistencia");
+        assertThat(again.getExperiencia()).isEqualTo(7);
+    }
+
+    @Test
+    @Order(23)
+    void update_Actividad() {
+        String nombre = "ActUpd-" + 2;
+        Actividad a = new Actividad(
+                nombre,
+                "Desc inicial",
+                TipoActividad.values()[0],
+                NivelActividad.values()[0]
+        );
+        a = repoActividad.save(a);
+
+        // UPDATE
+        a.setDescripcion("Desc actualizada");
+        a.setNivel(NivelActividad.values()[Math.min(1, NivelActividad.values().length-1)]);
+        repoActividad.saveAndFlush(a);
+
+        Actividad again = repoActividad.findById(a.getIdActividad()).orElseThrow();
+        assertThat(again.getDescripcion()).isEqualTo("Desc actualizada");
+        assertThat(again.getNivel()).isEqualTo(a.getNivel());
+    }
+
+    @Test
+    @Order(24)
+    void update_Sala() {
+        Sala s = new Sala("SalaUpd-" + 2, 20, "Planta 1");
+        s = repoSala.save(s);
+
+        // UPDATE
+        s.setCapacidad(25);
+        s.setUbicacion("Planta 2"); // si tu entidad tiene 'ubicacion'
+        repoSala.saveAndFlush(s);
+
+        Sala again = repoSala.findById(s.getIdSala()).orElseThrow();
+        assertThat(again.getCapacidad()).isEqualTo(25);
+        assertThat(again.getUbicacion()).isEqualTo("Planta 2");
+    }
+
+    @Test
+    @Order(25)
+    void update_Maquinaria() {
+        Maquinaria m = new Maquinaria(
+                "MaqUpd-" + 2,
+                5,
+                TipoActividad.values()[0],
+                "Desc inicial"
+        );
+        m = repoMaquinaria.save(m);
+
+        // UPDATE
+        m.setCantidadTotal(8);
+        m.setDescripcion("Desc actualizada");
+        repoMaquinaria.saveAndFlush(m);
+
+        Maquinaria again = repoMaquinaria.findById(m.getIdMaquinaria()).orElseThrow();
+        assertThat(again.getCantidadTotal()).isEqualTo(8);
+        assertThat(again.getDescripcion()).isEqualTo("Desc actualizada");
+    }
+
+    @Test
+    @Order(26)
+    void update_Reserva() {
+        // Prepara mínimos: usuario+cliente, usuario+entrenador, actividad, sala
+        Usuario uCli = repoUsuario.save(new Usuario(
+                "Cliente","Res","upd_res_cli@test.com","pass",
+                TipoUsuario.CLIENTE,"600555555"
+        ));
+        Cliente cli = repoCliente.save(new Cliente(
+                java.time.LocalDate.of(1992,2,2),
+                Genero.FEMENINO,
+                "Objetivo",
+                uCli
+        ));
+        Usuario uEnt = repoUsuario.save(new Usuario(
+                "Entr","Res","upd_res_ent@test.com","pass",
+                TipoUsuario.ENTRENADOR,"600666666"
+        ));
+        Entrenador ent = repoEntrnador.save(new Entrenador(
+                "Fuerza",6,
+                java.time.LocalTime.of(9,0),
+                java.time.LocalTime.of(17,0),
+                uEnt
+        ));
+        Actividad act = repoActividad.save(new Actividad(
+                "ActReserva-" + System.nanoTime(),
+                "Desc",
+                TipoActividad.values()[0],
+                NivelActividad.values()[0]
+        ));
+        Sala sala = repoSala.save(new Sala(
+                "SalaReserva-" + System.nanoTime(),
+                15,
+                "Planta 1"
+        ));
+
+        Reserva r = new Reserva(
+                LocalDateTime.now().plusDays(1).withHour(10).withMinute(0),
+                LocalDateTime.now().plusDays(1).withHour(11).withMinute(0),
+                Estado.Pendiente,
+                "Comentario inicial"
+        );
+        r.setCliente(cli);
+        r.setEntrenador(ent);
+        r.setActividad(act);
+        r.setSala(sala);
+        r = repoReserva.save(r);
+
+        // UPDATE
+        r.setEstado(Estado.Cancelada);  // ajusta al nombre exacto de tu enum
+        r.setComentarios("Comentario actualizado");
+        r.setFechaHoraFin(r.getFechaHoraFin().plusMinutes(30));
+        repoReserva.saveAndFlush(r);
+
+        Reserva again = repoReserva.findById(r.getIdReserva()).orElseThrow();
+        assertThat(again.getEstado()).isEqualTo(Estado.Cancelada);
+        assertThat(again.getComentarios()).isEqualTo("Comentario actualizado");
+        assertThat(again.getFechaHoraFin()).isEqualTo(r.getFechaHoraFin());
+    }
+
+    @Test
+    @Order(27)
+    void update_ReservaMaquinaria() {
+        // Prepara Reserva y Maquinaria
+        Maquinaria m = repoMaquinaria.save(new Maquinaria(
+                "MaqRM-" + System.nanoTime(),
+                10,
+                TipoActividad.values()[0],
+                "Para RM"
+        ));
+
+        Usuario uCli = repoUsuario.save(new Usuario(
+                "Cli","RM","upd_rm_cli@test.com","pass",
+                TipoUsuario.CLIENTE,"600777777"
+        ));
+        Cliente cli = repoCliente.save(new Cliente(
+                java.time.LocalDate.of(1993,3,3),
+                Genero.FEMENINO,
+                "Objetivo",
+                uCli
+        ));
+
+        Usuario uEnt = repoUsuario.save(new Usuario(
+                "Ent","RM","upd_rm_ent@test.com","pass",
+                TipoUsuario.ENTRENADOR,"600888888"
+        ));
+        Entrenador ent = repoEntrnador.save(new Entrenador(
+                "Cardio",4,
+                java.time.LocalTime.of(7,0),
+                java.time.LocalTime.of(15,0),
+                uEnt
+        ));
+
+        Actividad act = repoActividad.save(new Actividad(
+                "ActRM-" + System.nanoTime(),
+                "Desc",
+                TipoActividad.values()[0],
+                NivelActividad.values()[0]
+        ));
+        Sala sala = repoSala.save(new Sala(
+                "SalaRM-" + System.nanoTime(),
+                12,
+                "Planta 2"
+        ));
+
+        Reserva r = new Reserva(
+                LocalDateTime.now().plusDays(2).withHour(12),
+                LocalDateTime.now().plusDays(2).withHour(13),
+                Estado.Pendiente,
+                "RM inicial"
+        );
+        r.setCliente(cli);
+        r.setEntrenador(ent);
+        r.setActividad(act);
+        r.setSala(sala);
+        r = repoReserva.save(r);
+
+        ReservaMaquinaria rm = repoReservaMaquinaria.save(new ReservaMaquinaria(r, m, 2));
+
+        // UPDATE cantidad
+        rm.setCantidad(5);
+        repoReservaMaquinaria.saveAndFlush(rm);
+
+        final Long idReserva = r.getIdReserva();
+        final Long idMaquinaria = m.getIdMaquinaria();
+
+        ReservaMaquinaria again = repoReservaMaquinaria.findAll().stream()
+                .filter(x -> x.getReserva().getIdReserva().equals(idReserva)
+                        && x.getMaquinaria().getIdMaquinaria().equals(idMaquinaria))
+                .findFirst()
+                .orElseThrow();
     }
 }
