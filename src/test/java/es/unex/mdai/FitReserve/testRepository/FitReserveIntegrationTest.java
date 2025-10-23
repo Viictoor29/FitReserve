@@ -652,13 +652,13 @@ class FitReserveIntegrationTest {
         ));
 
         Actividad act = repoActividad.save(new Actividad(
-                "ActRM-" + System.nanoTime(),
+                "ActRM-" + 2,
                 "Desc",
                 TipoActividad.values()[0],
                 NivelActividad.values()[0]
         ));
         Sala sala = repoSala.save(new Sala(
-                "SalaRM-" + System.nanoTime(),
+                "SalaRM-" + 2,
                 12,
                 "Planta 2"
         ));
