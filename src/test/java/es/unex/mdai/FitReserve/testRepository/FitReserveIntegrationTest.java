@@ -538,7 +538,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(25)
+    @Order(14)
     void update_Maquinaria() {
         Maquinaria m = new Maquinaria(
                 "MaqUpd-" + 2,
@@ -559,7 +559,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(26)
+    @Order(15)
     void update_Reserva() {
         // Prepara mínimos: usuario+cliente, usuario+entrenador, actividad, sala
         Usuario uCli = repoUsuario.save(new Usuario(
@@ -619,7 +619,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(27)
+    @Order(16)
     void update_ReservaMaquinaria() {
         // Prepara Reserva y Maquinaria
         Maquinaria m = repoMaquinaria.save(new Maquinaria(
