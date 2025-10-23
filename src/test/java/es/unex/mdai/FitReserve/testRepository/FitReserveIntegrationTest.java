@@ -431,10 +431,10 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(20)
+    @Order(9)
     void update_Usuario() {
         Usuario u = new Usuario(
-                "Nombre"+System.nanoTime(), "Apellidos", "upd_user@test.com", "oldpass",
+                "Nombre"+2, "Apellidos", "upd_user@test.com", "oldpass",
                 TipoUsuario.CLIENTE, "600111111"
         );
         u = repoUsuario.save(u);
@@ -450,7 +450,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(21)
+    @Order(10)
     void update_Cliente() {
         // Usuario base + Cliente (MapsId)
         Usuario u = repoUsuario.save(new Usuario(
@@ -474,7 +474,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(22)
+    @Order(11)
     void update_Entrenador() {
         // Usuario base + Entrenador (MapsId)
         Usuario u = repoUsuario.save(new Usuario(
@@ -500,7 +500,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(23)
+    @Order(12)
     void update_Actividad() {
         String nombre = "ActUpd-" + 2;
         Actividad a = new Actividad(
@@ -522,7 +522,7 @@ class FitReserveIntegrationTest {
     }
 
     @Test
-    @Order(24)
+    @Order(13)
     void update_Sala() {
         Sala s = new Sala("SalaUpd-" + 2, 20, "Planta 1");
         s = repoSala.save(s);
@@ -583,13 +583,13 @@ class FitReserveIntegrationTest {
                 uEnt
         ));
         Actividad act = repoActividad.save(new Actividad(
-                "ActReserva-" + System.nanoTime(),
+                "ActReserva-" + 2,
                 "Desc",
                 TipoActividad.values()[0],
                 NivelActividad.values()[0]
         ));
         Sala sala = repoSala.save(new Sala(
-                "SalaReserva-" + System.nanoTime(),
+                "SalaReserva-" + 2,
                 15,
                 "Planta 1"
         ));
@@ -623,7 +623,7 @@ class FitReserveIntegrationTest {
     void update_ReservaMaquinaria() {
         // Prepara Reserva y Maquinaria
         Maquinaria m = repoMaquinaria.save(new Maquinaria(
-                "MaqRM-" + System.nanoTime(),
+                "MaqRM-" + 2,
                 10,
                 TipoActividad.values()[0],
                 "Para RM"
