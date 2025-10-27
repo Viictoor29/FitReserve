@@ -120,9 +120,9 @@ eliminar, para que no quede la reserva incompleta.
 - Se gestiona mediante la tabla **Reserva_Maquinaria**.
 - Permite registrar la cantidad de maquinaria utilizada por reserva.
 
+## Configuración de la base de datos.
 
 
 
-
-
+## Ejecución de los test.
 
