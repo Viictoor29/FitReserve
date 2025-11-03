@@ -153,7 +153,7 @@ En este punto se explica cómo crear un contenedor Docker con MySQL para la apli
    ```
 
 ## Ejecución de los test.
-Como ya se ha dicho antes los test se ejecutan con H2, por lo que no es necesario tener el docker de MySQL en funcionamiento. 
+Como ya se ha dicho antes, los test se ejecutan con H2, por lo que no es necesario tener el docker de MySQL en funcionamiento. 
 Por otra parte, será necesario tener el perfil "h2" seleccionado en application.properties (src/main/java/resources).  
 Los test se encargan de probar los casos de usos de la aplicación, por lo tanto, se han implementado los siguientes test:
 - FitReserveIntegrationTest: Prueba de integración que verifica la correcta interacción entre los componentes principales de la aplicación, además comprueba
