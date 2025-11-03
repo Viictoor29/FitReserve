@@ -121,8 +121,54 @@ eliminar, para que no quede la reserva incompleta.
 - Permite registrar la cantidad de maquinaria utilizada por reserva.
 
 ## Configuración de la base de datos.
+El plan inicial es que la base de datos para la ejecución normal de la aplicación sea MySQL y que los test se realicen con H2.
+Para eso se ha creado un archivo application-test.properties (src/main/java/resources) en el que se debe de elegir el perfil de ejecución. 
+Si se coje el perfil "h2", se utilizará H2, y si no, MySQL. **Tener en cuenta que para ejecutar los test, el perfil debe ser "h2", sino 
+dará error.**  
 
-
+### **Creación del docker MySql y configuración**
+En este punto se explica cómo crear un contenedor Docker con MySQL para la aplicación FitReserve.
+1. Tener docker instalado en tu máquina y funcionando.
+2. Ir a Docker Hub y descargar la imagen de MySQL oficial:
+    ```bash
+    docker pull mysql:8.4
+    ```
+3. Crear y ejecutar un contenedor con la imagen descargada:
+    ```bash
+    docker run -d --name mysql8 -e MYSQL_ROOT_PASSWORD=1234 -p 3306:3306 -v mysql_datos:/var/lib/mysql mysql:8.4
+    ```
+4. Puedes probar la conexión con:
+    ```bash
+    docker ps
+    ```
+5. Para crear la bd no es necesario hacer nada más, ya que la aplicación se encarga de crear las tablas al iniciarse.
+   **IMPORTANTE:** Al iniciar la aplicación se cargan unos datos por defecto, esto se refleja en application-mysql.properties (src/main/java/resources) con la propiedad:
+   ```properties
+   spring.sql.init.mode=always
+   ```
+   Esto es útil para la primera ejecución, pero el docker está diseñado para que los datos persistan, por lo que en futuras ejecuciones no es necesario volver a cargar los datos.
+   Así que se debera de cambiar a:
+   ```properties
+   spring.sql.init.mode=never
+   ```
 
 ## Ejecución de los test.
+Como ya se ha dicho antes los test se ejecutan con H2, por lo que no es necesario tener el docker de MySQL en funcionamiento. 
+Por otra parte, será necesario tener el perfil "h2" seleccionado en application.properties (src/main/java/resources).  
+Los test se encargan de probar los casos de usos de la aplicación, por lo tanto, se han implementado los siguientes test:
+- FitReserveIntegrationTest: Prueba de integración que verifica la correcta interacción entre los componentes principales de la aplicación, además comprueba
+los deletes.
+- TestClienteRepository: Pruebas unitarias para las operaciones CRUD del repositorio de clientes.
+- TestEntrenadorRepository: Pruebas unitarias para las operaciones CRUD del repositorio de entrenadores.
+- TestReservaRepository: Pruebas unitarias para las operaciones CRUD del repositorio de reservas.
+- TestUsuarioRepository: Pruebas unitarias para las operaciones CRUD del repositorio de usuarios.
+- TestSalaRepository: Pruebas unitarias para las operaciones CRUD del repositorio de salas.
+- TestActividadRepository: Pruebas unitarias para las operaciones CRUD del repositorio de actividades
+- TestMaquinariaRepository: Pruebas unitarias para las operaciones CRUD del repositorio de maquinaria.
+- TestReservaMaquinariaRepository: Pruebas unitarias para las operaciones CRUD del repositorio de reserva_maquinaria.
+
+**Nota:** Los test unitarios se centran en verificar que las operaciones básicas de la base de datos funcionan correctamente, 
+mientras que el test de integración asegura que los diferentes componentes de la aplicación trabajan juntos como se espera.
+
+
 
