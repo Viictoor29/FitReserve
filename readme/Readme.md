@@ -58,7 +58,7 @@ FitReserve es una plataforma web diseñada para la gestión integral de activida
 
 ## Base de Datos
 
-![BD](img/diagramaE_R.png)
+![Foto](img/DiagramaE_R.png)
 
 El modelo representa la estructura de una base de datos para la gestión de reservas en un gimnasio.  
 Incluye usuarios, entrenadores, clientes, reservas, actividades, salas y maquinaria.  
