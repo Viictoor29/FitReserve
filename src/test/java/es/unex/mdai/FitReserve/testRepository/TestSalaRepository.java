@@ -20,10 +20,6 @@ class SalaRepositoryTest {
     @Autowired
     private SalaRepository repo;
 
-    /* ==============
-       READ BÁSICO
-       ============== */
-
     @Test
     @DisplayName("findAll() devuelve las salas existentes (incluye Sala A y Sala B)")
     void findAll_ok() {
