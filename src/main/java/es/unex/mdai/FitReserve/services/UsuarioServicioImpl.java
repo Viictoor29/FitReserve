@@ -13,6 +13,9 @@ public class UsuarioServicioImpl implements UsuarioServicio {
     public Usuario registrarUsuario(Usuario usuario) {
         if(usuario==null) throw new IllegalArgumentException("El usuario no puede ser nulo.");
 
+        if(repository.existsByEmail(usuario.getEmail())) {
+            throw new IllegalArgumentException("El email ya está registrado: " + usuario.getEmail());
+        }
         return null;
     }
 
@@ -41,8 +44,4 @@ public class UsuarioServicioImpl implements UsuarioServicio {
 
     }
 
-    @Override
-    public boolean existeEmail(String email) {
-        return false;
-    }
 }

@@ -23,6 +23,4 @@ public interface UsuarioServicio {
     // --- Gestión de seguridad ---
     void cambiarContrasenia(Long idUsuario, String nuevaContrasenia);
 
-    // Opcional pero muy útil:
-    boolean existeEmail(String email);
 }
