@@ -12,7 +12,7 @@ public interface ClienteServicio {
     /**
      * Registra un nuevo cliente. Se asume que el Cliente ya tiene asociado su Usuario.
      */
-    Cliente registrarCliente(Cliente cliente);
+    boolean registrarCliente(Cliente cliente);
 
     /**
      * Actualiza los datos del cliente (datos personales, objetivos, etc.).
@@ -22,17 +22,13 @@ public interface ClienteServicio {
     /**
      * Elimina el cliente (y, por cascada, lo que corresponda).
      */
-    void eliminarCliente(Long idCliente);
+    boolean eliminarCliente(Long idCliente);
 
     /**
      * Obtiene un cliente por su idCliente.
      */
     Cliente obtenerClientePorId(Long idCliente);
 
-    /**
-     * Obtiene un cliente a partir del id de Usuario (relación 1:1).
-     */
-    Cliente obtenerPorIdUsuario(Long idUsuario);
 
     /**
      * Lista todos los clientes (útil para el administrador).

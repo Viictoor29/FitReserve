@@ -11,7 +11,6 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente,Long> {
     // 1–1 con Usuario
     Optional<Cliente> findByIdCliente(Long idCliente);            // PK=FK a Usuario
-    Optional<Cliente> findByUsuarioIdUsuario(Long idUsuario);     // por id de usuario
 
     List<Cliente> findAll();
 }

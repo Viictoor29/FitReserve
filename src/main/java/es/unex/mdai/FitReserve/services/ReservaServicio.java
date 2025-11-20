@@ -1,9 +1,12 @@
 package es.unex.mdai.FitReserve.services;
 
 import es.unex.mdai.FitReserve.data.enume.Estado;
+import es.unex.mdai.FitReserve.data.enume.TipoActividad;
 import es.unex.mdai.FitReserve.data.model.Reserva;
+import es.unex.mdai.FitReserve.data.model.ReservaMaquinaria;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface ReservaServicio {
@@ -108,4 +111,29 @@ public interface ReservaServicio {
      * (uso interno/controlado).
      */
     Reserva cambiarEstado(Long idReserva, Estado nuevoEstado);
+
+
+    // --- Gestión de maquinaria asociada a la reserva (usa ReservaMaquinariaRepository) ---
+
+    /**
+     * Devuelve todas las asociaciones de maquinaria para una reserva concreta.
+     * Delegará en ReservaMaquinariaRepository#findByReservaIdReserva.
+     */
+    List<ReservaMaquinaria> obtenerMaquinariaDeReserva(Long idReserva);
+
+    /**
+     * Elimina todas las asociaciones de maquinaria de una reserva.
+     * Delegará en ReservaMaquinariaRepository#deleteByReservaIdReserva.
+     */
+    void eliminarMaquinariaDeReserva(Long idReserva);
+
+    /**
+     * Devuelve el total de unidades de una maquinaria reservadas en un intervalo,
+     * para los estados indicados.
+     * Delegará en ReservaMaquinariaRepository#totalReservadoEnIntervalo.
+     */
+    int totalMaquinariaReservadaEnIntervalo(Long maquinariaId,
+                                            LocalDateTime inicio,
+                                            LocalDateTime fin,
+                                            TipoActividad tipoActividadestadosActivos);
 }
