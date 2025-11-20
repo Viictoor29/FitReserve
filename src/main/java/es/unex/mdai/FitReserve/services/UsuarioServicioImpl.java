@@ -17,6 +17,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
             throw new IllegalArgumentException("El email ya está registrado: " + usuario.getEmail());
         }
         return null;
+        
     }
 
     @Override
