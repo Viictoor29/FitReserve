@@ -11,6 +11,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
 
     @Override
     public Usuario registrarUsuario(Usuario usuario) {
+        if(usuario==null) throw new IllegalArgumentException("El usuario no puede ser nulo.");
 
         return null;
     }
