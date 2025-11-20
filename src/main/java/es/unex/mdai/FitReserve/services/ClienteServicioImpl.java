@@ -2,6 +2,8 @@ package es.unex.mdai.FitReserve.services;
 
 import es.unex.mdai.FitReserve.data.model.Cliente;
 import es.unex.mdai.FitReserve.data.model.Reserva;
+import es.unex.mdai.FitReserve.data.repository.ClienteRepository;
+import es.unex.mdai.FitReserve.data.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,8 +11,15 @@ import java.util.List;
 @Service
 public class ClienteServicioImpl implements ClienteServicio{
 
+    ReservaRepository repository;
+
+    public ClienteServicioImpl() {
+
+    }
+
     @Override
     public boolean registrarCliente(Cliente cliente) {
+
         return false;
     }
 

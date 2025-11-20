@@ -1,0 +1,47 @@
+package es.unex.mdai.FitReserve.services;
+
+import es.unex.mdai.FitReserve.data.model.Usuario;
+import es.unex.mdai.FitReserve.data.repository.UsuarioRepository;
+
+public class UsuarioServicioImpl implements UsuarioServicio {
+
+    private UsuarioRepository repository;
+
+    public UsuarioServicioImpl() {}
+
+    @Override
+    public Usuario registrarUsuario(Usuario usuario) {
+
+        return null;
+    }
+
+    @Override
+    public Usuario actualizarUsuario(Long idUsuario, Usuario datosActualizados) {
+        return null;
+    }
+
+    @Override
+    public void eliminarUsuario(Long idUsuario) {
+
+    }
+
+    @Override
+    public Usuario obtenerUsuarioPorId(Long idUsuario) {
+        return null;
+    }
+
+    @Override
+    public Usuario login(String email, String contrasenia) {
+        return null;
+    }
+
+    @Override
+    public void cambiarContrasenia(Long idUsuario, String nuevaContrasenia) {
+
+    }
+
+    @Override
+    public boolean existeEmail(String email) {
+        return false;
+    }
+}
