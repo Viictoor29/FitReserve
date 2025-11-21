@@ -16,6 +16,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
         if(repository.existsByEmail(usuario.getEmail())) {
             throw new IllegalArgumentException("El email ya está registrado: " + usuario.getEmail());
         }
+
         return null;
         
     }
