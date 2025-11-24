@@ -106,13 +106,6 @@ public interface ReservaServicio {
                                 LocalDateTime fin);
 
 
-    /**
-     * Permite cambiar el estado de una reserva de forma genérica
-     * (uso interno/controlado).
-     */
-    Reserva cambiarEstado(Long idReserva, Estado nuevoEstado);
-
-
     // --- Gestión de maquinaria asociada a la reserva (usa ReservaMaquinariaRepository) ---
 
     /**
