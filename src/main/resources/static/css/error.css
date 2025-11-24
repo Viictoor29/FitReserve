@@ -1,0 +1,48 @@
+/* css */
+@import url('index.css');
+
+/* Alineado específico para la página de error: centrado perfecto */
+.container {
+    text-align: center; /* refuerza centrado del contenido */
+}
+
+/* Usamos flex para centrar uno o varios botones y mantener separación */
+.buttons {
+    width: 100%;
+    max-width: 480px;
+    margin: 1.4rem auto 0; /* aumentado desde 0.6rem para separar más el texto del botón */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+.buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    box-sizing: border-box;
+    min-width: 120px;        /* antes 140px */
+    width: auto;
+    padding: 0.75rem 0.9rem; /* antes 0.95rem 1.1rem */
+    border-radius: 0.8rem;
+    font-size: 0.95rem;      /* ligeramente más pequeño */
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast), opacity var(--transition-fast);
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+@media (max-width: 640px) {
+    .buttons .btn {
+        width: 100%;
+        min-width: 0;
+        padding: 0.7rem 0.75rem; /* ajuste para móvil */
+        font-size: 0.95rem;
+    }
+}
