@@ -4,11 +4,13 @@ import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.enume.TipoActividad;
 import es.unex.mdai.FitReserve.data.model.Maquinaria;
 import es.unex.mdai.FitReserve.data.repository.MaquinariaRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class MaquinariaServicioImpl implements  MaquinariaServicio {
 
     private final MaquinariaRepository maquinariaRepository;

@@ -4,10 +4,12 @@ import es.unex.mdai.FitReserve.data.enume.NivelActividad;
 import es.unex.mdai.FitReserve.data.enume.TipoActividad;
 import es.unex.mdai.FitReserve.data.model.Actividad;
 import es.unex.mdai.FitReserve.data.repository.ActividadRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
 public class ActividadServicioImpl implements ActividadServicio {
 
 

@@ -5,23 +5,22 @@ import es.unex.mdai.FitReserve.data.repository.UsuarioRepository;
 import es.unex.mdai.FitReserve.services.UsuarioServicioImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class TestUsuarioServicioImpl {
 
-    @Mock
+    @MockitoBean
     private UsuarioRepository usuarioRepository;
 
-    @InjectMocks
+    @Autowired
     private UsuarioServicioImpl usuarioServicio;
 
     private Usuario usuario;

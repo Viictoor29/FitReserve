@@ -14,7 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,19 +27,19 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class TestReservaServicioImpl {
 
-    @Mock
+    @MockitoBean
     private ReservaRepository reservaRepository;
-    @Mock
+    @MockitoBean
     private ReservaMaquinariaRepository reservaMaquinariaRepository;
-    @Mock
+    @MockitoBean
     private MaquinariaRepository maquinariaRepository;
-    @Mock
+    @MockitoBean
     private EntrenadorRepository entrenadorRepository;
 
-    @InjectMocks
+    @Autowired
     private ReservaServicioImpl reservaServicio;
 
     private Reserva reservaBase;

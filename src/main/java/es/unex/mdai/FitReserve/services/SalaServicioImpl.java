@@ -3,11 +3,13 @@ package es.unex.mdai.FitReserve.services;
 import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Sala;
 import es.unex.mdai.FitReserve.data.repository.SalaRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class SalaServicioImpl implements SalaServicio {
 
     private final SalaRepository salaRepository;

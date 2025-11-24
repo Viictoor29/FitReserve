@@ -4,11 +4,13 @@ import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Entrenador;
 import es.unex.mdai.FitReserve.data.model.Reserva;
 import es.unex.mdai.FitReserve.data.repository.EntrenadorRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class EntrenadorServicioImpl implements  EntrenadorServicio {
 
     private final EntrenadorRepository entrenadorRepository;

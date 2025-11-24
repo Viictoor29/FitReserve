@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FitReserve</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS específico del index -->
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+<body>
+<div class="container">
+    <!-- Logo -->
+    <img th:src="@{/img/logo.png}" alt="Logo FitReserve" class="logo">
+
+    <!-- Nombre app -->
+    <h1>FitReserve</h1>
+    <p class="tagline">El fitness empieza en tu agenda.</p>
+
+    <!-- Botones login / registro -->
+    <div class="buttons">
+        <a th:href="@{/login}" class="btn btn-primary">Iniciar sesión</a>
+        <a th:href="@{/registro}" class="btn btn-secondary">Registrarme</a>
+    </div>
+
+    <p class="footer-text">
+        Gestiona tus reservas de gimnasio de forma fácil y rápida.
+    </p>
+</div>
+</body>
+</html>

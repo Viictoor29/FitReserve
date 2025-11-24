@@ -2,7 +2,9 @@ package es.unex.mdai.FitReserve.services;
 
 import es.unex.mdai.FitReserve.data.model.Usuario;
 import es.unex.mdai.FitReserve.data.repository.UsuarioRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UsuarioServicioImpl implements UsuarioServicio {
 
     private final UsuarioRepository repository;
