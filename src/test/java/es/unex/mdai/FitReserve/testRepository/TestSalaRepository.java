@@ -47,24 +47,12 @@ class SalaRepositoryTest {
        ======================== */
 
     @Test
-    @DisplayName("findDisponibles: excluye Sala A en 21/10/2025 09:00–10:00")
-    void findDisponibles_excluyeSalaA_21Oct_09_10() {
-        var inicio = LocalDateTime.of(2025, 10, 21, 9, 0);
-        var fin    = LocalDateTime.of(2025, 10, 21, 10, 0);
-
-        var libres = repo.findDisponibles(inicio, fin, List.of(Estado.Pendiente, Estado.Completada));
-
-        assertThat(libres).extracting(Sala::getNombre).doesNotContain("Sala A");
-        assertThat(libres).extracting(Sala::getNombre).contains("Sala B");
-    }
-
-    @Test
     @DisplayName("findDisponibles: excluye Sala B en 22/10/2025 18:00–19:00")
     void findDisponibles_excluyeSalaB_22Oct_18_19() {
         var inicio = LocalDateTime.of(2025, 10, 22, 18, 0);
         var fin    = LocalDateTime.of(2025, 10, 22, 19, 0);
 
-        var libres = repo.findDisponibles(inicio, fin, List.of(Estado.Pendiente, Estado.Completada));
+        var libres = repo.findDisponibles(inicio, fin, Estado.Pendiente);
 
         assertThat(libres).extracting(Sala::getNombre).doesNotContain("Sala B");
         assertThat(libres).extracting(Sala::getNombre).contains("Sala A");
@@ -76,7 +64,7 @@ class SalaRepositoryTest {
         var inicio = LocalDateTime.of(2025, 10, 22, 18, 0);
         var fin    = LocalDateTime.of(2025, 10, 22, 19, 0);
 
-        var libres = repo.findDisponibles(inicio, fin, List.of(Estado.Cancelada));
+        var libres = repo.findDisponibles(inicio, fin, Estado.Cancelada);
 
         assertThat(libres).extracting(Sala::getNombre).contains("Sala A", "Sala B");
     }

@@ -24,14 +24,14 @@ public interface SalaRepository extends JpaRepository<Sala,Long> {
       WHERE NOT EXISTS (
         SELECT 1 FROM Reserva r
         WHERE r.sala = s
-          AND r.estado IN :estadosOcupados
+          AND r.estado = :estadosOcupados
           AND r.fechaHoraInicio < :fin
           AND r.fechaHoraFin  > :inicio
       )
     """)
     List<Sala> findDisponibles(@Param("inicio") LocalDateTime inicio,
                                @Param("fin") LocalDateTime fin,
-                               @Param("estadosOcupados") Collection<Estado> estadosOcupados);
+                               @Param("estadosOcupados") Estado estadosOcupados);
 
     List<Sala> findAll();
 

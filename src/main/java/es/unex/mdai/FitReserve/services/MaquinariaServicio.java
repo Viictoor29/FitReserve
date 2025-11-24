@@ -13,19 +13,19 @@ public interface MaquinariaServicio {
     /**
      * Crea una nueva maquinaria.
      */
-    Maquinaria crearMaquinaria(Maquinaria maquinaria);
+    boolean crearMaquinaria(Maquinaria maquinaria);
 
     /**
      * Actualiza una maquinaria existente.
      */
-    Maquinaria actualizarMaquinaria(Long idMaquinaria, Maquinaria maquinariaActualizada);
+    boolean actualizarMaquinaria(Long idMaquinaria, Maquinaria maquinariaActualizada);
 
     /**
      * Elimina una maquinaria por su ID.
      * Según tu regla de negocio, al eliminar una maquinaria
      * también deberían gestionarse las reservas asociadas.
      */
-    void eliminarMaquinaria(Long idMaquinaria);
+    boolean eliminarMaquinaria(Long idMaquinaria);
 
     /**
      * Obtiene una maquinaria por su ID.

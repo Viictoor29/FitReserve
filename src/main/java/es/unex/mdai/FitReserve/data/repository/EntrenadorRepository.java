@@ -27,14 +27,14 @@ public interface EntrenadorRepository extends JpaRepository<Entrenador,Long> {
         AND NOT EXISTS (
           SELECT 1 FROM Reserva r
           WHERE r.entrenador = e
-            AND r.estado IN :estadosOcupados
+            AND r.estado = :estadosOcupados
             AND r.fechaHoraInicio < :fin
             AND r.fechaHoraFin  > :inicio
         )
     """)
     List<Entrenador> findDisponibles(@Param("inicio") LocalDateTime inicio,
                                      @Param("fin") LocalDateTime fin,
-                                     @Param("estadosOcupados") Collection<Estado> estadosOcupados,
+                                     @Param("estadosOcupados") Estado estadosOcupados,
                                      @Param("especialidad") String especialidad);
 }
 

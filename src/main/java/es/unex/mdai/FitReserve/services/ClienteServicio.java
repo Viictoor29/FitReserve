@@ -17,7 +17,7 @@ public interface ClienteServicio {
     /**
      * Actualiza los datos del cliente (datos personales, objetivos, etc.).
      */
-    Cliente actualizarCliente(Long idCliente, Cliente datosActualizados);
+    boolean actualizarCliente(Long idCliente, Cliente datosActualizados);
 
     /**
      * Elimina el cliente (y, por cascada, lo que corresponda).
@@ -28,6 +28,8 @@ public interface ClienteServicio {
      * Obtiene un cliente por su idCliente.
      */
     Cliente obtenerClientePorId(Long idCliente);
+
+    Cliente obtenerPorIdUsuario(Long idUsuario);
 
 
     /**
@@ -41,4 +43,5 @@ public interface ClienteServicio {
      * Devuelve el historial de reservas del cliente.
      */
     List<Reserva> obtenerHistorialReservas(Long idCliente);
+
 }

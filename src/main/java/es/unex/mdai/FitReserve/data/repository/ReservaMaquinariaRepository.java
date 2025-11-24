@@ -21,13 +21,13 @@ public interface ReservaMaquinariaRepository extends JpaRepository<ReservaMaquin
         FROM ReservaMaquinaria rm
         JOIN rm.reserva r
         WHERE rm.maquinaria.idMaquinaria = :maquinariaId
-          AND r.estado IN :estadosActivos
+          AND r.estado = :estadosOcupados
           AND r.fechaHoraInicio < :fin
           AND r.fechaHoraFin > :inicio
     """)
     Integer totalReservadoEnIntervalo(@Param("maquinariaId") Long maquinariaId,
                                       @Param("inicio") LocalDateTime inicio,
                                       @Param("fin") LocalDateTime fin,
-                                      @Param("estadosActivos") Collection<Estado> estadosActivos);
+                                      @Param("estadosOcupados") Estado estadosOcupados);
 }
 

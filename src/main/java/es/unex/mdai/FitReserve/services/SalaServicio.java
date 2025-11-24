@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface SalaServicio {
     // --- CRUD básico ---
-    Sala crearSala(Sala sala);
+    boolean crearSala(Sala sala);
 
-    Sala actualizarSala(Long idSala, Sala salaActualizada);
+    boolean actualizarSala(Long idSala, Sala salaActualizada);
 
-    void eliminarSala(Long idSala);
+    boolean eliminarSala(Long idSala);
 
     Sala obtenerSalaPorId(Long idSala);
 

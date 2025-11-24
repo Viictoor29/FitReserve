@@ -17,17 +17,17 @@ public interface ReservaServicio {
      * Debe verificar disponibilidad de sala, entrenador y maquinaria
      * según la lógica de negocio antes de guardar.
      */
-    Reserva crearReserva(Reserva reserva);
+    boolean crearReserva(Reserva reserva);
 
     /**
      * Modifica una reserva existente (solo si no ha empezado).
      */
-    Reserva actualizarReserva(Long idReserva, Reserva datosActualizados);
+    boolean actualizarReserva(Long idReserva, Reserva datosActualizados);
 
     /**
      * Elimina una reserva (uso interno / admin).
      */
-    void eliminarReserva(Long idReserva);
+    boolean eliminarReserva(Long idReserva);
 
     /**
      * Obtiene una reserva por su ID.
@@ -40,18 +40,18 @@ public interface ReservaServicio {
     /**
      * Cancelación iniciada por el cliente.
      */
-    void cancelarPorCliente(Long idReserva, Long idCliente);
+    boolean cancelarPorCliente(Long idReserva, Long idCliente);
 
     /**
      * Cancelación iniciada por el entrenador.
      */
-    void cancelarPorEntrenador(Long idReserva, Long idEntrenador);
+    boolean cancelarPorEntrenador(Long idReserva, Long idEntrenador);
 
     /**
      * Marca la reserva como COMPLETADA.
      * Solo debería poder hacerlo el entrenador.
      */
-    void marcarComoCompletada(Long idReserva, Long idEntrenador);
+    boolean marcarComoCompletada(Long idReserva, Long idEntrenador);
 
 
     // --- Listados para cliente y entrenador ---
@@ -125,7 +125,7 @@ public interface ReservaServicio {
      * Elimina todas las asociaciones de maquinaria de una reserva.
      * Delegará en ReservaMaquinariaRepository#deleteByReservaIdReserva.
      */
-    void eliminarMaquinariaDeReserva(Long idReserva);
+    boolean eliminarMaquinariaDeReserva(Long idReserva);
 
     /**
      * Devuelve el total de unidades de una maquinaria reservadas en un intervalo,

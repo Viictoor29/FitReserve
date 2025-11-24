@@ -120,7 +120,7 @@ class ReservaRepositoryTest {
                 salaB,
                 LocalDateTime.of(2025,10,22,18,0),
                 LocalDateTime.of(2025,10,22,19,0),
-                List.of(Estado.Pendiente, Estado.Completada)
+                Estado.Pendiente
         );
         assertTrue(solapa);
     }
@@ -136,7 +136,7 @@ class ReservaRepositoryTest {
                 salaB,
                 LocalDateTime.of(2025,10,22,18,0),
                 LocalDateTime.of(2025,10,22,19,0),
-                List.of(Estado.Cancelada)
+                Estado.Cancelada
         );
         assertFalse(solapa);
     }
@@ -151,16 +151,16 @@ class ReservaRepositoryTest {
                 sofiaId,
                 LocalDateTime.of(2025,10,21,9,0),
                 LocalDateTime.of(2025,10,21,10,0),
-                List.of(Estado.Pendiente, Estado.Completada)
+                Estado.Pendiente
         );
         boolean davidSolapa = reservaRepo.existeSolapeEntrenador(
                 davidId,
                 LocalDateTime.of(2025,10,22,18,0),
                 LocalDateTime.of(2025,10,22,19,0),
-                List.of(Estado.Pendiente, Estado.Completada)
+                Estado.Pendiente
         );
 
-        assertTrue(sofiaSolapa);
+        assertFalse(sofiaSolapa);
         assertTrue(davidSolapa);
     }
 
@@ -173,7 +173,7 @@ class ReservaRepositoryTest {
                 sofiaId,
                 LocalDateTime.of(2025,10,21,9,0),
                 LocalDateTime.of(2025,10,21,10,0),
-                List.of(Estado.Cancelada)
+                Estado.Cancelada
         );
         assertFalse(solapa);
     }

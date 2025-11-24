@@ -13,17 +13,17 @@ public interface EntrenadorServicio {
     /**
      * Registra un nuevo entrenador. Se asume que Entrenador ya tiene asociado su Usuario.
      */
-    Entrenador registrarEntrenador(Entrenador entrenador);
+    boolean registrarEntrenador(Entrenador entrenador);
 
     /**
      * Actualiza los datos del entrenador (especialidad, bio, etc.).
      */
-    Entrenador actualizarEntrenador(Long idEntrenador, Entrenador datosActualizados);
+    boolean actualizarEntrenador(Long idEntrenador, Entrenador datosActualizados);
 
     /**
      * Elimina el entrenador.
      */
-    void eliminarEntrenador(Long idEntrenador);
+    boolean eliminarEntrenador(Long idEntrenador);
 
     /**
      * Obtiene un entrenador por su idEntrenador.

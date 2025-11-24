@@ -12,17 +12,17 @@ public interface ActividadServicio {
     /**
      * Crea una nueva actividad.
      */
-    Actividad crearActividad(Actividad actividad);
+    boolean crearActividad(Actividad actividad);
 
     /**
      * Actualiza una actividad existente.
      */
-    Actividad actualizarActividad(Long idActividad, Actividad actividadActualizada);
+    boolean actualizarActividad(Long idActividad, Actividad actividadActualizada);
 
     /**
      * Elimina una actividad por su ID.
      */
-    void eliminarActividad(Long idActividad);
+    boolean eliminarActividad(Long idActividad);
 
     /**
      * Obtiene una actividad por su ID.

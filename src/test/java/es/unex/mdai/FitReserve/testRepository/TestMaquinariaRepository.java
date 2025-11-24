@@ -47,9 +47,8 @@ class MaquinariaRepositoryTest {
         LocalDateTime inicio = LocalDateTime.of(2025, 10, 21, 9, 0);
         LocalDateTime fin    = LocalDateTime.of(2025, 10, 21, 10, 0);
 
-        var disponibles = repo.findDisponibles(inicio, fin, List.of(Estado.Pendiente, Estado.Completada));
+        var disponibles = repo.findDisponibles(inicio, fin, Estado.Pendiente);
 
-        // A esa hora solo se usa Esterillas (10/30) → todas siguen disponibles
         assertThat(disponibles).extracting(Maquinaria::getNombre)
                 .contains("Esterillas", "Mancuernas", "CintaCorrer");
     }
@@ -60,9 +59,8 @@ class MaquinariaRepositoryTest {
         LocalDateTime inicio = LocalDateTime.of(2025, 10, 22, 18, 0);
         LocalDateTime fin    = LocalDateTime.of(2025, 10, 22, 19, 0);
 
-        var disponibles = repo.findDisponibles(inicio, fin, List.of(Estado.Pendiente, Estado.Completada));
+        var disponibles = repo.findDisponibles(inicio, fin, Estado.Pendiente);
 
-        // En esa franja hay reserva de 4 Mancuernas → aún quedan disponibles (20 - 4 = 16)
         assertThat(disponibles).extracting(Maquinaria::getNombre)
                 .contains("Mancuernas", "CintaCorrer", "Esterillas");
     }
@@ -73,7 +71,7 @@ class MaquinariaRepositoryTest {
         LocalDateTime inicio = LocalDateTime.of(2025, 10, 21, 9, 0);
         LocalDateTime fin    = LocalDateTime.of(2025, 10, 21, 10, 0);
 
-        var disponibles = repo.findDisponibles(inicio, fin, List.of(Estado.Cancelada));
+        var disponibles = repo.findDisponibles(inicio, fin, Estado.Cancelada);
 
         assertThat(disponibles).extracting(Maquinaria::getNombre)
                 .contains("CintaCorrer", "Mancuernas", "Esterillas");

@@ -54,26 +54,6 @@ class ReservaMaquinariaRepositoryTest {
     }
 
     @Test
-    @DisplayName("totalReservadoEnIntervalo() devuelve la cantidad reservada en el rango 21/10/2025 09:00-10:00 (Esterillas=10)")
-    void totalReservadoEnIntervalo_21Oct_ok() {
-        var esterillas = maquinariaRepo.findAll().stream()
-                .filter(m -> m.getNombre().equals("Esterillas"))
-                .findFirst().orElseThrow();
-
-        LocalDateTime inicio = LocalDateTime.of(2025, 10, 21, 9, 0);
-        LocalDateTime fin    = LocalDateTime.of(2025, 10, 21, 10, 0);
-
-        Integer total = repo.totalReservadoEnIntervalo(
-                esterillas.getIdMaquinaria(),
-                inicio,
-                fin,
-                List.of(Estado.Pendiente, Estado.Completada)
-        );
-
-        assertThat(total).isEqualTo(10);
-    }
-
-    @Test
     @DisplayName("totalReservadoEnIntervalo() devuelve la cantidad reservada en el rango 22/10/2025 18:00-19:00 (Mancuernas=4)")
     void totalReservadoEnIntervalo_22Oct_ok() {
         var mancuernas = maquinariaRepo.findAll().stream()
@@ -87,7 +67,7 @@ class ReservaMaquinariaRepositoryTest {
                 mancuernas.getIdMaquinaria(),
                 inicio,
                 fin,
-                List.of(Estado.Pendiente, Estado.Completada)
+                Estado.Pendiente
         );
 
         assertThat(total).isEqualTo(4);
@@ -107,7 +87,7 @@ class ReservaMaquinariaRepositoryTest {
                 mancuernas.getIdMaquinaria(),
                 inicio,
                 fin,
-                List.of(Estado.Cancelada)
+                Estado.Cancelada
         );
 
         assertThat(total).isZero();

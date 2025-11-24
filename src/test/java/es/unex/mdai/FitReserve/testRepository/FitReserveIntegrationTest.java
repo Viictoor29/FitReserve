@@ -225,8 +225,8 @@ class FitReserveIntegrationTest {
         assertThat(reserva.getIdReserva()).isNotNull();
 
         // ==== DISPONIBILIDAD DE MAQUINARIA =====================================
-        // Estados que consideras "activos" (añade CONFIRMADA si existe en tu enum)
-        var estadosActivos = List.of(Estado.Pendiente);
+        // Estados que consideras "activos"
+        var estadosActivos = Estado.Pendiente;
 
         // Consulta máquinas disponibles en el intervalo de la reserva
         List<Maquinaria> disponibles = repoMaquinaria.findDisponibles(
