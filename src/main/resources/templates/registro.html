@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro | FitReserve</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <!-- estilos generales -->
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <!-- estilos específicos del registro -->
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+</head>
+<body>
+<div class="container">
+
+    <!-- Flecha volver -->
+    <a class="back-arrow" onclick="history.back()">←</a>
+
+    <!-- Logo -->
+    <img th:src="@{/img/logo.png}" alt="Logo FitReserve" class="logo">
+
+    <h1>Crear cuenta</h1>
+    <p class="tagline">Completa tus datos para empezar a gestionar tus reservas.</p>
+
+    <!-- FORMULARIO -->
+    <form th:action="@{/registro}" th:object="${cliente}" method="post" id="registroForm" novalidate>
+
+        <!-- DATOS DE USUARIO -->
+        <h2 class="form-section-title">Datos de acceso</h2>
+
+        <div class="form-group">
+            <label for="nombre">Nombre *</label>
+            <input id="nombre" type="text"
+                   th:field="*{usuario.nombre}"
+                   required maxlength="20" autocomplete="given-name"
+                   placeholder="Tu nombre">
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('usuario.nombre')}"
+                   th:errors="*{usuario.nombre}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="apellidos">Apellidos *</label>
+            <input id="apellidos" type="text"
+                   th:field="*{usuario.apellidos}"
+                   required maxlength="50" autocomplete="family-name"
+                   placeholder="Tus apellidos">
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('usuario.apellidos')}"
+                   th:errors="*{usuario.apellidos}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Correo electrónico *</label>
+            <small class="helper-text">
+                Debe contener una @ y un dominio, por ejemplo: usuario@gmail.com
+            </small>
+            <input id="email" type="email"
+                   th:field="*{usuario.email}"
+                   required maxlength="100"
+                   placeholder="ejemplo@correo.com">
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('usuario.email')}"
+                   th:errors="*{usuario.email}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="contrasenia">Contraseña *</label>
+            <small class="helper-text">
+                Usa letras y números para mayor seguridad. Mínimo 6 caracteres.
+            </small>
+            <input id="contrasenia" type="password"
+                   th:field="*{usuario.contrasenia}"
+                   required minlength="6" maxlength="20"
+                   placeholder="Mínimo 6 caracteres">
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('usuario.contrasenia')}"
+                   th:errors="*{usuario.contrasenia}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono *</label>
+            <small class="helper-text">
+                Introduce exactamente 9 dígitos, sin espacios.
+            </small>
+            <input id="telefono" type="tel"
+                   th:field="*{usuario.telefono}"
+                   required pattern="\\d{9}"
+                   maxlength="9"
+                   placeholder="9 dígitos">
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('usuario.telefono')}"
+                   th:errors="*{usuario.telefono}"></small>
+        </div>
+
+        <!-- TipoUsuario fijo a CLIENTE -->
+        <input type="hidden" th:field="*{usuario.tipoUsuario}" value="CLIENTE"/>
+
+        <!-- DATOS DE CLIENTE -->
+        <h2 class="form-section-title">Perfil de cliente</h2>
+
+        <div class="form-group">
+            <label for="fechaNacimiento">Fecha de nacimiento *</label>
+            <input id="fechaNacimiento" type="date"
+                   th:field="*{fechaNacimiento}"
+                   required>
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('fechaNacimiento')}"
+                   th:errors="*{fechaNacimiento}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="genero">Género *</label>
+            <select id="genero" th:field="*{genero}" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option th:each="g : ${T(es.unex.mdai.FitReserve.data.enume.Genero).values()}"
+                        th:value="${g}"
+                        th:text="${g}"></option>
+            </select>
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('genero')}"
+                   th:errors="*{genero}"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="objetivos">Objetivos (opcional)</label>
+            <small class="helper-text">
+                Puedes indicar tus metas: perder peso, ganar masa muscular, mejorar resistencia...
+            </small>
+            <textarea id="objetivos"
+                      th:field="*{objetivos}"
+                      maxlength="255"
+                      rows="3"
+                      placeholder="Por ejemplo: perder peso, ganar masa muscular, mejorar resistencia..."></textarea>
+            <small class="error-message"
+                   th:if="${#fields.hasErrors('objetivos')}"
+                   th:errors="*{objetivos}"></small>
+        </div>
+
+        <!-- BOTÓN  -->
+        <div class="buttons" style="margin-top:1.8rem;">
+            <button type="submit" class="btn btn-primary">Registrarme</button>
+            <a th:href="@{/login}" class="btn btn-secondary">Ya tengo cuenta</a>
+        </div>
+
+        <p class="footer-text">
+            Al registrarte, aceptas nuestras condiciones de uso.
+        </p>
+    </form>
+</div>
+
+<!-- VALIDACIÓN CLIENTE (JS) -->
+<script>
+    (function () {
+        const form = document.getElementById('registroForm');
+        const emailInput = document.getElementById('email');
+        const telefonoInput = document.getElementById('telefono');
+
+        function showError(input, message) {
+            const container = input.closest('.form-group');
+            const errorSpan = container.querySelector('.error-message');
+            if (errorSpan) {
+                errorSpan.textContent = message;
+                errorSpan.style.display = 'block';
+            }
+            input.classList.add('input-error');
+        }
+
+        function clearError(input) {
+            const container = input.closest('.form-group');
+            const errorSpan = container.querySelector('.error-message');
+            if (errorSpan) {
+                errorSpan.textContent = '';
+                errorSpan.style.display = 'none';
+            }
+            input.classList.remove('input-error');
+        }
+
+        function validateEmail() {
+            const value = emailInput.value.trim();
+
+            // autolimpiar espacios
+            emailInput.value = value;
+
+            if (!value) {
+                showError(emailInput, 'El correo es obligatorio.');
+                return false;
+            }
+            // validación básica: debe tener @ y algo delante y detrás
+            const regex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+            if (!regex.test(value)) {
+                showError(emailInput, 'Revisa el formato. Ejemplo: usuario@correo.com');
+                return false;
+            }
+            clearError(emailInput);
+            return true;
+        }
+
+        function validateTelefono() {
+            const value = telefonoInput.value.replace(/\s+/g, '');
+            telefonoInput.value = value;
+
+            if (!value) {
+                showError(telefonoInput, 'El teléfono es obligatorio.');
+                return false;
+            }
+            if (!/^\d{9}$/.test(value)) {
+                showError(telefonoInput, 'El teléfono debe tener exactamente 9 dígitos.');
+                return false;
+            }
+            clearError(telefonoInput);
+            return true;
+        }
+
+        // Validación en tiempo real
+        emailInput.addEventListener('blur', validateEmail);
+        telefonoInput.addEventListener('blur', validateTelefono);
+
+        form.addEventListener('submit', function (e) {
+            let ok = true;
+
+            if (!validateEmail()) ok = false;
+            if (!validateTelefono()) ok = false;
+
+            // también aprovechamos las validaciones HTML5
+            if (!form.checkValidity()) {
+                ok = false;
+                const elements = form.querySelectorAll('input, select, textarea');
+                elements.forEach(function (el) {
+                    if (!el.checkValidity()) {
+                        const msg = el.validationMessage || 'Campo inválido.';
+                        showError(el, msg);
+                    } else {
+                        clearError(el);
+                    }
+                });
+            }
+
+            if (!ok) {
+                e.preventDefault();
+            }
+        });
+
+        // limpiar mensajes cuando el usuario escribe
+        form.addEventListener('input', function (e) {
+            if (e.target.closest('.form-group')) {
+                clearError(e.target);
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>
