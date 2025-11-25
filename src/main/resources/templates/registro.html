@@ -6,28 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-    <!-- estilos generales -->
-    <link rel="stylesheet" th:href="@{/css/index.css}">
-    <!-- estilos específicos del registro -->
+    <!-- estilos del login para fondo y tarjeta -->
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <!-- estilos específicos del registro (pequeños ajustes) -->
     <link rel="stylesheet" th:href="@{/css/registro.css}">
 </head>
 <body>
-<div class="container">
+<div class="login-container">
 
     <!-- Flecha volver -->
     <a class="back-arrow" onclick="history.back()">←</a>
 
-    <!-- Logo -->
-    <img th:src="@{/img/logo.png}" alt="Logo FitReserve" class="logo">
-
-    <h1>Crear cuenta</h1>
+    <h2>Crear cuenta</h2>
     <p class="tagline">Completa tus datos para empezar a gestionar tus reservas.</p>
 
     <!-- FORMULARIO -->
     <form th:action="@{/registro}" th:object="${cliente}" method="post" id="registroForm" novalidate>
 
         <!-- DATOS DE USUARIO -->
-        <h2 class="form-section-title">Datos de acceso</h2>
+        <h3 class="form-section-title">Datos de acceso</h3>
 
         <div class="form-group">
             <label for="nombre">Nombre *</label>
@@ -94,11 +91,10 @@
                    th:errors="*{usuario.telefono}"></small>
         </div>
 
-        <!-- TipoUsuario fijo a CLIENTE -->
         <input type="hidden" th:field="*{usuario.tipoUsuario}" value="CLIENTE"/>
 
         <!-- DATOS DE CLIENTE -->
-        <h2 class="form-section-title">Perfil de cliente</h2>
+        <h3 class="form-section-title">Perfil de cliente</h3>
 
         <div class="form-group">
             <label for="fechaNacimiento">Fecha de nacimiento *</label>
@@ -140,11 +136,11 @@
 
         <!-- BOTÓN  -->
         <div class="buttons" style="margin-top:1.8rem;">
-            <button type="submit" class="btn btn-primary">Registrarme</button>
-            <a th:href="@{/login}" class="btn btn-secondary">Ya tengo cuenta</a>
+            <button type="submit" class="btn" style="margin-bottom:0.6rem;">Registrarme</button>
+            <a th:href="@{/login}" class="btn" style="background: transparent; color: var(--text-dark); border: 1px solid rgba(6,95,70,0.12); box-shadow: none;">Ya tengo cuenta</a>
         </div>
 
-        <p class="footer-text">
+        <p class="footer-text" style="margin-top:1rem; font-size:0.85rem; color: rgba(7,16,35,0.7);">
             Al registrarte, aceptas nuestras condiciones de uso.
         </p>
     </form>
@@ -179,15 +175,11 @@
 
         function validateEmail() {
             const value = emailInput.value.trim();
-
-            // autolimpiar espacios
             emailInput.value = value;
-
             if (!value) {
                 showError(emailInput, 'El correo es obligatorio.');
                 return false;
             }
-            // validación básica: debe tener @ y algo delante y detrás
             const regex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
             if (!regex.test(value)) {
                 showError(emailInput, 'Revisa el formato. Ejemplo: usuario@correo.com');
@@ -200,7 +192,6 @@
         function validateTelefono() {
             const value = telefonoInput.value.replace(/\s+/g, '');
             telefonoInput.value = value;
-
             if (!value) {
                 showError(telefonoInput, 'El teléfono es obligatorio.');
                 return false;
@@ -213,17 +204,13 @@
             return true;
         }
 
-        // Validación en tiempo real
         emailInput.addEventListener('blur', validateEmail);
         telefonoInput.addEventListener('blur', validateTelefono);
 
         form.addEventListener('submit', function (e) {
             let ok = true;
-
             if (!validateEmail()) ok = false;
             if (!validateTelefono()) ok = false;
-
-            // también aprovechamos las validaciones HTML5
             if (!form.checkValidity()) {
                 ok = false;
                 const elements = form.querySelectorAll('input, select, textarea');
@@ -236,13 +223,11 @@
                     }
                 });
             }
-
             if (!ok) {
                 e.preventDefault();
             }
         });
 
-        // limpiar mensajes cuando el usuario escribe
         form.addEventListener('input', function (e) {
             if (e.target.closest('.form-group')) {
                 clearError(e.target);

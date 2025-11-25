@@ -177,6 +177,25 @@ input[type="password"]::placeholder {
     box-shadow: 0 0 0 4px rgba(34,197,94,0.12);
 }
 
+/* Botón flecha volver atrás */
+.back-arrow {
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.back-arrow:hover {
+    opacity: 1;
+    transform: translateX(-3px);
+}
+
 /* Responsive */
 @media (max-width: 420px) {
     .login-container {

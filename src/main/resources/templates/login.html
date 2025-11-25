@@ -10,6 +10,10 @@
 </head>
 <body>
 <div class="login-container">
+
+    <!-- Flecha volver -->
+    <a class="back-arrow" onclick="history.back()">←</a>
+
     <h2>Iniciar sesión</h2>
 
     <form th:action="@{/login}" th:method="post" id="loginForm" novalidate>
