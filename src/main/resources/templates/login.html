@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta charset="UTF-8">
+    <title>Iniciar sesión - FitReserve</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+
+</head>
+<body>
+<div class="login-container">
+    <h2>Iniciar sesión</h2>
+
+    <form th:action="@{/login}" th:method="post" id="loginForm" novalidate>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" required>
+            <div class="error" id="emailError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="contrasenia">Contraseña</label>
+            <input type="password" id="contrasenia" name="contrasenia" placeholder="Contraseña" required>
+            <div class="error" id="passError" aria-live="polite"></div>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn" id="submitBtn">Entrar</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function () {
+        const form = document.getElementById('loginForm');
+        const email = document.getElementById('email');
+        const pass = document.getElementById('contrasenia');
+        const emailError = document.getElementById('emailError');
+        const passError = document.getElementById('passError');
+
+        const emailRegex = /^\S+@\S+\.\S+$/;
+
+        function clearErrors() {
+            emailError.textContent = '';
+            passError.textContent = '';
+        }
+
+        form.addEventListener('submit', function (e) {
+            clearErrors();
+            let hasError = false;
+
+            if (!email.value.trim()) {
+                emailError.textContent = 'El correo es obligatorio.';
+                hasError = true;
+            } else if (!emailRegex.test(email.value.trim())) {
+                emailError.textContent = 'El correo no tiene un formato válido.';
+                hasError = true;
+            }
+
+            if (!pass.value.trim()) {
+                passError.textContent = 'La contraseña es obligatoria.';
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+                if (emailError.textContent) email.focus();
+                else pass.focus();
+            }
+        });
+
+        email.addEventListener('input', function () {
+            if (!email.value.trim()) {
+                emailError.textContent = 'El correo es obligatorio.';
+            } else if (!emailRegex.test(email.value.trim())) {
+                emailError.textContent = 'El correo no tiene un formato válido.';
+            } else {
+                emailError.textContent = '';
+            }
+        });
+
+        pass.addEventListener('input', function () {
+            if (!pass.value.trim()) {
+                passError.textContent = 'La contraseña es obligatoria.';
+            } else {
+                passError.textContent = '';
+            }
+        });
+    })();
+</script>
+</body>
+</html>
