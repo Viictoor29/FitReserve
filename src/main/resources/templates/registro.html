@@ -1,236 +1,270 @@
 <!DOCTYPE html>
-    <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Registro - FitReserve</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-        <link rel="stylesheet" th:href="@{/css/registro.css}">
-    </head>
-    <body>
-    <div class="registro-container">
-        <a class="back-arrow" onclick="history.back()">←</a>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - FitReserve</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+</head>
+<body>
+<div class="registro-container">
+    <a class="back-arrow" onclick="history.back()">←</a>
 
-        <h2>Crear cuenta</h2>
+    <h2>Crear cuenta</h2>
 
-        <form th:action="@{/registro}" th:object="${cliente}" method="post" id="registroForm" novalidate>
+    <form th:action="@{/registro}" th:object="${cliente}" method="post" id="registroForm" novalidate>
 
-            <input type="hidden" th:field="*{usuario.tipoUsuario}" value="CLIENTE"/>
+        <input type="hidden" th:field="*{usuario.tipoUsuario}" value="CLIENTE"/>
 
-            <div class="field">
-                <label for="nombre">Nombre</label>
-                <input type="text" id="nombre" th:field="*{usuario.nombre}"
-                       placeholder="Tu nombre" required maxlength="20">
-                <div class="error" id="nombreError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" th:field="*{usuario.nombre}"
+                   placeholder="Tu nombre" required maxlength="20">
+            <div class="error" id="nombreError" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" th:field="*{usuario.apellidos}"
-                       placeholder="Tus apellidos" required maxlength="50">
-                <div class="error" id="apellidosError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="apellidos">Apellidos</label>
+            <input type="text" id="apellidos" th:field="*{usuario.apellidos}"
+                   placeholder="Tus apellidos" required maxlength="50">
+            <div class="error" id="apellidosError" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="email">Correo electrónico</label>
-                <input type="email" id="email" th:field="*{usuario.email}"
-                       placeholder="ejemplo@correo.com" required maxlength="100">
-                <div class="error" id="emailError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" th:field="*{usuario.email}"
+                   placeholder="ejemplo@correo.com" required maxlength="100">
+            <div class="error" id="emailError" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="contrasenia">Contraseña</label>
-                <input type="password" id="contrasenia" th:field="*{usuario.contrasenia}"
-                       placeholder="Mínimo 6 caracteres" required minlength="6" maxlength="20">
-                <div class="error" id="contraseniaError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="contrasenia">Contraseña</label>
+            <input type="password" id="contrasenia" th:field="*{usuario.contrasenia}"
+                   placeholder="Contraseña" required maxlength="20">
+            <div class="error" id="contraseniaError" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" th:field="*{usuario.telefono}"
-                       placeholder="9 dígitos" required pattern="\\d{9}" maxlength="9">
-                <div class="error" id="telefonoError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="contrasenia2">Confirmar contraseña</label>
+            <input type="password" id="contrasenia2" name="confirmContrasenia"
+                   placeholder="Repite la contraseña" required maxlength="20">
+            <div class="error" id="contrasenia2Error" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="fechaNacimiento">Fecha de nacimiento</label>
-                <input type="date" id="fechaNacimiento" th:field="*{fechaNacimiento}" required>
-                <div class="error" id="fechaError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" th:field="*{usuario.telefono}"
+                   placeholder="9 dígitos" required pattern="\\d{9}" maxlength="9">
+            <div class="error" id="telefonoError" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="genero">Género</label>
-                <select id="genero" th:field="*{genero}" required>
-                    <option value="" disabled selected>Selecciona una opción</option>
-                    <option th:each="g : ${T(es.unex.mdai.FitReserve.data.enume.Genero).values()}"
-                            th:value="${g}" th:text="${g}"></option>
-                </select>
-                <div class="error" id="generoError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="fechaNacimiento">Fecha de nacimiento</label>
+            <input type="date" id="fechaNacimiento" th:field="*{fechaNacimiento}" required>
+            <div class="error" id="fechaError" aria-live="polite"></div>
+        </div>
 
-            <div class="field">
-                <label for="objetivos">Objetivos (opcional)</label>
-                <textarea id="objetivos" th:field="*{objetivos}"
-                          placeholder="Por ejemplo: perder peso, ganar masa muscular..."
-                          maxlength="255" rows="3"></textarea>
-                <div class="error" id="objetivosError" aria-live="polite"></div>
-            </div>
+        <div class="field">
+            <label for="genero">Género</label>
+            <select id="genero" th:field="*{genero}" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option th:each="g : ${T(es.unex.mdai.FitReserve.data.enume.Genero).values()}"
+                        th:value="${g}" th:text="${g}"></option>
+            </select>
+            <div class="error" id="generoError" aria-live="polite"></div>
+        </div>
 
-            <div class="actions">
-                <button type="submit" class="btn">Registrarme</button>
-            </div>
+        <div class="field">
+            <label for="objetivos">Objetivos (opcional)</label>
+            <textarea id="objetivos" th:field="*{objetivos}"
+                      placeholder="Por ejemplo: perder peso, ganar masa muscular..."
+                      maxlength="255" rows="3"></textarea>
+            <div class="error" id="objetivosError" aria-live="polite"></div>
+        </div>
 
-            <div class="footer-link">
-                <a th:href="@{/login}">Ya tengo cuenta</a>
-            </div>
-        </form>
-    </div>
+        <div class="actions">
+            <button type="submit" class="btn">Registrarme</button>
+        </div>
 
-    <script>
-        (function () {
-            const form = document.getElementById('registroForm');
-            const nombre = document.getElementById('nombre');
-            const apellidos = document.getElementById('apellidos');
-            const email = document.getElementById('email');
-            const contrasenia = document.getElementById('contrasenia');
-            const telefono = document.getElementById('telefono');
-            const fechaNacimiento = document.getElementById('fechaNacimiento');
-            const genero = document.getElementById('genero');
+        <div class="footer-link">
+            <a th:href="@{/login}">Ya tengo cuenta</a>
+        </div>
+    </form>
+</div>
 
-            const emailRegex = /^\S+@\S+\.\S+$/;
-            const telefonoRegex = /^\d{9}$/;
+<script>
+    (function () {
+        const form = document.getElementById('registroForm');
+        const nombre = document.getElementById('nombre');
+        const apellidos = document.getElementById('apellidos');
+        const email = document.getElementById('email');
+        const contrasenia = document.getElementById('contrasenia');
+        const contrasenia2 = document.getElementById('contrasenia2');
+        const telefono = document.getElementById('telefono');
+        const fechaNacimiento = document.getElementById('fechaNacimiento');
+        const genero = document.getElementById('genero');
 
-            function showError(input, errorId, message) {
-                const errorDiv = document.getElementById(errorId);
-                errorDiv.textContent = message;
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        const telefonoRegex = /^\d{9}$/;
+
+        function showError(input, errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['nombreError', 'apellidosError', 'emailError', 'contraseniaError',
+             'contrasenia2Error', 'telefonoError', 'fechaError', 'generoError'].forEach(id => clearError(id));
+        }
+
+        function passwordsMatch() {
+            return contrasenia.value.trim() === contrasenia2.value.trim();
+        }
+
+        form.addEventListener('submit', function (e) {
+            clearAllErrors();
+            let hasError = false;
+
+            if (!nombre.value.trim()) {
+                showError(nombre, 'nombreError', 'El nombre es obligatorio.');
+                hasError = true;
             }
 
-            function clearError(errorId) {
-                const errorDiv = document.getElementById(errorId);
-                errorDiv.textContent = '';
+            if (!apellidos.value.trim()) {
+                showError(apellidos, 'apellidosError', 'Los apellidos son obligatorios.');
+                hasError = true;
             }
 
-            function clearAllErrors() {
-                ['nombreError', 'apellidosError', 'emailError', 'contraseniaError',
-                 'telefonoError', 'fechaError', 'generoError'].forEach(id => clearError(id));
+            if (!email.value.trim()) {
+                showError(email, 'emailError', 'El correo es obligatorio.');
+                hasError = true;
+            } else if (!emailRegex.test(email.value.trim())) {
+                showError(email, 'emailError', 'El correo no tiene un formato válido.');
+                hasError = true;
             }
 
-            form.addEventListener('submit', function (e) {
-                clearAllErrors();
-                let hasError = false;
+            if (!contrasenia.value.trim()) {
+                showError(contrasenia, 'contraseniaError', 'La contraseña es obligatoria.');
+                hasError = true;
+            }
 
-                if (!nombre.value.trim()) {
-                    showError(nombre, 'nombreError', 'El nombre es obligatorio.');
-                    hasError = true;
-                }
+            if (!contrasenia2.value.trim()) {
+                showError(contrasenia2, 'contrasenia2Error', 'Por favor confirma la contraseña.');
+                hasError = true;
+            } else if (contrasenia.value.trim() && !passwordsMatch()) {
+                showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                hasError = true;
+            }
 
-                if (!apellidos.value.trim()) {
-                    showError(apellidos, 'apellidosError', 'Los apellidos son obligatorios.');
-                    hasError = true;
-                }
+            if (!telefono.value.trim()) {
+                showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
+                hasError = true;
+            } else if (!telefonoRegex.test(telefono.value.trim())) {
+                showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
+                hasError = true;
+            }
 
-                if (!email.value.trim()) {
-                    showError(email, 'emailError', 'El correo es obligatorio.');
-                    hasError = true;
-                } else if (!emailRegex.test(email.value.trim())) {
-                    showError(email, 'emailError', 'El correo no tiene un formato válido.');
-                    hasError = true;
-                }
+            if (!fechaNacimiento.value.trim()) {
+                showError(fechaNacimiento, 'fechaError', 'La fecha de nacimiento es obligatoria.');
+                hasError = true;
+            }
 
-                if (!contrasenia.value.trim()) {
-                    showError(contrasenia, 'contraseniaError', 'La contraseña es obligatoria.');
-                    hasError = true;
-                } else if (contrasenia.value.trim().length < 6) {
-                    showError(contrasenia, 'contraseniaError', 'La contraseña debe tener al menos 6 caracteres.');
-                    hasError = true;
-                }
+            if (!genero.value) {
+                showError(genero, 'generoError', 'El género es obligatorio.');
+                hasError = true;
+            }
 
-                if (!telefono.value.trim()) {
-                    showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
-                    hasError = true;
-                } else if (!telefonoRegex.test(telefono.value.trim())) {
-                    showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
-                    hasError = true;
-                }
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
 
-                if (!fechaNacimiento.value.trim()) {
-                    showError(fechaNacimiento, 'fechaError', 'La fecha de nacimiento es obligatoria.');
-                    hasError = true;
-                }
+        // Validación en tiempo real
+        nombre.addEventListener('input', function () {
+            if (!nombre.value.trim()) {
+                showError(nombre, 'nombreError', 'El nombre es obligatorio.');
+            } else {
+                clearError('nombreError');
+            }
+        });
 
-                if (!genero.value) {
-                    showError(genero, 'generoError', 'El género es obligatorio.');
-                    hasError = true;
-                }
+        apellidos.addEventListener('input', function () {
+            if (!apellidos.value.trim()) {
+                showError(apellidos, 'apellidosError', 'Los apellidos son obligatorios.');
+            } else {
+                clearError('apellidosError');
+            }
+        });
 
-                if (hasError) {
-                    e.preventDefault();
-                }
-            });
+        email.addEventListener('input', function () {
+            if (!email.value.trim()) {
+                showError(email, 'emailError', 'El correo es obligatorio.');
+            } else if (!emailRegex.test(email.value.trim())) {
+                showError(email, 'emailError', 'El correo no tiene un formato válido.');
+            } else {
+                clearError('emailError');
+            }
+        });
 
-            // Validación en tiempo real
-            nombre.addEventListener('input', function () {
-                if (!nombre.value.trim()) {
-                    showError(nombre, 'nombreError', 'El nombre es obligatorio.');
+        contrasenia.addEventListener('input', function () {
+            if (!contrasenia.value.trim()) {
+                showError(contrasenia, 'contraseniaError', 'La contraseña es obligatoria.');
+            } else {
+                clearError('contraseniaError');
+            }
+
+            // comprobar coincidencia si ya se ha escrito en el segundo campo
+            if (contrasenia2.value.trim()) {
+                if (!passwordsMatch()) {
+                    showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
                 } else {
-                    clearError('nombreError');
+                    clearError('contrasenia2Error');
                 }
-            });
+            }
+        });
 
-            apellidos.addEventListener('input', function () {
-                if (!apellidos.value.trim()) {
-                    showError(apellidos, 'apellidosError', 'Los apellidos son obligatorios.');
-                } else {
-                    clearError('apellidosError');
-                }
-            });
+        contrasenia2.addEventListener('input', function () {
+            if (!contrasenia2.value.trim()) {
+                showError(contrasenia2, 'contrasenia2Error', 'Por favor confirma la contraseña.');
+            } else if (!passwordsMatch()) {
+                showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+            } else {
+                clearError('contrasenia2Error');
+            }
+        });
 
-            email.addEventListener('input', function () {
-                if (!email.value.trim()) {
-                    showError(email, 'emailError', 'El correo es obligatorio.');
-                } else if (!emailRegex.test(email.value.trim())) {
-                    showError(email, 'emailError', 'El correo no tiene un formato válido.');
-                } else {
-                    clearError('emailError');
-                }
-            });
+        telefono.addEventListener('input', function () {
+            if (!telefono.value.trim()) {
+                showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
+            } else if (!telefonoRegex.test(telefono.value.trim())) {
+                showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
+            } else {
+                clearError('telefonoError');
+            }
+        });
 
-            contrasenia.addEventListener('input', function () {
-                if (!contrasenia.value.trim()) {
-                    showError(contrasenia, 'contraseniaError', 'La contraseña es obligatoria.');
-                } else if (contrasenia.value.trim().length < 6) {
-                    showError(contrasenia, 'contraseniaError', 'La contraseña debe tener al menos 6 caracteres.');
-                } else {
-                    clearError('contraseniaError');
-                }
-            });
+        fechaNacimiento.addEventListener('change', function () {
+            if (!fechaNacimiento.value.trim()) {
+                showError(fechaNacimiento, 'fechaError', 'La fecha de nacimiento es obligatoria.');
+            } else {
+                clearError('fechaError');
+            }
+        });
 
-            telefono.addEventListener('input', function () {
-                if (!telefono.value.trim()) {
-                    showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
-                } else if (!telefonoRegex.test(telefono.value.trim())) {
-                    showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
-                } else {
-                    clearError('telefonoError');
-                }
-            });
-
-            fechaNacimiento.addEventListener('change', function () {
-                if (!fechaNacimiento.value.trim()) {
-                    showError(fechaNacimiento, 'fechaError', 'La fecha de nacimiento es obligatoria.');
-                } else {
-                    clearError('fechaError');
-                }
-            });
-
-            genero.addEventListener('change', function () {
-                if (!genero.value) {
-                    showError(genero, 'generoError', 'El género es obligatorio.');
-                } else {
-                    clearError('generoError');
-                }
-            });
-        })();
-    </script>
-    </body>
-    </html>
+        genero.addEventListener('change', function () {
+            if (!genero.value) {
+                showError(genero, 'generoError', 'El género es obligatorio.');
+            } else {
+                clearError('generoError');
+            }
+        });
+    })();
+</script>
+</body>
+</html>
