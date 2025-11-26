@@ -23,32 +23,12 @@ public class RegistroController {
     @Autowired
     private ClienteRepository clienteRepository;
 
-
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         Cliente cliente = new Cliente();
-        cliente.setUsuario(new Usuario()); // importante
+        cliente.setUsuario(new Usuario());
+
         model.addAttribute("cliente", cliente);
         return "registro";
-    }
-
-    @PostMapping("/registro")
-    public String procesarRegistro(
-            @Valid @ModelAttribute("cliente") Cliente cliente,
-            BindingResult result,
-            Model model
-    ) {
-
-        if (result.hasErrors()) {
-            return "registro";
-        }
-
-        // Guardar usuario → cliente (MapsId)
-        Usuario u = cliente.getUsuario();
-        usuarioRepository.save(u);
-
-        clienteRepository.save(cliente);
-
-        return "redirect:/login";
     }
 }

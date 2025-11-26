@@ -1,5 +1,7 @@
 package es.unex.mdai.FitReserve.controller;
 
+import es.unex.mdai.FitReserve.data.model.Cliente;
+import es.unex.mdai.FitReserve.data.model.Usuario;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,11 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     public HomeController() {
-    }
-
-    @GetMapping({"/login"})
-    public String login() {
-        return "login";
     }
 
     @GetMapping({"/", "/index"})
