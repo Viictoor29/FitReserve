@@ -31,6 +31,8 @@
             <div class="error" id="passError" aria-live="polite"></div>
         </div>
 
+        <div class="error" th:if="${loginError}" th:text="${loginError}" aria-live="assertive"></div>
+
         <div class="actions">
             <button type="submit" class="btn" id="submitBtn">Entrar</button>
         </div>

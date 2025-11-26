@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Cliente - FitReserve</title>
+    <link rel="stylesheet" th:href="@{/css/clientePage.css}">
+</head>
+<body>
+<div class="page-container">
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <h1>FitReserve</h1>
+        </div>
+        <div class="user-info">
+            <span class="user-name" th:text="${session.usuarioSesion.getNombre()}">Usuario</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn-logout">Cerrar Sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="welcome-card">
+            <h2>Bienvenido, <span th:text="${session.usuarioSesion.getNombre()}">Cliente</span></h2>
+            <p class="tagline">Gestiona tus reservas y alcanza tus objetivos fitness</p>
+        </div>
+
+        <div class="actions-grid">
+            <a th:href="@{/cliente/nueva-reserva}" class="action-card">
+                <div class="icon">📅</div>
+                <h3>Nueva Reserva</h3>
+                <p>Reserva una clase con sala, actividad y entrenador</p>
+            </a>
+
+            <a th:href="@{/cliente/mis-reservas}" class="action-card">
+                <div class="icon">🏋️</div>
+                <h3>Mis Reservas</h3>
+                <p>Consulta, modifica o cancela tus reservas activas</p>
+            </a>
+
+            <a th:href="@{/cliente/historial}" class="action-card">
+                <div class="icon">📊</div>
+                <h3>Historial</h3>
+                <p>Revisa tu historial de clases completadas</p>
+            </a>
+
+            <a th:href="@{/cliente/perfil}" class="action-card">
+                <div class="icon">👤</div>
+                <h3>Mi Perfil</h3>
+                <p>Actualiza tus datos personales y objetivos</p>
+            </a>
+
+            <a th:href="@{/cliente/eliminar-cuenta}" class="action-card danger">
+                <div class="icon">🗑️</div>
+                <h3>Eliminar Cuenta</h3>
+                <p>Eliminar permanentemente tu cuenta</p>
+            </a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

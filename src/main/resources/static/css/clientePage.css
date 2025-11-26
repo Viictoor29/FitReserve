@@ -1,0 +1,189 @@
+:root {
+    --bg-1: #0f172a;
+    --bg-2: #0ea5a4;
+    --accent-1: #16a34a;
+    --accent-2: #22c55e;
+    --accent-3: #86efac;
+    --danger: #dc2626;
+    --danger-hover: #b91c1c;
+    --text-dark: #071023;
+    --muted: #4b5563;
+    --shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+    --radius-lg: 1.2rem;
+    --transition-fast: 180ms;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(135deg, rgba(6, 95, 70, 0.95), rgba(13, 148, 136, 0.92) 45%, rgba(134, 239, 172, 0.9));
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(10px) saturate(120%);
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-small {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    padding: 0.4rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #052e2a;
+    font-weight: 700;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #065f46;
+    font-size: 1.05rem;
+}
+
+.btn-logout {
+    padding: 0.7rem 1.3rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.82));
+    border: 1px solid rgba(6, 95, 70, 0.08);
+    border-radius: 0.6rem;
+    color: #065f46;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.95rem;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.08);
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+}
+
+.welcome-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(12px) saturate(120%);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 12px 32px rgba(2, 6, 23, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.welcome-card h2 {
+    margin: 0 0 0.8rem 0;
+    font-size: 2.2rem;
+    color: #052e2a;
+    font-weight: 700;
+}
+
+.tagline {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--muted);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.8rem;
+}
+
+.action-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    backdrop-filter: blur(10px) saturate(120%);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: all var(--transition-fast);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 20px rgba(2, 6, 23, 0.15);
+    cursor: pointer;
+}
+
+.action-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.25);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+}
+
+.action-card .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.action-card h3 {
+    margin: 0 0 0.6rem 0;
+    font-size: 1.4rem;
+    color: #052e2a;
+    font-weight: 700;
+}
+
+.action-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.action-card.danger {
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.action-card.danger:hover {
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.15), rgba(220, 38, 38, 0.08));
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-container {
+        padding: 1rem;
+    }
+}

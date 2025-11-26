@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - FitReserve</title>
+    <link rel="stylesheet" th:href="@{/css/adminPage.css}">
+</head>
+<body>
+<div class="page-container">
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <h1>FitReserve Admin</h1>
+        </div>
+        <div class="user-info">
+            <span class="user-name" th:text="${session.usuarioSesion.getNombre()}">Administrador</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn-logout">Cerrar Sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="welcome-card">
+            <h2>Panel de Administración</h2>
+            <p class="tagline">Gestiona todos los recursos del gimnasio</p>
+        </div>
+
+        <div class="actions-grid">
+            <a th:href="@{/admin/usuarios}" class="action-card">
+                <div class="icon">👥</div>
+                <h3>Gestión de Usuarios</h3>
+                <p>Administrar clientes y entrenadores</p>
+            </a>
+
+            <a th:href="@{/admin/entrenadores}" class="action-card">
+                <div class="icon">🏃</div>
+                <h3>Entrenadores</h3>
+                <p>Registrar, modificar o eliminar entrenadores</p>
+            </a>
+
+            <a th:href="@{/admin/salas}" class="action-card">
+                <div class="icon">🏢</div>
+                <h3>Salas</h3>
+                <p>Gestionar espacios y capacidades</p>
+            </a>
+
+            <a th:href="@{/admin/actividades}" class="action-card">
+                <div class="icon">🎯</div>
+                <h3>Actividades</h3>
+                <p>Añadir o modificar tipos de actividades</p>
+            </a>
+
+            <a th:href="@{/admin/maquinaria}" class="action-card">
+                <div class="icon">⚙️</div>
+                <h3>Maquinaria</h3>
+                <p>Controlar equipamiento disponible</p>
+            </a>
+
+            <a th:href="@{/admin/reservas}" class="action-card">
+                <div class="icon">📋</div>
+                <h3>Todas las Reservas</h3>
+                <p>Visualizar y gestionar todas las reservas</p>
+            </a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

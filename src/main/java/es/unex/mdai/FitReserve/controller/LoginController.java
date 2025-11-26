@@ -1,6 +1,9 @@
 package es.unex.mdai.FitReserve.controller;
 
+import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
 import es.unex.mdai.FitReserve.data.model.Usuario;
+import es.unex.mdai.FitReserve.services.ClienteServicio;
+import es.unex.mdai.FitReserve.services.EntrenadorServicio;
 import es.unex.mdai.FitReserve.services.UsuarioServicio;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -15,9 +18,13 @@ import java.security.AuthProvider;
 public class LoginController {
 
     private final UsuarioServicio usuarioServicio;
+    private final ClienteServicio clienteServicio;
+    private final EntrenadorServicio entrenadorServicio;
 
-    public LoginController(UsuarioServicio usuarioServicio) {
+    public LoginController(UsuarioServicio usuarioServicio, ClienteServicio clienteServicio, EntrenadorServicio entrenadorServicio) {
         this.usuarioServicio = usuarioServicio;
+        this.clienteServicio = clienteServicio;
+        this.entrenadorServicio = entrenadorServicio;
     }
 
     @GetMapping({"/login"})
@@ -37,18 +44,21 @@ public class LoginController {
             Usuario usuario = usuarioServicio.login(email, contrasenia);
 
             // Guardar en sesión (ajustar nombre de getter si el modelo usa otro)
-            session.setAttribute("usuarioId", usuario.getIdUsuario());
-            session.setAttribute("usuario", usuario);
+            session.setAttribute("usuarioSesion", usuario);
 
-            // Redirigir al index/principal
-            return "redirect:/";
+            if(usuario.getTipoUsuario().equals(TipoUsuario.CLIENTE)) {
+                return "clientePage";
+            }else if (usuario.getTipoUsuario().equals(TipoUsuario.ENTRENADOR)) {
+                return "entrenadorPage";
+            }else {
+                return "adminPage";
+            }
+
         } catch (IllegalArgumentException e) {
             model.addAttribute("loginError", e.getMessage());
-            model.addAttribute("email", email);
             return "login";
         } catch (Exception e) {
             model.addAttribute("loginError", "Error inesperado al iniciar sesión.");
-            model.addAttribute("email", email);
             return "login";
         }
     }
