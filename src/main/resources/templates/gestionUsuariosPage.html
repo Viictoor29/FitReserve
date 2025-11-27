@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de usuarios</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/gestionUsuariosPage.css}">
+</head>
+<body>
+<div class="page-container">
+
+    <!-- CABECERA -->
+    <header class="header">
+        <div class="logo-section">
+            <img class="logo-small" th:src="@{/img/logo.png}" alt="Logo FitReserve">
+            <div>
+                <h1>Panel de gestión de usuarios</h1>
+                <p class="subtitle">Administra clientes y entrenadores desde un solo lugar</p>
+            </div>
+        </div>
+
+        <div class="user-info">
+            <span class="user-name"
+                  th:text="${#authentication != null ? #authentication.name : 'Administrador'}">
+                Administrador
+            </span>
+
+            <form th:action="@{/logout}" method="post">
+                <button class="btn-logout" type="submit">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- TARJETA RESUMEN -->
+    <section class="summary-card">
+        <div class="summary-item">
+            <div class="summary-label">Clientes</div>
+            <div class="summary-value" th:text="${clientes != null ? clientes.size() : 0}">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Entrenadores</div>
+            <div class="summary-value trainer" th:text="${entrenadores != null ? entrenadores.size() : 0}">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Usuarios totales</div>
+            <div class="summary-value total"
+                 th:text="${(clientes != null ? clientes.size() : 0) + (entrenadores != null ? entrenadores.size() : 0)}">
+                0
+            </div>
+        </div>
+    </section>
+
+    <!-- GRID PRINCIPAL -->
+    <section class="grid">
+        <!-- CLIENTES -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Clientes</h2>
+                    <p>Información básica y objetivos de entrenamiento</p>
+                </div>
+                <a class="btn btn-secondary" th:href="@{/admin/clientes/nuevo}">
+                    + Nuevo cliente
+                </a>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Fecha nacimiento</th>
+                        <th>Género</th>
+                        <th>Objetivos</th>
+                        <th class="center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cliente : ${clientes}">
+                        <td th:text="${cliente.idCliente}">1</td>
+                        <td th:text="${cliente.usuario.nombre + ' ' + cliente.usuario.apellidos}">Nombre Apellidos</td>
+                        <td th:text="${cliente.usuario.email}">correo@ejemplo.com</td>
+                        <td th:text="${cliente.usuario.telefono}">600000000</td>
+                        <td th:text="${cliente.fechaNacimiento}">1990-01-01</td>
+                        <td th:text="${cliente.genero}">MASCULINO</td>
+                        <td th:text="${cliente.objetivos}">Perder peso</td>
+                        <td class="center actions-cell">
+                            <a class="link link-view"
+                               th:href="@{'/admin/clientes/' + ${cliente.idCliente}}">
+                                Ver
+                            </a>
+                            <a class="link link-edit"
+                               th:href="@{'/admin/clientes/editar/' + ${cliente.idCliente}}">
+                                Editar
+                            </a>
+                            <form th:action="@{'/admin/clientes/eliminar/' + ${cliente.idCliente}}"
+                                  method="post" class="inline-form">
+                                <button type="submit" class="link link-delete"
+                                        onclick="return confirm('¿Eliminar este cliente?');">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${clientes == null or #lists.isEmpty(clientes)}">
+                        <td colspan="8" class="empty-state">
+                            No hay clientes registrados todavía.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ENTRENADORES -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Entrenadores</h2>
+                    <p>Gestiona disponibilidad y especialidades</p>
+                </div>
+                <a class="btn btn-primary" th:href="@{/admin/entrenadores/nuevo}">
+                    + Nuevo entrenador
+                </a>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Especialidad</th>
+                        <th>Experiencia</th>
+                        <th>Horario</th>
+                        <th class="center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="entrenador : ${entrenadores}">
+                        <td th:text="${entrenador.idEntrenador}">1</td>
+                        <td th:text="${entrenador.usuario.nombre + ' ' + entrenador.usuario.apellidos}">
+                            Nombre Apellidos
+                        </td>
+                        <td th:text="${entrenador.usuario.email}">correo@ejemplo.com</td>
+                        <td th:text="${entrenador.usuario.telefono}">600000000</td>
+                        <td th:text="${entrenador.especialidad}">Crossfit</td>
+                        <td th:text="${entrenador.experiencia + ' años'}">5 años</td>
+                        <td>
+                            <span th:text="${entrenador.horaInicioTrabajo}">08:00</span> -
+                            <span th:text="${entrenador.horaFinTrabajo}">16:00</span>
+                        </td>
+                        <td class="center actions-cell">
+                            <a class="link link-view"
+                               th:href="@{'/admin/entrenadores/' + ${entrenador.idEntrenador}}">
+                                Ver
+                            </a>
+                            <a class="link link-edit"
+                               th:href="@{'/admin/entrenadores/editar/' + ${entrenador.idEntrenador}}">
+                                Editar
+                            </a>
+                            <form th:action="@{'/admin/entrenadores/eliminar/' + ${entrenador.idEntrenador}}"
+                                  method="post" class="inline-form">
+                                <button type="submit" class="link link-delete"
+                                        onclick="return confirm('¿Eliminar este entrenador?');">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${entrenadores == null or #lists.isEmpty(entrenadores)}">
+                        <td colspan="8" class="empty-state">
+                            No hay entrenadores registrados todavía.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ENLACE VOLVER -->
+    <div class="footer-link">
+        <a th:href="@{/admin}">
+            ← Volver al panel de administrador
+        </a>
+    </div>
+
+</div>
+</body>
+</html>
