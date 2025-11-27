@@ -2,8 +2,6 @@ package es.unex.mdai.FitReserve.controller;
 
 import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
 import es.unex.mdai.FitReserve.data.model.Usuario;
-import es.unex.mdai.FitReserve.services.ClienteServicio;
-import es.unex.mdai.FitReserve.services.EntrenadorServicio;
 import es.unex.mdai.FitReserve.services.UsuarioServicio;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -12,14 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.security.AuthProvider;
-
 @Controller
 public class LoginController {
 
     private final UsuarioServicio usuarioServicio;
 
-    public LoginController(UsuarioServicio usuarioServicio, ClienteServicio clienteServicio, EntrenadorServicio entrenadorServicio) {
+    public LoginController(UsuarioServicio usuarioServicio) {
         this.usuarioServicio = usuarioServicio;
     }
 
