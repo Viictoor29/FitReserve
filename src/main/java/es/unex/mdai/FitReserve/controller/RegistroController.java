@@ -77,7 +77,7 @@ public class RegistroController {
             model.addAttribute("regError", ex.getMessage());
             return "registro";
         } catch (Exception ex) {
-            model.addAttribute("regError", "Error inesperado durante el registro.");
+            model.addAttribute("regError", ex.getMessage());
             return "registro";
         }
     }
