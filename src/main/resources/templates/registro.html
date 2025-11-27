@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="registro-container">
-    <a class="back-arrow" onclick="history.back()">←</a>
+    <a class="back-arrow" th:href="@{/}">←</a>
 
     <h2>Crear cuenta</h2>
 
@@ -82,6 +82,8 @@
                       maxlength="255" rows="3"></textarea>
             <div class="error" id="objetivosError" aria-live="polite"></div>
         </div>
+
+        <div class="error" th:if="${regError}" th:text="${regError}" aria-live="assertive"></div>
 
         <div class="actions">
             <button type="submit" class="btn">Registrarme</button>

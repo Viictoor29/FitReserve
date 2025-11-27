@@ -24,11 +24,34 @@ public class RegistroController {
     private ClienteRepository clienteRepository;
 
     @GetMapping("/registro")
-    public String mostrarRegistro(Model model) {
+    public String registroGet(Model model) {
         Cliente cliente = new Cliente();
         cliente.setUsuario(new Usuario());
 
         model.addAttribute("cliente", cliente);
         return "registro";
     }
+
+    @PostMapping("/registro")
+    public String registroPost(
+            @Valid @ModelAttribute("cliente") Cliente cliente,
+            BindingResult bindingResult,
+            Model model
+    ) {
+
+        if(cliente == null || cliente.getUsuario() == null) {
+            model.addAttribute("regError", "Datos de registro incompletos.");
+            return "registro";
+        }
+
+        Usuario usuario = cliente.getUsuario();
+
+
+
+
+
+        return null;
+    }
+
+
 }

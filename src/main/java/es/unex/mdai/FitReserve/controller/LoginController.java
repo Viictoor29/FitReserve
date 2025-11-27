@@ -18,18 +18,24 @@ import java.security.AuthProvider;
 public class LoginController {
 
     private final UsuarioServicio usuarioServicio;
-    private final ClienteServicio clienteServicio;
-    private final EntrenadorServicio entrenadorServicio;
 
     public LoginController(UsuarioServicio usuarioServicio, ClienteServicio clienteServicio, EntrenadorServicio entrenadorServicio) {
         this.usuarioServicio = usuarioServicio;
-        this.clienteServicio = clienteServicio;
-        this.entrenadorServicio = entrenadorServicio;
     }
 
     @GetMapping({"/login"})
     public String loginGet() {
         return "login";
+    }
+
+    @PostMapping({"/logout"})
+    public String logout(HttpSession session) {
+        if(session.getAttribute("usuarioSesion") != null) {
+            session.removeAttribute("usuarioSesion");
+            session.invalidate();
+        }
+
+        return "redirect:/login";
     }
 
     @PostMapping({"/login"})
@@ -47,11 +53,11 @@ public class LoginController {
             session.setAttribute("usuarioSesion", usuario);
 
             if(usuario.getTipoUsuario().equals(TipoUsuario.CLIENTE)) {
-                return "clientePage";
+                return "redirect:/cliente";
             }else if (usuario.getTipoUsuario().equals(TipoUsuario.ENTRENADOR)) {
-                return "entrenadorPage";
+                return "redirect:/entrenador";
             }else {
-                return "adminPage";
+                return "redirect:/admin";
             }
 
         } catch (IllegalArgumentException e) {

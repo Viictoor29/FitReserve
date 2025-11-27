@@ -2,6 +2,7 @@ package es.unex.mdai.FitReserve.controller;
 
 import es.unex.mdai.FitReserve.data.model.Cliente;
 import es.unex.mdai.FitReserve.data.model.Usuario;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,4 +17,5 @@ public class HomeController {
     public String index() {
         return "index";
     }
+
 }
