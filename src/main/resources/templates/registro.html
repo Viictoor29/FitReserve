@@ -15,6 +15,8 @@
 
     <form th:action="@{/registro}" th:object="${cliente}" method="post" id="registroForm" novalidate>
 
+        <input type="hidden" th:field="*{usuario.tipoUsuario}" value="CLIENTE"/>
+
         <div class="field">
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre" th:field="*{usuario.nombre}"
