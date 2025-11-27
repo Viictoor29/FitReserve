@@ -96,12 +96,10 @@
                                th:href="@{'/admin/clientes/editar/' + ${cliente.idCliente}}">
                                 Editar
                             </a>
-                            <form th:action="@{'/admin/clientes/eliminar/' + ${cliente.idCliente}}"
-                                  method="post" class="inline-form">
-                                <button type="submit" class="link link-delete"
-                                        onclick="return confirm('¿Eliminar este cliente?');">
-                                    Eliminar
-                                </button>
+                            <form th:action="@{'/admin/usuarios/clientes/eliminar/' + ${cliente.idCliente}}"
+                                  method="post" class="inline-form"
+                                  onsubmit="return confirmarEliminacion('cliente');">
+                                <button type="submit" class="link link-delete">Eliminar</button>
                             </form>
                         </td>
                     </tr>
@@ -164,12 +162,10 @@
                                th:href="@{'/admin/entrenadores/editar/' + ${entrenador.idEntrenador}}">
                                 Editar
                             </a>
-                            <form th:action="@{'/admin/entrenadores/eliminar/' + ${entrenador.idEntrenador}}"
-                                  method="post" class="inline-form">
-                                <button type="submit" class="link link-delete"
-                                        onclick="return confirm('¿Eliminar este entrenador?');">
-                                    Eliminar
-                                </button>
+                            <form th:action="@{'/admin/usuarios/entrenadores/eliminar/' + ${entrenador.idEntrenador}}"
+                                  method="post" class="inline-form"
+                                  onsubmit="return confirmarEliminacion('entrenador');">
+                                <button type="submit" class="link link-delete">Eliminar</button>
                             </form>
                         </td>
                     </tr>
@@ -194,3 +190,8 @@
 </div>
 </body>
 </html>
+<script>
+    function confirmarEliminacion(tipo) {
+        return confirm("¿Seguro que deseas eliminar este " + tipo + "?\nEsta acción no se puede deshacer.");
+    }
+</script>
