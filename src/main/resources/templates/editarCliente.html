@@ -83,6 +83,16 @@
             <div class="error" id="objetivosError" aria-live="polite"></div>
         </div>
 
+        <!-- Zona de alertas -->
+        <div class="alert-container">
+            <div th:if="${mensajeExito}" class="alert alert-success" role="alert">
+                <span th:text="${mensajeExito}">Mensaje de éxito</span>
+            </div>
+            <div th:if="${mensajeError}" class="alert alert-error" role="alert">
+                <span th:text="${mensajeError}">Mensaje de error</span>
+            </div>
+        </div>
+
         <div class="actions">
             <button class="btn" type="submit">Guardar cambios</button>
         </div>
@@ -95,6 +105,7 @@
         const form = document.getElementById('editarForm');
         const contrasenia = document.getElementById('contrasenia');
         const contrasenia2 = document.getElementById('contrasenia2');
+        const fechaNacimiento = document.getElementById('fechaNacimiento');
 
         function showError(input, errorId, message) {
             const errorDiv = document.getElementById(errorId);
@@ -104,6 +115,10 @@
         function clearError(errorId) {
             const errorDiv = document.getElementById(errorId);
             if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['contrasenia2Error', 'fechaError'].forEach(id => clearError(id));
         }
 
         function passwordsMatch() {
@@ -119,7 +134,7 @@
 
         if (form) {
             form.addEventListener('submit', function (e) {
-                clearError('contrasenia2Error');
+                clearAllErrors();
                 let hasError = false;
 
                 const nuevaPass = contrasenia.value.trim();
@@ -128,6 +143,15 @@
                 if (nuevaPass !== '' || confirm !== '') {
                     if (!passwordsMatch()) {
                         showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                        hasError = true;
+                    }
+                }
+
+                if (fechaNacimiento.value) {
+                    const fecha = new Date(fechaNacimiento.value);
+                    const hoy = new Date();
+                    if (fecha > hoy) {
+                        showError(fechaNacimiento, 'fechaError', 'La fecha de nacimiento no puede ser futura.');
                         hasError = true;
                     }
                 }
@@ -150,6 +174,19 @@
             if (contrasenia.value.trim() || contrasenia2.value.trim()) {
                 if (!passwordsMatch()) showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
                 else clearError('contrasenia2Error');
+            }
+        });
+
+        // Validación en tiempo real de fecha
+        if (fechaNacimiento) fechaNacimiento.addEventListener('change', function () {
+            if (fechaNacimiento.value) {
+                const fecha = new Date(fechaNacimiento.value);
+                const hoy = new Date();
+                if (fecha > hoy) {
+                    showError(fechaNacimiento, 'fechaError', 'La fecha de nacimiento no puede ser futura.');
+                } else {
+                    clearError('fechaError');
+                }
             }
         });
     })();

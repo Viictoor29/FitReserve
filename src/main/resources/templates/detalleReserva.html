@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Reserva - FitReserve</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/detalleReserva.css}">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/cliente/mis-reservas}" class="back-arrow">←</a>
+
+    <h2>Detalle de la Reserva</h2>
+
+    <div class="field">
+        <label>ID de Reserva</label>
+        <p th:text="${reserva.idReserva}">1</p>
+    </div>
+
+    <div class="field">
+        <label>Estado</label>
+        <p>
+                        <span class="status-badge"
+                              th:classappend="${reserva.estado.name() == 'Pendiente'} ? 'status-pendiente' :
+                                              (${reserva.estado.name() == 'Completada'} ? 'status-completada' : 'status-cancelada')"
+                              th:text="${reserva.estado}">
+                            Pendiente
+                        </span>
+        </p>
+    </div>
+
+    <div class="field">
+        <label>Actividad</label>
+        <p th:text="${reserva.actividad != null ? reserva.actividad.nombre + ' - ' + reserva.actividad.tipoActividad : 'No especificada'}">
+            Yoga - Grupal
+        </p>
+    </div>
+
+    <div class="field">
+        <label>Sala</label>
+        <p th:text="${reserva.sala != null ? reserva.sala.nombre + ' (Capacidad: ' + reserva.sala.capacidad + ')' : 'No especificada'}">
+            Sala Principal (Capacidad: 20)
+        </p>
+    </div>
+
+    <div class="field">
+        <label>Entrenador</label>
+        <p th:text="${reserva.entrenador != null ? reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos + ' - ' + reserva.entrenador.especialidad : 'No asignado'}">
+            Juan Pérez - Yoga
+        </p>
+    </div>
+
+    <div class="field">
+        <label>Fecha y Hora de Inicio</label>
+        <p th:text="${#temporals.format(reserva.fechaHoraInicio, 'dd/MM/yyyy HH:mm')}">
+            01/01/2025 09:00
+        </p>
+    </div>
+
+    <div class="field">
+        <label>Fecha y Hora de Fin</label>
+        <p th:text="${#temporals.format(reserva.fechaHoraFin, 'dd/MM/yyyy HH:mm')}">
+            01/01/2025 10:00
+        </p>
+    </div>
+
+    <div class="field" th:if="${reserva.comentarios != null && !#strings.isEmpty(reserva.comentarios)}">
+        <label>Comentarios</label>
+        <p class="comentarios-text" th:text="${reserva.comentarios}">
+            Comentarios adicionales de la reserva
+        </p>
+    </div>
+
+    <div class="field" th:if="${reserva.maquinariaAsignada != null && !#lists.isEmpty(reserva.maquinariaAsignada)}">
+        <label>Maquinaria Asignada</label>
+        <div class="maquinaria-list">
+            <div th:each="rm : ${reserva.maquinariaAsignada}" class="maquinaria-item">
+                <span class="maquinaria-nombre" th:text="${rm.maquinaria.nombre}">Cinta de correr</span>
+                <span class="maquinaria-cantidad">
+                                Cantidad: <strong th:text="${rm.cantidad}">2</strong>
+                            </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a class="btn btn-secondary" th:href="@{'/cliente/reserva/editar/' + ${reserva.idReserva}}"
+           th:if="${reserva.estado.name() == 'Pendiente'}">
+            Editar Reserva
+        </a>
+        <button type="button" class="btn btn-danger"
+                th:if="${reserva.estado.name() == 'Pendiente'}"
+                th:onclick="'confirmarCancelacion(' + ${reserva.idReserva} + ');'">
+            Cancelar Reserva
+        </button>
+    </div>
+</div>
+
+<script>
+    function confirmarCancelacion(id) {
+        if (confirm('¿Estás seguro de que deseas cancelar esta reserva?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/cliente/reserva/cancelar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+</body>
+</html>

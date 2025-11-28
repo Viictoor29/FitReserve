@@ -16,10 +16,6 @@
     background: linear-gradient(180deg, #f59e0b, #f97316);
 }
 
-.status-confirmada {
-    background: linear-gradient(180deg, #16a34a, #22c55e);
-}
-
 .status-cancelada {
     background: linear-gradient(180deg, #dc2626, #ef4444);
 }

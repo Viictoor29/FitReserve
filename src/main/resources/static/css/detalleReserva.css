@@ -1,0 +1,118 @@
+@import url('registroAdmin.css');
+
+/* Extensiones específicas para detalle de reserva */
+
+.field p {
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(6, 95, 70, 0.2);
+    border-radius: 0.75rem;
+    margin: 0;
+    color: var(--text-dark);
+    font-size: 1rem;
+}
+
+.comentarios-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 3rem;
+}
+
+/* Badges de estado */
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.6rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+}
+
+.status-pendiente {
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.1));
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    color: #92400e;
+}
+
+.status-completada {
+    background: linear-gradient(180deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #065f46;
+}
+
+.status-cancelada {
+    background: linear-gradient(180deg, rgba(220, 38, 38, 0.2), rgba(220, 38, 38, 0.1));
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    color: #991b1b;
+}
+
+/* Lista de maquinaria */
+.maquinaria-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.maquinaria-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(6, 95, 70, 0.2);
+    border-radius: 0.75rem;
+}
+
+.maquinaria-nombre {
+    font-weight: 500;
+    color: #065f46;
+}
+
+.maquinaria-cantidad {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.maquinaria-cantidad strong {
+    color: var(--accent-1);
+}
+
+/* Botones de acciones */
+.actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-secondary {
+    background: linear-gradient(180deg, rgba(6, 95, 70, 0.85), rgba(13, 148, 136, 0.85));
+    box-shadow: 0 10px 30px rgba(6, 95, 70, 0.28), inset 0 -3px 8px rgba(255, 255, 255, 0.06);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(6, 95, 70, 0.36);
+}
+
+.btn-danger {
+    background: linear-gradient(180deg, #dc2626, #ef4444);
+    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.28), inset 0 -3px 8px rgba(255, 255, 255, 0.06);
+}
+
+.btn-danger:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(220, 38, 38, 0.36);
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+    .actions {
+        flex-direction: column;
+    }
+
+    .maquinaria-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Reserva - FitReserve</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/editarReserva.css}">
+</head>
+<body>
+<div class="registro-container">
+
+    <a th:href="@{/cliente/mis-reservas}" class="back-arrow">←</a>
+
+    <h2>Editar Reserva</h2>
+
+    <form id="editarReservaForm" th:action="@{'/cliente/reserva/editar/' + ${reserva.idReserva}}"
+          th:object="${reserva}" method="post">
+
+        <div class="field">
+            <label for="idSala">Sala</label>
+            <select id="idSala" name="idSala">
+                <option value="">Selecciona una sala</option>
+                <option th:each="sala : ${salas}"
+                        th:value="${sala.idSala}"
+                        th:text="${sala.nombre + ' (Capacidad: ' + sala.capacidad + ')'}"
+                        th:selected="${reserva.sala != null && reserva.sala.idSala == sala.idSala}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="idActividad">Actividad</label>
+            <select id="idActividad" name="idActividad">
+                <option value="">Selecciona una actividad</option>
+                <option th:each="actividad : ${actividades}"
+                        th:value="${actividad.idActividad}"
+                        th:text="${actividad.nombre + ' - ' + actividad.tipoActividad}"
+                        th:selected="${reserva.actividad != null && reserva.actividad.idActividad == actividad.idActividad}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="idEntrenador">Entrenador</label>
+            <select id="idEntrenador" name="idEntrenador">
+                <option value="">Selecciona un entrenador</option>
+                <option th:each="entrenador : ${entrenadores}"
+                        th:value="${entrenador.idEntrenador}"
+                        th:text="${entrenador.usuario.nombre + ' ' + entrenador.usuario.apellidos + ' - ' + entrenador.especialidad}"
+                        th:selected="${reserva.entrenador != null && reserva.entrenador.idEntrenador == entrenador.idEntrenador}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="fechaHoraInicio">Fecha y Hora de Inicio</label>
+            <input type="datetime-local" id="fechaHoraInicio" name="fechaHoraInicio"
+                   th:value="${reserva.fechaHoraInicio != null} ? ${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd''T''HH:mm')} : ''">
+            <div class="error" id="inicioError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="fechaHoraFin">Fecha y Hora de Fin</label>
+            <input type="datetime-local" id="fechaHoraFin" name="fechaHoraFin"
+                   th:value="${reserva.fechaHoraFin != null} ? ${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd''T''HH:mm')} : ''">
+            <div class="error" id="finError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="comentarios">Comentarios</label>
+            <textarea id="comentarios" name="comentarios" rows="4" maxlength="255"
+                      th:text="${reserva.comentarios}"
+                      placeholder="Comentarios adicionales..."></textarea>
+        </div>
+
+        <div class="field maquinaria-section">
+            <label>Maquinaria (Opcional)</label>
+            <div id="maquinaria-container">
+                <div th:each="rm, iterStat : ${reserva.maquinariaAsignada}"
+                     class="maquinaria-item"
+                     th:id="'maquinaria-' + ${iterStat.index}">
+                    <div class="field-row">
+                        <select th:name="'maquinarias'" class="select-maquinaria">
+                            <option value="">Selecciona maquinaria</option>
+                            <option th:each="maq : ${maquinarias}"
+                                    th:value="${maq.idMaquinaria}"
+                                    th:text="${maq.nombre + ' - ' + maq.tipoActividad + ' (Disponibles: ' + maq.cantidadTotal + ')'}"
+                                    th:selected="${rm.maquinaria.idMaquinaria == maq.idMaquinaria}">
+                            </option>
+                        </select>
+                        <input type="number" th:name="'cantidades'" min="1"
+                               th:value="${rm.cantidad}" class="input-cantidad">
+                        <button type="button" class="btn-remove"
+                                th:onclick="'eliminarMaquinaria(' + ${iterStat.index} + ')'">✕
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-maquinaria" onclick="agregarMaquinaria()">+ Añadir Maquinaria
+                </button>
+            </div>
+        </div>
+
+        <!-- Zona de alertas -->
+        <div class="alert-container">
+            <div th:if="${mensaje}" class="alert alert-success" role="alert">
+                <span th:text="${mensaje}">Mensaje de éxito</span>
+            </div>
+            <div th:if="${error}" class="alert alert-error" role="alert">
+                <span th:text="${error}">Mensaje de error</span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Guardar Cambios</button>
+        </div>
+    </form>
+
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const maquinarias = /*[[${maquinarias}]]*/ [];
+    let maquinariaCount = /*[[${reserva.maquinariaAsignada != null ? reserva.maquinariaAsignada.size() : 0}]]*/ 0;
+
+    function agregarMaquinaria() {
+        const container = document.getElementById('maquinaria-container');
+        const div = document.createElement('div');
+        div.className = 'maquinaria-item';
+        div.id = 'maquinaria-' + maquinariaCount;
+
+        let optionsHTML = '<option value="">Selecciona maquinaria</option>';
+        maquinarias.forEach(maq => {
+            optionsHTML += `<option value="${maq.idMaquinaria}">${maq.nombre} - ${maq.tipoActividad} (Disponibles: ${maq.cantidadTotal})</option>`;
+        });
+
+        div.innerHTML = `
+                                <div class="field-row">
+                                    <select name="maquinarias" class="select-maquinaria">
+                                        ${optionsHTML}
+                                    </select>
+                                    <input type="number" name="cantidades" min="1" value="1" class="input-cantidad">
+                                    <button type="button" class="btn-remove" onclick="eliminarMaquinaria(${maquinariaCount})">✕</button>
+                                </div>
+                            `;
+
+        container.insertBefore(div, container.querySelector('.btn-add-maquinaria'));
+        maquinariaCount++;
+    }
+
+    function eliminarMaquinaria(id) {
+        const element = document.getElementById('maquinaria-' + id);
+        if (element) {
+            element.remove();
+        }
+    }
+
+    (function () {
+        const form = document.getElementById('editarReservaForm');
+        const inicio = document.getElementById('fechaHoraInicio');
+        const fin = document.getElementById('fechaHoraFin');
+
+        function showError(errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['inicioError', 'finError'].forEach(clearError);
+        }
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                clearAllErrors();
+                let hasError = false;
+
+                if (inicio.value && fin.value) {
+                    if (new Date(fin.value) <= new Date(inicio.value)) {
+                        showError('finError', 'La hora de fin debe ser posterior a la de inicio.');
+                        hasError = true;
+                    }
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        if (inicio) {
+            inicio.addEventListener('change', function () {
+                if (fin.value && inicio.value) {
+                    if (new Date(fin.value) <= new Date(inicio.value)) {
+                        showError('finError', 'La hora de fin debe ser posterior a la de inicio.');
+                    } else {
+                        clearError('finError');
+                    }
+                }
+            });
+        }
+
+        if (fin) {
+            fin.addEventListener('change', function () {
+                if (inicio.value && fin.value) {
+                    if (new Date(fin.value) <= new Date(inicio.value)) {
+                        showError('finError', 'La hora de fin debe ser posterior a la de inicio.');
+                    } else {
+                        clearError('finError');
+                    }
+                }
+            });
+        }
+    })();
+    /*]]>*/
+</script>
+</body>
+</html>

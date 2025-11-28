@@ -84,6 +84,16 @@
             <div class="error" id="horaFinError" aria-live="polite"></div>
         </div>
 
+        <!-- Zona de alertas -->
+        <div class="alert-container">
+            <div th:if="${mensajeExito}" class="alert alert-success" role="alert">
+                <span th:text="${mensajeExito}">Mensaje de éxito</span>
+            </div>
+            <div th:if="${mensajeError}" class="alert alert-error" role="alert">
+                <span th:text="${mensajeError}">Mensaje de error</span>
+            </div>
+        </div>
+
         <div class="actions">
             <button class="btn" type="submit">Guardar cambios</button>
         </div>

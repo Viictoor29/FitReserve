@@ -128,7 +128,7 @@ public class ClienteController {
             redirectAttributes.addFlashAttribute("mensaje", "Perfil actualizado correctamente");
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar el perfil: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar el perfil");
         }
 
         return "redirect:/cliente/perfil";
@@ -364,11 +364,97 @@ public class ClienteController {
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cancelar la reserva: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al cancelar la reserva");
         }
 
         return "redirect:/cliente/mis-reservas";
     }
 
+    @PostMapping("/reserva/editar/{id}")
+    public String actualizarReserva(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long idSala,
+            @RequestParam(required = false) Long idActividad,
+            @RequestParam(required = false) Long idEntrenador,
+            @RequestParam(required = false) String fechaHoraInicio,
+            @RequestParam(required = false) String fechaHoraFin,
+            @RequestParam(required = false) String comentarios,
+            @RequestParam(required = false) List<Long> maquinarias,
+            @RequestParam(required = false) List<Integer> cantidades,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+            Reserva reservaExistente = reservaService.obtenerPorId(id);
+
+            // Verificar propiedad
+            if (reservaExistente == null || !reservaExistente.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
+                redirectAttributes.addFlashAttribute("error", "Reserva no encontrada o no autorizada.");
+                return "redirect:/cliente/mis-reservas";
+            }
+
+            // Crear objeto con datos actualizados
+            Reserva datosActualizados = new Reserva();
+
+            if (idSala != null) {
+                Sala sala = salaService.obtenerSalaPorId(idSala);
+                datosActualizados.setSala(sala);
+            }
+
+            if (idActividad != null) {
+                Actividad actividad = actividadService.obtenerActividadPorId(idActividad);
+                datosActualizados.setActividad(actividad);
+            }
+
+            if (idEntrenador != null) {
+                Entrenador entrenador = entrenadorService.obtenerEntrenadorPorId(idEntrenador);
+                datosActualizados.setEntrenador(entrenador);
+            }
+
+            if (fechaHoraInicio != null && !fechaHoraInicio.isBlank()) {
+                datosActualizados.setFechaHoraInicio(LocalDateTime.parse(fechaHoraInicio));
+            }
+
+            if (fechaHoraFin != null && !fechaHoraFin.isBlank()) {
+                datosActualizados.setFechaHoraFin(LocalDateTime.parse(fechaHoraFin));
+            }
+
+            if (comentarios != null) {
+                datosActualizados.setComentarios(comentarios);
+            }
+
+            // Maquinaria
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
+                    if (maq != null) {
+                        ReservaMaquinaria rm = new ReservaMaquinaria(reservaExistente, maq, cantidades.get(i));
+                        reservaMaquinarias.add(rm);
+                    }
+                }
+                datosActualizados.setMaquinariaAsignada(reservaMaquinarias);
+            }
+
+            boolean actualizada = reservaService.actualizarReserva(id, datosActualizados);
+
+            if (actualizada) {
+                redirectAttributes.addFlashAttribute("mensaje", "Reserva actualizada correctamente");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "No se pudo actualizar la reserva. Verifica disponibilidad.");
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar la reserva ");
+        }
+
+        return "redirect:/cliente/mis-reservas";
+    }
 
 }

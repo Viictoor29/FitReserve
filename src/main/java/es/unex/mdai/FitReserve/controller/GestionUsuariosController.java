@@ -1,6 +1,5 @@
 package es.unex.mdai.FitReserve.controller;
 
-    import es.unex.mdai.FitReserve.data.enume.Genero;
     import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
     import es.unex.mdai.FitReserve.data.model.Cliente;
     import es.unex.mdai.FitReserve.data.model.Entrenador;
@@ -138,7 +137,7 @@ package es.unex.mdai.FitReserve.controller;
                 model.addAttribute("clienteForm", clienteForm);
                 return "editarCliente";
             } catch (Exception e) {
-                model.addAttribute("mensajeError", "Error al actualizar el cliente: " + e.getMessage());
+                model.addAttribute("mensajeError", "Error al actualizar el cliente");
                 model.addAttribute("clienteForm", clienteForm);
                 return "editarCliente";
             }
@@ -284,7 +283,7 @@ package es.unex.mdai.FitReserve.controller;
                 model.addAttribute("entrenadorForm", entrenadorForm);
                 return "editarEntrenador";
             } catch (Exception e) {
-                model.addAttribute("mensajeError", "Error al actualizar el entrenador: " + e.getMessage());
+                model.addAttribute("mensajeError", "Error al actualizar el entrenador");
                 model.addAttribute("entrenadorForm", entrenadorForm);
                 return "editarEntrenador";
             }
