@@ -36,7 +36,7 @@ INSERT INTO reserva
 (fecha_hora_inicio, fecha_hora_fin, estado, comentarios, id_cliente, id_entrenador, id_actividad, id_sala)
 VALUES
     ('2025-10-21 09:00:00','2025-10-21 10:00:00','Completada','Primera clase',
-     (SELECT id_usuario FROM usuario WHERE email='admin@gym.test'),
+     (SELECT id_usuario FROM usuario WHERE email='mario@gym.test'),
      (SELECT id_usuario FROM usuario WHERE email='sofia@gym.test'),
      (SELECT id_actividad FROM actividad WHERE nombre='Yoga Vinyasa'),
      (SELECT id_sala FROM sala WHERE nombre='Sala A')
@@ -48,21 +48,25 @@ VALUES
      (SELECT id_sala FROM sala WHERE nombre='Sala B')
     );
 
--- RESERVA ↔ MAQUINARIA
+-- RESERVA ↔ MAQUINARIA (corregido: insert por fila usando el cliente correcto)
 INSERT INTO reserva_maquinaria (id_reserva, id_maquinaria, cantidad) VALUES
-                                                                         (
-                                                                             (SELECT r.id_reserva FROM reserva r
-                                                                                                           JOIN usuario u ON r.id_cliente=u.id_usuario AND u.email='admin@gym.test'
-                                                                              WHERE r.id_actividad=(SELECT id_actividad FROM actividad WHERE nombre='Yoga Vinyasa')
-                                                                             ),
-                                                                             (SELECT id_maquinaria FROM maquinaria WHERE nombre='Esterillas'),
-                                                                             10
-                                                                         ),
-                                                                         (
-                                                                             (SELECT r.id_reserva FROM reserva r
-                                                                                                           JOIN usuario u ON r.id_cliente=u.id_usuario AND u.email='mario@gym.test'
-                                                                              WHERE r.id_actividad=(SELECT id_actividad FROM actividad WHERE nombre='HIIT')
-                                                                             ),
-                                                                             (SELECT id_maquinaria FROM maquinaria WHERE nombre='Mancuernas'),
-                                                                             4
-                                                                         );
+    (
+        (SELECT r.id_reserva FROM reserva r
+                                      JOIN usuario u ON r.id_cliente = u.id_usuario
+         WHERE u.email = 'mario@gym.test'
+           AND r.id_actividad = (SELECT id_actividad FROM actividad WHERE nombre = 'Yoga Vinyasa')
+        ),
+        (SELECT id_maquinaria FROM maquinaria WHERE nombre = 'Esterillas'),
+        10
+    );
+
+INSERT INTO reserva_maquinaria (id_reserva, id_maquinaria, cantidad) VALUES
+    (
+        (SELECT r.id_reserva FROM reserva r
+                                      JOIN usuario u ON r.id_cliente = u.id_usuario
+         WHERE u.email = 'mario@gym.test'
+           AND r.id_actividad = (SELECT id_actividad FROM actividad WHERE nombre = 'HIIT')
+        ),
+        (SELECT id_maquinaria FROM maquinaria WHERE nombre = 'Mancuernas'),
+        4
+    );
