@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva maquinaria</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/maquinaria}" class="back-arrow">←</a>
+
+    <h2>Registrar nueva maquinaria</h2>
+
+    <form th:action="@{/admin/maquinaria/nueva}"
+          th:object="${maquinariaForm}" method="post">
+
+        <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" th:field="*{nombre}"
+                   placeholder="Cinta, Elíptica, Banco de pesas..."
+                   required maxlength="20">
+            <div class="error" id="nombreError"></div>
+        </div>
+
+        <div class="field">
+            <label for="cantidadTotal">Cantidad total</label>
+            <input id="cantidadTotal" type="number" min="1" max="500"
+                   th:field="*{cantidadTotal}" required>
+            <div class="error" id="cantidadError"></div>
+        </div>
+
+        <div class="field">
+            <label for="tipoActividad">Tipo de actividad asociada</label>
+            <select id="tipoActividad" th:field="*{tipoActividad}" required>
+                <option value="" disabled>Selecciona un tipo</option>
+                <option th:each="t : ${T(es.unex.mdai.FitReserve.data.enume.TipoActividad).values()}"
+                        th:value="${t}"
+                        th:text="${t}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" th:field="*{descripcion}"
+                      placeholder="Descripción breve de la máquina"
+                      maxlength="255"></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Crear maquinaria</button>
+        </div>
+    </form>
+
+    <div class="footer-link">
+        <a th:href="@{/admin/maquinaria}">← Volver a gestión de maquinaria</a>
+    </div>
+</div>
+</body>
+</html>
