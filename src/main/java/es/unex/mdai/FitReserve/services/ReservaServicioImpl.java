@@ -11,16 +11,16 @@ import es.unex.mdai.FitReserve.data.repository.ReservaMaquinariaRepository;
 import es.unex.mdai.FitReserve.data.repository.ReservaRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ReservaServicioImpl implements  ReservaServicio {
+public class ReservaServicioImpl implements ReservaServicio {
 
     private final ReservaRepository reservaRepository;
     private final ReservaMaquinariaRepository reservaMaquinariaRepository;
@@ -29,7 +29,8 @@ public class ReservaServicioImpl implements  ReservaServicio {
 
     public ReservaServicioImpl(ReservaRepository reservaRepository,
                                ReservaMaquinariaRepository reservaMaquinariaRepository,
-                               MaquinariaRepository maquinariaRepository, EntrenadorRepository entrenadorRepository) {
+                               MaquinariaRepository maquinariaRepository,
+                               EntrenadorRepository entrenadorRepository) {
         this.reservaRepository = reservaRepository;
         this.reservaMaquinariaRepository = reservaMaquinariaRepository;
         this.maquinariaRepository = maquinariaRepository;
@@ -37,6 +38,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
     }
 
     @Override
+    @Transactional
     public boolean crearReserva(Reserva reserva) {
         if (reserva == null ||
                 reserva.getFechaHoraInicio() == null ||
@@ -117,9 +119,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
             }
 
             Maquinaria maquinaria = maquinariaOpt.get();
-
-            // TODO: ajusta el nombre del campo de capacidad según tu entidad Maquinaria
-            int capacidadTotal = maquinaria.getCantidadTotal(); // <-- cambia si tu campo se llama distinto
+            int capacidadTotal = maquinaria.getCantidadTotal();
 
             if (totalEnUso + rm.getCantidad() > capacidadTotal) {
                 return false; // no hay suficientes unidades disponibles
@@ -130,6 +130,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
     }
 
     @Override
+    @Transactional
     public boolean actualizarReserva(Long idReserva, Reserva datosActualizados) {
         if (idReserva == null || datosActualizados == null) {
             return false;
@@ -176,6 +177,10 @@ public class ReservaServicioImpl implements  ReservaServicio {
             existente.setCliente(datosActualizados.getCliente());
         }
 
+        if (datosActualizados.getEstado() != null) {
+            existente.setEstado(datosActualizados.getEstado());
+        }
+
         // --- Actualización de maquinaria SOLO si viene en la petición ---
         if (datosActualizados.getMaquinariaAsignada() != null) {
             existente.getMaquinariaAsignada().clear();
@@ -190,6 +195,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
     }
 
     @Override
+    @Transactional
     public boolean eliminarReserva(Long idReserva) {
         if (idReserva == null) return false;
 
@@ -197,18 +203,19 @@ public class ReservaServicioImpl implements  ReservaServicio {
             return false;
         }
 
-        // Uso interno/admin → no aplico restricciones de fecha/estado
         reservaRepository.deleteByIdReserva(idReserva);
         return true;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Reserva obtenerPorId(Long idReserva) {
         if (idReserva == null) return null;
         return reservaRepository.findById(idReserva).orElse(null);
     }
 
     @Override
+    @Transactional
     public boolean cancelarPorCliente(Long idReserva, Long idCliente) {
         if (idReserva == null || idCliente == null) return false;
 
@@ -217,18 +224,15 @@ public class ReservaServicioImpl implements  ReservaServicio {
 
         Reserva reserva = opt.get();
 
-        // Comprobar que la reserva pertenece al cliente
         if (reserva.getCliente() == null ||
                 !idCliente.equals(reserva.getCliente().getIdCliente())) {
             return false;
         }
 
-        // Solo si no ha empezado
         if (!LocalDateTime.now().isBefore(reserva.getFechaHoraInicio())) {
             return false;
         }
 
-        // No cancelar si ya está cancelada o completada
         if (reserva.getEstado() == Estado.Cancelada ||
                 reserva.getEstado() == Estado.Completada) {
             return false;
@@ -240,6 +244,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
     }
 
     @Override
+    @Transactional
     public boolean cancelarPorEntrenador(Long idReserva, Long idEntrenador) {
         if (idReserva == null || idEntrenador == null) return false;
 
@@ -248,13 +253,11 @@ public class ReservaServicioImpl implements  ReservaServicio {
 
         Reserva reserva = opt.get();
 
-        // Comprobar que la reserva pertenece al entrenador
         if (reserva.getEntrenador() == null ||
                 !idEntrenador.equals(reserva.getEntrenador().getIdEntrenador())) {
             return false;
         }
 
-        // Solo si no ha empezado
         if (!LocalDateTime.now().isBefore(reserva.getFechaHoraInicio())) {
             return false;
         }
@@ -270,6 +273,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
     }
 
     @Override
+    @Transactional
     public boolean marcarComoCompletada(Long idReserva, Long idEntrenador) {
         if (idReserva == null || idEntrenador == null) return false;
 
@@ -278,13 +282,11 @@ public class ReservaServicioImpl implements  ReservaServicio {
 
         Reserva reserva = opt.get();
 
-        // Comprobar que la acción la hace el entrenador de la reserva
         if (reserva.getEntrenador() == null ||
                 !idEntrenador.equals(reserva.getEntrenador().getIdEntrenador())) {
             return false;
         }
 
-        // Idealmente, solo se marca completada si ya ha finalizado
         if (LocalDateTime.now().isBefore(reserva.getFechaHoraFin())) {
             return false;
         }
@@ -369,7 +371,6 @@ public class ReservaServicioImpl implements  ReservaServicio {
             return false;
         }
 
-        // Consideramos ocupadas solo las reservas PENDIENTES
         return reservaRepository.existeSolapeSala(
                 salaId, inicio, fin, Estado.Pendiente
         );
@@ -395,6 +396,7 @@ public class ReservaServicioImpl implements  ReservaServicio {
     }
 
     @Override
+    @Transactional
     public boolean eliminarMaquinariaDeReserva(Long idReserva) {
         if (idReserva == null) return false;
 
@@ -413,7 +415,6 @@ public class ReservaServicioImpl implements  ReservaServicio {
             return 0;
         }
 
-        // Sumamos los estados "activos" que bloquean maquinaria.
         int totalPendiente = reservaMaquinariaRepository.totalReservadoEnIntervalo(
                 maquinariaId, inicio, fin, Estado.Pendiente
         );
@@ -428,7 +429,6 @@ public class ReservaServicioImpl implements  ReservaServicio {
     @Override
     @Transactional(readOnly = true)
     public List<Reserva> listarTodas() {
-        // Ordenadas de más reciente a más antigua
         return reservaRepository.findAll(Sort.by(Sort.Direction.DESC, "fechaHoraInicio"));
     }
 }

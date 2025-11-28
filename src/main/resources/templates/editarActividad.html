@@ -13,42 +13,48 @@
 
     <h2>Editar actividad</h2>
 
-    <form th:action="@{'/admin/actividades/editar/' + ${actividadForm.idActividad}}"
+    <div class="error" th:if="${mensajeError}" th:text="${mensajeError}" aria-live="assertive"></div>
+
+    <form id="editarActividadForm"
+          th:action="@{'/admin/actividades/editar/' + ${actividadForm.idActividad}}"
           th:object="${actividadForm}" method="post">
 
         <div class="field">
             <label for="nombre">Nombre</label>
             <input id="nombre" type="text" th:field="*{nombre}"
                    required maxlength="50">
-            <div class="error" id="nombreError"></div>
+            <div class="error" id="nombreError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="tipoActividad">Tipo de actividad</label>
             <select id="tipoActividad" th:field="*{tipoActividad}" required>
-                <option value="" disabled>Selecciona un tipo</option>
+                <option value="">Selecciona un tipo</option>
                 <option th:each="t : ${tiposActividad}"
                         th:value="${t}"
                         th:text="${t}">
                 </option>
             </select>
+            <div class="error" id="tipoActividadError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="nivel">Nivel</label>
             <select id="nivel" th:field="*{nivel}" required>
-                <option value="" disabled>Selecciona un nivel</option>
+                <option value="">Selecciona un nivel</option>
                 <option th:each="n : ${nivelesActividad}"
                         th:value="${n}"
                         th:text="${n}">
                 </option>
             </select>
+            <div class="error" id="nivelError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="descripcion">Descripción</label>
             <textarea id="descripcion" th:field="*{descripcion}"
                       maxlength="255"></textarea>
+            <div class="error" id="descripcionError" aria-live="polite"></div>
         </div>
 
         <div class="actions">
@@ -57,5 +63,107 @@
     </form>
 
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('editarActividadForm');
+        const nombre = document.getElementById('nombre');
+        const tipoActividad = document.getElementById('tipoActividad');
+        const nivel = document.getElementById('nivel');
+        const descripcion = document.getElementById('descripcion');
+
+        function showError(errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['nombreError', 'tipoActividadError', 'nivelError', 'descripcionError']
+                .forEach(clearError);
+        }
+
+        form.addEventListener('submit', function (e) {
+            clearAllErrors();
+            let hasError = false;
+
+            // Nombre
+            const nombreVal = nombre.value.trim();
+            if (!nombreVal) {
+                showError('nombreError', 'El nombre es obligatorio.');
+                hasError = true;
+            } else if (nombreVal.length > 50) {
+                showError('nombreError', 'El nombre no puede superar 50 caracteres.');
+                hasError = true;
+            }
+
+            // Tipo de actividad
+            const tipoVal = tipoActividad.value;
+            if (!tipoVal) {
+                showError('tipoActividadError', 'El tipo de actividad es obligatorio.');
+                hasError = true;
+            }
+
+            // Nivel
+            const nivelVal = nivel.value;
+            if (!nivelVal) {
+                showError('nivelError', 'El nivel es obligatorio.');
+                hasError = true;
+            }
+
+            // Descripción
+            const descVal = descripcion.value.trim();
+            if (descVal.length > 255) {
+                showError('descripcionError', 'La descripción no puede superar 255 caracteres.');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+
+        // Validación en tiempo real
+        nombre.addEventListener('input', function () {
+            const val = nombre.value.trim();
+            if (!val) {
+                showError('nombreError', 'El nombre es obligatorio.');
+            } else if (val.length > 50) {
+                showError('nombreError', 'El nombre no puede superar 50 caracteres.');
+            } else {
+                clearError('nombreError');
+            }
+        });
+
+        tipoActividad.addEventListener('change', function () {
+            if (!tipoActividad.value) {
+                showError('tipoActividadError', 'El tipo de actividad es obligatorio.');
+            } else {
+                clearError('tipoActividadError');
+            }
+        });
+
+        nivel.addEventListener('change', function () {
+            if (!nivel.value) {
+                showError('nivelError', 'El nivel es obligatorio.');
+            } else {
+                clearError('nivelError');
+            }
+        });
+
+        descripcion.addEventListener('input', function () {
+            const val = descripcion.value.trim();
+            if (val.length > 255) {
+                showError('descripcionError', 'La descripción no puede superar 255 caracteres.');
+            } else {
+                clearError('descripcionError');
+            }
+        });
+    })();
+</script>
 </body>
 </html>

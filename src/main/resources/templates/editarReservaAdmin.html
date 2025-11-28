@@ -13,22 +13,49 @@
 
     <h2>Editar reserva</h2>
 
-    <form th:action="@{'/admin/reservas/editar/' + ${reserva.idReserva}}" method="post">
+    <div class="error" th:if="${mensajeError}" th:text="${mensajeError}" aria-live="assertive"></div>
+
+    <form id="editarReservaForm"
+          th:action="@{'/admin/reservas/editar/' + ${reserva.idReserva}}"
+          method="post">
+
+        <!-- ================= INICIO ================= -->
+        <!-- Campo oculto que recibe el valor final yyyy-MM-ddTHH:mm para el controlador -->
+        <input type="hidden" id="inicioHidden" name="inicio"/>
 
         <div class="field">
-            <label for="inicio">Fecha y hora de inicio</label>
-            <input id="inicio" name="inicio" type="datetime-local"
-                   th:value="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd''T''HH:mm')}"
+            <label for="fechaInicio">Fecha de inicio</label>
+            <input id="fechaInicio" type="date"
+                   th:value="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd')}"
                    required>
         </div>
 
         <div class="field">
-            <label for="fin">Fecha y hora de fin</label>
-            <input id="fin" name="fin" type="datetime-local"
-                   th:value="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd''T''HH:mm')}"
+            <label for="horaInicio">Hora de inicio</label>
+            <input id="horaInicio" type="time"
+                   th:value="${#temporals.format(reserva.fechaHoraInicio, 'HH:mm')}"
                    required>
         </div>
 
+        <!-- ================= FIN ================= -->
+        <!-- Campo oculto que recibe el valor final yyyy-MM-ddTHH:mm para el controlador -->
+        <input type="hidden" id="finHidden" name="fin"/>
+
+        <div class="field">
+            <label for="fechaFin">Fecha de fin</label>
+            <input id="fechaFin" type="date"
+                   th:value="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd')}"
+                   required>
+        </div>
+
+        <div class="field">
+            <label for="horaFin">Hora de fin</label>
+            <input id="horaFin" type="time"
+                   th:value="${#temporals.format(reserva.fechaHoraFin, 'HH:mm')}"
+                   required>
+        </div>
+
+        <!-- ================= SELECCIONES ================= -->
         <div class="field">
             <label for="clienteId">Cliente</label>
             <select id="clienteId" name="clienteId" required>
@@ -99,9 +126,48 @@
         </div>
     </form>
 
-    <div class="footer-link">
-        <a th:href="@{/admin/reservas}">← Volver a gestión de reservas</a>
-    </div>
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('editarReservaForm');
+
+        function combina(fechaId, horaId, hiddenId) {
+            const fecha = document.getElementById(fechaId).value;
+            const hora = document.getElementById(horaId).value;
+            const hidden = document.getElementById(hiddenId);
+
+            if (fecha && hora) {
+                hidden.value = fecha + "T" + hora;
+                return true;
+            }
+            return false;
+        }
+
+        form.addEventListener('submit', function (e) {
+            const ok1 = combina("fechaInicio", "horaInicio", "inicioHidden");
+            const ok2 = combina("fechaFin", "horaFin", "finHidden");
+
+            if (!ok1 || !ok2) {
+                e.preventDefault();
+                alert("Debes rellenar fecha y hora para inicio y fin.");
+                return;
+            }
+
+            // Validación: fin > inicio
+            const inicioVal = document.getElementById("inicioHidden").value;
+            const finVal = document.getElementById("finHidden").value;
+
+            const inicioDate = new Date(inicioVal);
+            const finDate = new Date(finVal);
+
+            if (!(finDate > inicioDate)) {
+                e.preventDefault();
+                alert("La fecha/hora de fin debe ser posterior a la de inicio.");
+            }
+        });
+    })();
+</script>
+
 </body>
 </html>

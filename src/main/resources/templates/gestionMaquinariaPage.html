@@ -15,12 +15,15 @@
             <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
             <div>
                 <h1>Panel de gestión de maquinaria</h1>
-                <p class="subtitle">Administrador</p>
+                <p class="subtitle">Administra la maquinaria del centro</p>
             </div>
         </div>
 
         <div class="user-info">
-            <span class="user-name">Administrador</span>
+            <span class="user-name"
+                  th:text="${#authentication != null ? #authentication.name : 'Administrador'}">
+                Administrador
+            </span>
             <form th:action="@{/logout}" method="post" style="display:inline;">
                 <button type="submit" class="btn-logout">Cerrar sesión</button>
             </form>
@@ -78,7 +81,7 @@
                     </td>
                 </tr>
 
-                <tr th:if="${#lists.isEmpty(maquinarias)}">
+                <tr th:if="${maquinarias == null or #lists.isEmpty(maquinarias)}">
                     <td colspan="6" class="empty-state">
                         No hay maquinaria registrada.
                     </td>

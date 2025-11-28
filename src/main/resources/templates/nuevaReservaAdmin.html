@@ -13,10 +13,12 @@
 
     <h2>Crear nueva reserva</h2>
 
+    <div class="error" th:if="${regError}" th:text="${regError}" aria-live="assertive"></div>
+
     <form id="reservaForm" th:action="@{/admin/reservas/nueva}" method="post">
 
         <!-- ================= INICIO ================= -->
-        <input type="hidden" id="fechaHoraInicioHidden" name="fechaHoraInicio"/>
+        <input type="hidden" id="inicioHidden" name="inicio"/>
 
         <div class="field">
             <label for="fechaInicio">Fecha de inicio</label>
@@ -29,7 +31,7 @@
         </div>
 
         <!-- ================= FIN ================= -->
-        <input type="hidden" id="fechaHoraFinHidden" name="fechaHoraFin"/>
+        <input type="hidden" id="finHidden" name="fin"/>
 
         <div class="field">
             <label for="fechaFin">Fecha de fin</label>
@@ -97,9 +99,6 @@
         </div>
     </form>
 
-    <div class="footer-link">
-        <a th:href="@{/admin/reservas}">← Volver a gestión de reservas</a>
-    </div>
 </div>
 
 <!-- ================= SCRIPT ================= -->
@@ -120,12 +119,25 @@
         }
 
         form.addEventListener('submit', function (e) {
-            let ok1 = combina("fechaInicio", "horaInicio", "fechaHoraInicioHidden");
-            let ok2 = combina("fechaFin", "horaFin", "fechaHoraFinHidden");
+            const ok1 = combina("fechaInicio", "horaInicio", "inicioHidden");
+            const ok2 = combina("fechaFin", "horaFin", "finHidden");
 
             if (!ok1 || !ok2) {
                 e.preventDefault();
                 alert("Debes rellenar fecha y hora para inicio y fin.");
+                return;
+            }
+
+            // Validación simple: fin > inicio
+            const inicioVal = document.getElementById("inicioHidden").value;
+            const finVal = document.getElementById("finHidden").value;
+
+            const inicioDate = new Date(inicioVal);
+            const finDate = new Date(finVal);
+
+            if (!(finDate > inicioDate)) {
+                e.preventDefault();
+                alert("La fecha/hora de fin debe ser posterior a la de inicio.");
             }
         });
     })();

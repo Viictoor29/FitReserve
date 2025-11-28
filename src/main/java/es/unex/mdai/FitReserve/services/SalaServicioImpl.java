@@ -14,18 +14,18 @@ public class SalaServicioImpl implements SalaServicio {
 
     private final SalaRepository salaRepository;
 
-    // Inyección por constructor (mejor práctica)
     public SalaServicioImpl(SalaRepository salaRepository) {
         this.salaRepository = salaRepository;
     }
 
     @Override
+    @Transactional
     public boolean crearSala(Sala sala) {
         if (sala == null) {
             return false;
         }
 
-        // Validaciones básicas: si algo obligatorio falta, NO guardamos
+        // Validaciones básicas
         if (sala.getNombre() == null || sala.getNombre().isBlank()) {
             return false;
         }
@@ -41,12 +41,12 @@ public class SalaServicioImpl implements SalaServicio {
             return false;
         }
 
-        // Si llegamos aquí, los datos son válidos
         salaRepository.save(sala);
         return true;
     }
 
     @Override
+    @Transactional
     public boolean actualizarSala(Long idSala, Sala salaActualizada) {
         if (idSala == null) {
             throw new IllegalArgumentException("El idSala no puede ser nulo.");
@@ -55,10 +55,14 @@ public class SalaServicioImpl implements SalaServicio {
             throw new IllegalArgumentException("Los datos actualizados no pueden ser nulos.");
         }
 
-        Sala existente = salaRepository.findByIdSala(idSala)
-                .orElseThrow(() -> new IllegalArgumentException("No existe sala con id: " + idSala));
+        var opt = salaRepository.findByIdSala(idSala);
+        if (opt.isEmpty()) {
+            return false; // igual que haces en otros servicios cuando no existe
+        }
 
-        // ACTUALIZAR solo campos no nulos / no vacíos
+        Sala existente = opt.get();
+
+        // ACTUALIZAR solo campos no nulos / válidos
         if (salaActualizada.getNombre() != null) {
             existente.setNombre(salaActualizada.getNombre());
         }
@@ -77,15 +81,18 @@ public class SalaServicioImpl implements SalaServicio {
     }
 
     @Override
+    @Transactional
     public boolean eliminarSala(Long idSala) {
         if (idSala == null) {
             throw new IllegalArgumentException("El idSala no puede ser nulo.");
         }
 
+        // IMPORTANTE: esta llamada se ejecuta ahora dentro de una transacción
         if (!salaRepository.existsById(idSala)) {
             return false;
         }
 
+        // Si tienes un deleteByIdSala derivado, se usará aquí
         salaRepository.deleteByIdSala(idSala);
         return true;
     }
@@ -97,8 +104,9 @@ public class SalaServicioImpl implements SalaServicio {
             throw new IllegalArgumentException("El idSala no puede ser nulo.");
         }
 
-        return salaRepository.findByIdSala(idSala)
-                .orElseThrow(() -> new IllegalArgumentException("No existe sala con id: " + idSala));
+        // Cambiamos para que devuelva null si no existe, igual que
+        // tu controlador de usuarios espera (if (cliente == null) ...)
+        return salaRepository.findByIdSala(idSala).orElse(null);
     }
 
     @Override

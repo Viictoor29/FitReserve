@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 public class ActividadServicioImpl implements ActividadServicio {
 
-
     private final ActividadRepository actividadRepository;
 
     public ActividadServicioImpl(ActividadRepository actividadRepository) {
@@ -20,9 +19,15 @@ public class ActividadServicioImpl implements ActividadServicio {
     }
 
     @Override
+    @Transactional
     public boolean crearActividad(Actividad actividad) {
         if (actividad == null) {
             throw new IllegalArgumentException("La actividad no puede ser nula.");
+        }
+
+        // Validación básica
+        if (actividad.getNombre() == null || actividad.getNombre().isBlank()) {
+            return false;
         }
 
         // No permitir nombres duplicados
@@ -36,6 +41,7 @@ public class ActividadServicioImpl implements ActividadServicio {
     }
 
     @Override
+    @Transactional
     public boolean actualizarActividad(Long idActividad, Actividad actividadActualizada) {
         if (idActividad == null) {
             throw new IllegalArgumentException("El idActividad no puede ser nulo.");
@@ -44,8 +50,12 @@ public class ActividadServicioImpl implements ActividadServicio {
             throw new IllegalArgumentException("Los datos actualizados no pueden ser nulos.");
         }
 
-        Actividad existente = actividadRepository.findByIdActividad(idActividad)
-                .orElseThrow(() -> new IllegalArgumentException("No existe actividad con id: " + idActividad));
+        var opt = actividadRepository.findByIdActividad(idActividad);
+        if (opt.isEmpty()) {
+            return false;
+        }
+
+        Actividad existente = opt.get();
 
         // actualizar solo los campos no nulos
         if (actividadActualizada.getNombre() != null) {
@@ -66,6 +76,7 @@ public class ActividadServicioImpl implements ActividadServicio {
     }
 
     @Override
+    @Transactional
     public boolean eliminarActividad(Long idActividad) {
         if (idActividad == null) {
             throw new IllegalArgumentException("El idActividad no puede ser nulo.");
@@ -85,8 +96,8 @@ public class ActividadServicioImpl implements ActividadServicio {
             throw new IllegalArgumentException("El idActividad no puede ser nulo.");
         }
 
-        return actividadRepository.findByIdActividad(idActividad)
-                .orElseThrow(() -> new IllegalArgumentException("No existe actividad con id: " + idActividad));
+        // devolvemos null si no existe, igual que en salas
+        return actividadRepository.findByIdActividad(idActividad).orElse(null);
     }
 
     @Override
@@ -105,6 +116,7 @@ public class ActividadServicioImpl implements ActividadServicio {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Actividad> buscarPorNivel(NivelActividad nivel) {
         if (nivel == null) {
             throw new IllegalArgumentException("El nivel no puede ser nulo.");
@@ -113,11 +125,13 @@ public class ActividadServicioImpl implements ActividadServicio {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Actividad buscarPorNombre(String nombre) {
         if (nombre == null || nombre.isBlank()) {
             throw new IllegalArgumentException("El nombre no puede ser nulo o vacío.");
         }
 
+        // aquí podemos seguir lanzando excepción si no existe
         return actividadRepository.findByNombre(nombre)
                 .orElseThrow(() -> new IllegalArgumentException("No existe actividad con nombre: " + nombre));
     }
