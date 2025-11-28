@@ -53,13 +53,24 @@
                 <p>Actualiza tus datos personales y objetivos</p>
             </a>
 
-            <a th:href="@{/cliente/eliminar-cuenta}" class="action-card danger">
+            <div class="action-card danger" onclick="confirmarEliminacion()">
                 <div class="icon">🗑️</div>
                 <h3>Eliminar Cuenta</h3>
                 <p>Eliminar permanentemente tu cuenta</p>
-            </a>
+            </div>
         </div>
     </main>
 </div>
+<script>
+    function confirmarEliminacion() {
+        if (confirm('¿Está seguro de que desea eliminar su cuenta? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/cliente/eliminar-cuenta';
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
 </body>
 </html>

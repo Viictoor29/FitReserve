@@ -3,6 +3,7 @@ package es.unex.mdai.FitReserve.services;
 import es.unex.mdai.FitReserve.data.model.Usuario;
 import es.unex.mdai.FitReserve.data.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioServicioImpl implements UsuarioServicio {
@@ -73,6 +74,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
     }
 
     @Override
+    @Transactional
     public void eliminarUsuario(Long idUsuario) {
         if (idUsuario == null) {
             throw new IllegalArgumentException("El idUsuario no puede ser nulo.");
