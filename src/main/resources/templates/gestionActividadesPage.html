@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de actividades</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/adminGestion.css}">
+</head>
+<body>
+<div class="page-container">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <div>
+                <h1>Panel de gestión de actividades</h1>
+                <p class="subtitle">Administrador</p>
+            </div>
+        </div>
+
+        <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- MENSAJES -->
+    <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+    <div th:if="${mensajeError}" class="alert alert-error" th:text="${mensajeError}"></div>
+
+    <!-- TARJETA LISTADO -->
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>Actividades del centro</h2>
+                <p>Gestiona los tipos de clases disponibles</p>
+            </div>
+
+            <a th:href="@{/admin/actividades/nueva}" class="btn btn-primary">
+                + Nueva actividad
+            </a>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Nivel</th>
+                    <th>Descripción</th>
+                    <th class="center">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="actividad, stat : ${actividades}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${actividad.nombre}">Yoga</td>
+                    <td th:text="${actividad.tipoActividad}">COLECTIVA</td>
+                    <td th:text="${actividad.nivel}">BÁSICO</td>
+                    <td th:text="${actividad.descripcion}">Clase suave de estiramientos</td>
+                    <td class="center actions-cell">
+                        <a class="link link-edit"
+                           th:href="@{'/admin/actividades/editar/' + ${actividad.idActividad}}">
+                            Editar
+                        </a>
+
+                        <button type="button"
+                                class="link link-delete"
+                                th:onclick="'confirmarEliminacionActividad(' + ${actividad.idActividad} + ');'">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(actividades)}">
+                    <td colspan="6" class="empty-state">
+                        No hay actividades registradas.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- BOTÓN VOLVER -->
+    <div style="margin-top:2rem;">
+        <a th:href="@{/admin}" class="btn-logout">← Volver al panel de administrador</a>
+    </div>
+
+</div>
+
+<script>
+    function confirmarEliminacionActividad(id) {
+        if (confirm('¿Está seguro de que desea eliminar esta actividad? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/actividades/eliminar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+</body>
+</html>
