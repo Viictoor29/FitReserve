@@ -58,7 +58,7 @@ public class ClienteController {
         Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
 
         if (usuario != null) {
-            usuarioService.eliminarUsuario(usuario.getIdUsuario());
+            boolean ok = usuarioService.eliminarUsuario(usuario.getIdUsuario());
             session.invalidate();
             return "redirect:/";
         }

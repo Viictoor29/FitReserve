@@ -75,7 +75,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
 
     @Override
     @Transactional
-    public void eliminarUsuario(Long idUsuario) {
+    public boolean eliminarUsuario(Long idUsuario) {
         if (idUsuario == null) {
             throw new IllegalArgumentException("El idUsuario no puede ser nulo.");
         }
@@ -85,6 +85,7 @@ public class UsuarioServicioImpl implements UsuarioServicio {
         }
 
         repository.deleteByIdUsuario(idUsuario);
+        return true;
     }
 
     @Override

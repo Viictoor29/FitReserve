@@ -9,7 +9,7 @@ public interface UsuarioServicio {
 
     Usuario actualizarUsuario(Long idUsuario, Usuario datosActualizados);
 
-    void eliminarUsuario(Long idUsuario);
+    boolean eliminarUsuario(Long idUsuario);
 
     Usuario obtenerUsuarioPorId(Long idUsuario);
 

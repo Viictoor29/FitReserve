@@ -3,71 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar entrenador</title>
-    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
     <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 <div class="registro-container">
+
     <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
 
     <h2>Editar entrenador</h2>
 
-    <form th:action="@{'/admin/usuarios/entrenadores/editar/' + ${entrenadorForm.idEntrenador}}"
+    <form id="editarForm" th:action="@{'/admin/usuarios/entrenadores/editar/' + ${entrenadorForm.idEntrenador}}"
           th:object="${entrenadorForm}" method="post">
 
-        <!-- DATOS DE USUARIO -->
         <div class="field">
             <label for="nombre">Nombre</label>
-            <input id="nombre" type="text" th:field="*{usuario.nombre}" required maxlength="20">
+            <input id="nombre" type="text" th:field="*{usuario.nombre}"
+                   placeholder="Nombre" maxlength="20">
+            <div class="error" id="nombreError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="apellidos">Apellidos</label>
-            <input id="apellidos" type="text" th:field="*{usuario.apellidos}" required maxlength="50">
+            <input id="apellidos" type="text" th:field="*{usuario.apellidos}"
+                   placeholder="Apellidos" maxlength="50">
+            <div class="error" id="apellidosError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="email">Correo electrónico</label>
-            <input id="email" type="email" th:field="*{usuario.email}" required maxlength="100">
+            <input id="email" type="email" th:field="*{usuario.email}"
+                   placeholder="ejemplo@correo.com" maxlength="100">
+            <div class="error" id="emailError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="telefono">Teléfono</label>
             <input id="telefono" type="tel" th:field="*{usuario.telefono}"
-                   pattern="[0-9]{9}" maxlength="9" required>
+                   placeholder="9 dígitos" pattern="\d{9}" maxlength="9">
+            <div class="error" id="telefonoError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="contrasenia">Contraseña</label>
-            <input id="contrasenia" type="password" th:field="*{usuario.contrasenia}"
-                   placeholder="Nueva contraseña (o deja la actual)" maxlength="20" >
+            <input type="password" id="contrasenia" name="contrasenia"
+                   placeholder="Dejar vacío para mantener actual" maxlength="20">
+            <div class="error" id="contraseniaError" aria-live="polite"></div>
         </div>
 
-        <!-- DATOS DE ENTRENADOR -->
+        <div class="field">
+            <label for="contrasenia2">Confirmar contraseña</label>
+            <input type="password" id="contrasenia2" name="confirmContrasenia"
+                   placeholder="Repite la contraseña" maxlength="20">
+            <div class="error" id="contrasenia2Error" aria-live="polite"></div>
+        </div>
+
         <div class="field">
             <label for="especialidad">Especialidad</label>
-            <input id="especialidad" type="text" th:field="*{especialidad}" required maxlength="50">
+            <input id="especialidad" type="text" th:field="*{especialidad}"
+                   placeholder="Crossfit, Yoga, Pilates..." maxlength="50">
+            <div class="error" id="especialidadError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="experiencia">Experiencia (años)</label>
-            <input id="experiencia" type="number" th:field="*{experiencia}" min="1" max="50" required>
+            <input id="experiencia" type="number" min="1" max="10" th:field="*{experiencia}">
+            <div class="error" id="experienciaError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="horaInicioTrabajo">Hora inicio trabajo</label>
-            <input id="horaInicioTrabajo" type="time" th:field="*{horaInicioTrabajo}" required>
+            <input id="horaInicioTrabajo" type="time" th:field="*{horaInicioTrabajo}">
+            <div class="error" id="horaInicioError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="horaFinTrabajo">Hora fin trabajo</label>
-            <input id="horaFinTrabajo" type="time" th:field="*{horaFinTrabajo}" required>
+            <input id="horaFinTrabajo" type="time" th:field="*{horaFinTrabajo}">
+            <div class="error" id="horaFinError" aria-live="polite"></div>
         </div>
 
         <div class="actions">
             <button class="btn" type="submit">Guardar cambios</button>
         </div>
     </form>
+
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('editarForm');
+        const contrasenia = document.getElementById('contrasenia');
+        const contrasenia2 = document.getElementById('contrasenia2');
+        const experiencia = document.getElementById('experiencia');
+        const horaInicioTrabajo = document.getElementById('horaInicioTrabajo');
+        const horaFinTrabajo = document.getElementById('horaFinTrabajo');
+
+        function showError(input, errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['contrasenia2Error', 'experienciaError', 'horaInicioError', 'horaFinError'].forEach(id => clearError(id));
+        }
+
+        function passwordsMatch() {
+            const v1 = contrasenia.value.trim();
+            const v2 = contrasenia2.value.trim();
+
+            if (v1 === '' && v2 === '') {
+                return true;
+            }
+
+            return v1 === v2;
+        }
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                clearAllErrors();
+                let hasError = false;
+
+                // Validar contraseñas
+                const nuevaPass = contrasenia.value.trim();
+                const confirm = contrasenia2.value.trim();
+
+                if (nuevaPass !== '' || confirm !== '') {
+                    if (!passwordsMatch()) {
+                        showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                        hasError = true;
+                    }
+                }
+
+                // Validar experiencia si se proporciona
+                if (experiencia.value) {
+                    const expValue = parseInt(experiencia.value);
+                    if (expValue < 1 || expValue > 10) {
+                        showError(experiencia, 'experienciaError', 'La experiencia debe estar entre 1 y 10 años.');
+                        hasError = true;
+                    }
+                }
+
+                // Validar horas si ambas están proporcionadas
+                if (horaInicioTrabajo.value && horaFinTrabajo.value) {
+                    if (horaInicioTrabajo.value >= horaFinTrabajo.value) {
+                        showError(horaFinTrabajo, 'horaFinError', 'La hora de fin debe ser posterior a la de inicio.');
+                        hasError = true;
+                    }
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Validación en tiempo real de contraseñas
+        if (contrasenia) contrasenia.addEventListener('input', function () {
+            if (contrasenia2.value.trim()) {
+                if (!passwordsMatch()) showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                else clearError('contrasenia2Error');
+            }
+        });
+
+        if (contrasenia2) contrasenia2.addEventListener('input', function () {
+            if (contrasenia.value.trim() || contrasenia2.value.trim()) {
+                if (!passwordsMatch()) showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                else clearError('contrasenia2Error');
+            }
+        });
+
+        // Validación en tiempo real de experiencia
+        if (experiencia) experiencia.addEventListener('input', function () {
+            if (experiencia.value) {
+                const expValue = parseInt(experiencia.value);
+                if (expValue < 1 || expValue > 10) {
+                    showError(experiencia, 'experienciaError', 'La experiencia debe estar entre 1 y 10 años.');
+                } else {
+                    clearError('experienciaError');
+                }
+            } else {
+                clearError('experienciaError');
+            }
+        });
+
+        // Validación en tiempo real de horas
+        if (horaInicioTrabajo) horaInicioTrabajo.addEventListener('input', function () {
+            if (horaFinTrabajo.value && horaInicioTrabajo.value >= horaFinTrabajo.value) {
+                showError(horaFinTrabajo, 'horaFinError', 'La hora de fin debe ser posterior a la de inicio.');
+            } else if (horaFinTrabajo.value) {
+                clearError('horaFinError');
+            }
+        });
+
+        if (horaFinTrabajo) horaFinTrabajo.addEventListener('input', function () {
+            if (horaInicioTrabajo.value && horaInicioTrabajo.value >= horaFinTrabajo.value) {
+                showError(horaFinTrabajo, 'horaFinError', 'La hora de fin debe ser posterior a la de inicio.');
+            } else {
+                clearError('horaFinError');
+            }
+        });
+    })();
+</script>
 </body>
 </html>

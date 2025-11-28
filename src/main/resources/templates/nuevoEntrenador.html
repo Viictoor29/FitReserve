@@ -15,7 +15,7 @@
     <h2>Registrar nuevo entrenador</h2>
 
     <form id="registroForm" th:action="@{/admin/usuarios/entrenadores/nuevo}"
-          th:object="${entrenadorForm}" method="post">
+          th:object="${entrenador}" method="post">
 
         <div class="field">
             <label for="nombre">Nombre</label>
@@ -68,7 +68,7 @@
 
         <div class="field">
             <label for="experiencia">Experiencia (años)</label>
-            <input id="experiencia" type="number" min="1" max="50" th:field="*{experiencia}" required>
+            <input id="experiencia" type="number" min="1" max="10" th:field="*{experiencia}" required>
             <div class="error" id="experienciaError" aria-live="polite"></div>
         </div>
 
@@ -102,6 +102,10 @@
         const contrasenia = document.getElementById('contrasenia');
         const contrasenia2 = document.getElementById('contrasenia2');
         const telefono = document.getElementById('telefono');
+        const especialidad = document.getElementById('especialidad');
+        const experiencia = document.getElementById('experiencia');
+        const horaInicioTrabajo = document.getElementById('horaInicioTrabajo');
+        const horaFinTrabajo = document.getElementById('horaFinTrabajo');
 
         const emailRegex = /^\S+@\S+\.\S+$/;
         const telefonoRegex = /^\d{9}$/;
@@ -118,9 +122,8 @@
 
         function clearAllErrors() {
             ['nombreError', 'apellidosError', 'emailError', 'contraseniaError',
-                'contrasenia2Error', 'telefonoError',
-                'especialidadError', 'experienciaError',
-                'horaInicioError', 'horaFinError'].forEach(id => clearError(id));
+                'contrasenia2Error', 'telefonoError', 'especialidadError',
+                'experienciaError', 'horaInicioError', 'horaFinError'].forEach(id => clearError(id));
         }
 
         function passwordsMatch() {
@@ -171,28 +174,29 @@
                     hasError = true;
                 }
 
-                const especialidad = document.getElementById('especialidad');
-                const experiencia = document.getElementById('experiencia');
-                const horaInicioTrabajo = document.getElementById('horaInicioTrabajo');
-                const horaFinTrabajo = document.getElementById('horaFinTrabajo');
-
-                if (especialidad && !especialidad.value.trim()) {
+                if (!especialidad.value.trim()) {
                     showError(especialidad, 'especialidadError', 'La especialidad es obligatoria.');
                     hasError = true;
                 }
 
-                if (experiencia && (!experiencia.value || experiencia.value < 1)) {
-                    showError(experiencia, 'experienciaError', 'La experiencia es obligatoria y debe ser >= 1.');
+                const expValue = parseInt(experiencia.value);
+                if (!experiencia.value || expValue < 1 || expValue > 10) {
+                    showError(experiencia, 'experienciaError', 'La experiencia debe estar entre 1 y 10 años.');
                     hasError = true;
                 }
 
-                if (horaInicioTrabajo && !horaInicioTrabajo.value) {
+                if (!horaInicioTrabajo.value) {
                     showError(horaInicioTrabajo, 'horaInicioError', 'La hora de inicio es obligatoria.');
                     hasError = true;
                 }
 
-                if (horaFinTrabajo && !horaFinTrabajo.value) {
+                if (!horaFinTrabajo.value) {
                     showError(horaFinTrabajo, 'horaFinError', 'La hora de fin es obligatoria.');
+                    hasError = true;
+                }
+
+                if (horaInicioTrabajo.value && horaFinTrabajo.value && horaInicioTrabajo.value >= horaFinTrabajo.value) {
+                    showError(horaFinTrabajo, 'horaFinError', 'La hora de fin debe ser posterior a la de inicio.');
                     hasError = true;
                 }
 
@@ -202,7 +206,7 @@
             });
         }
 
-        // Validación en tiempo real (igual que en nuevoCliente)
+        // Validación en tiempo real
         if (nombre) nombre.addEventListener('input', function () {
             if (!nombre.value.trim()) showError(nombre, 'nombreError', 'El nombre es obligatorio.');
             else clearError('nombreError');
@@ -239,6 +243,40 @@
             if (!telefono.value.trim()) showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
             else if (!telefonoRegex.test(telefono.value.trim())) showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
             else clearError('telefonoError');
+        });
+
+        if (especialidad) especialidad.addEventListener('input', function () {
+            if (!especialidad.value.trim()) showError(especialidad, 'especialidadError', 'La especialidad es obligatoria.');
+            else clearError('especialidadError');
+        });
+
+        if (experiencia) experiencia.addEventListener('input', function () {
+            const expValue = parseInt(experiencia.value);
+            if (!experiencia.value || expValue < 1 || expValue > 10) {
+                showError(experiencia, 'experienciaError', 'La experiencia debe estar entre 1 y 10 años.');
+            } else {
+                clearError('experienciaError');
+            }
+        });
+
+        if (horaInicioTrabajo) horaInicioTrabajo.addEventListener('input', function () {
+            if (!horaInicioTrabajo.value) showError(horaInicioTrabajo, 'horaInicioError', 'La hora de inicio es obligatoria.');
+            else clearError('horaInicioError');
+
+            if (horaFinTrabajo.value && horaInicioTrabajo.value >= horaFinTrabajo.value) {
+                showError(horaFinTrabajo, 'horaFinError', 'La hora de fin debe ser posterior a la de inicio.');
+            } else if (horaFinTrabajo.value) {
+                clearError('horaFinError');
+            }
+        });
+
+        if (horaFinTrabajo) horaFinTrabajo.addEventListener('input', function () {
+            if (!horaFinTrabajo.value) showError(horaFinTrabajo, 'horaFinError', 'La hora de fin es obligatoria.');
+            else if (horaInicioTrabajo.value && horaInicioTrabajo.value >= horaFinTrabajo.value) {
+                showError(horaFinTrabajo, 'horaFinError', 'La hora de fin debe ser posterior a la de inicio.');
+            } else {
+                clearError('horaFinError');
+            }
         });
     })();
 </script>
