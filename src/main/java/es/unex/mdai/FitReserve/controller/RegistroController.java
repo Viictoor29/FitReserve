@@ -58,6 +58,7 @@ public class RegistroController {
         }
 
         Usuario usuario = cliente.getUsuario();
+        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
 
         try {
             // Primero guardamos el usuario (obtendremos idUsuario)
@@ -77,7 +78,7 @@ public class RegistroController {
             model.addAttribute("regError", ex.getMessage());
             return "registro";
         } catch (Exception ex) {
-            model.addAttribute("regError", ex.getMessage());
+            model.addAttribute("regError", "Error inesperado durante el registro.");
             return "registro";
         }
     }
