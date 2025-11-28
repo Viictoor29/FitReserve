@@ -13,7 +13,10 @@
 
     <h2>Editar reserva</h2>
 
-    <form th:action="@{'/admin/reservas/editar/' + ${reserva.idReserva}}" method="post">
+    <div class="error" th:if="${mensajeError}" th:text="${mensajeError}" aria-live="assertive"></div>
+
+    <form id="editarReservaForm"
+          th:action="@{'/admin/reservas/editar/' + ${reserva.idReserva}}" method="post">
 
         <div class="field">
             <label for="inicio">Fecha y hora de inicio</label>
@@ -103,5 +106,29 @@
         <a th:href="@{/admin/reservas}">← Volver a gestión de reservas</a>
     </div>
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('editarReservaForm');
+        const inicio = document.getElementById('inicio');
+        const fin = document.getElementById('fin');
+
+        form.addEventListener('submit', function (e) {
+            const inicioVal = inicio.value;
+            const finVal = fin.value;
+
+            if (!inicioVal || !finVal) return;
+
+            const inicioDate = new Date(inicioVal);
+            const finDate = new Date(finVal);
+
+            if (!(finDate > inicioDate)) {
+                e.preventDefault();
+                alert("La fecha/hora de fin debe ser posterior a la de inicio.");
+            }
+        });
+    })();
+</script>
+
 </body>
 </html>

@@ -6,7 +6,6 @@ import es.unex.mdai.FitReserve.services.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -35,6 +34,14 @@ public class GestionReservasController {
         this.salaServicio = salaServicio;
     }
 
+    private void cargarCombos(Model model) {
+        model.addAttribute("clientes", clienteServicio.listarTodos());
+        model.addAttribute("entrenadores", entrenadorServicio.listarTodos());
+        model.addAttribute("actividades", actividadServicio.listarTodas());
+        model.addAttribute("salas", salaServicio.listarTodas());
+        model.addAttribute("estados", Estado.values());
+    }
+
     /* ========== LISTADO PRINCIPAL ========== */
 
     @GetMapping
@@ -61,11 +68,7 @@ public class GestionReservasController {
 
     @GetMapping("/nueva")
     public String mostrarNuevaReserva(Model model) {
-        model.addAttribute("clientes", clienteServicio.listarTodos());
-        model.addAttribute("entrenadores", entrenadorServicio.listarTodos());
-        model.addAttribute("actividades", actividadServicio.listarTodas());
-        model.addAttribute("salas", salaServicio.listarTodas());
-        model.addAttribute("estados", Estado.values()); // por si quieres permitir cambiar estado en admin
+        cargarCombos(model);
         return "nuevaReservaAdmin";
     }
 
@@ -85,30 +88,47 @@ public class GestionReservasController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
-        Cliente cliente = clienteServicio.obtenerClientePorId(clienteId);
-        Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
-        Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
-        Sala sala = salaServicio.obtenerSalaPorId(salaId);
+        try {
+            Cliente cliente = clienteServicio.obtenerClientePorId(clienteId);
+            Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
+            Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
+            Sala sala = salaServicio.obtenerSalaPorId(salaId);
 
-        Reserva reserva = new Reserva();
-        reserva.setFechaHoraInicio(inicio);
-        reserva.setFechaHoraFin(fin);
-        reserva.setCliente(cliente);
-        reserva.setEntrenador(entrenador);
-        reserva.setActividad(actividad);
-        reserva.setSala(sala);
-        reserva.setComentarios(comentarios);
+            if (cliente == null || entrenador == null || actividad == null || sala == null) {
+                model.addAttribute("regError", "Datos inválidos: cliente, entrenador, actividad o sala no encontrados.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
 
-        boolean ok = reservaServicio.crearReserva(reserva);
+            Reserva reserva = new Reserva();
+            reserva.setFechaHoraInicio(inicio);
+            reserva.setFechaHoraFin(fin);
+            reserva.setCliente(cliente);
+            reserva.setEntrenador(entrenador);
+            reserva.setActividad(actividad);
+            reserva.setSala(sala);
+            reserva.setComentarios(comentarios);
 
-        if (!ok) {
-            redirectAttributes.addFlashAttribute("mensajeError",
-                    "No se ha podido crear la reserva. Revisa horarios y disponibilidad.");
+            boolean ok = reservaServicio.crearReserva(reserva);
+
+            if (!ok) {
+                model.addAttribute("regError", "No se ha podido crear la reserva. Revisa horarios y disponibilidad.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            redirectAttributes.addFlashAttribute("mensajeExito", "Reserva creada correctamente.");
             return "redirect:/admin/reservas";
-        }
 
-        redirectAttributes.addFlashAttribute("mensajeExito", "Reserva creada correctamente.");
-        return "redirect:/admin/reservas";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("regError", ex.getMessage());
+            cargarCombos(model);
+            return "nuevaReservaAdmin";
+        } catch (Exception ex) {
+            model.addAttribute("regError", "Error inesperado al crear la reserva.");
+            cargarCombos(model);
+            return "nuevaReservaAdmin";
+        }
     }
 
     /* ========== EDITAR RESERVA ========== */
@@ -122,12 +142,7 @@ public class GestionReservasController {
         }
 
         model.addAttribute("reserva", reserva);
-        model.addAttribute("clientes", clienteServicio.listarTodos());
-        model.addAttribute("entrenadores", entrenadorServicio.listarTodos());
-        model.addAttribute("actividades", actividadServicio.listarTodas());
-        model.addAttribute("salas", salaServicio.listarTodas());
-        model.addAttribute("estados", Estado.values());
-
+        cargarCombos(model);
         return "editarReservaAdmin";
     }
 
@@ -146,48 +161,87 @@ public class GestionReservasController {
             @RequestParam("salaId") Long salaId,
             @RequestParam("estado") Estado estado,
             @RequestParam(name = "comentarios", required = false) String comentarios,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
-        Cliente cliente = clienteServicio.obtenerClientePorId(clienteId);
-        Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
-        Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
-        Sala sala = salaServicio.obtenerSalaPorId(salaId);
+        try {
+            Reserva existente = reservaServicio.obtenerPorId(id);
+            if (existente == null) {
+                redirectAttributes.addFlashAttribute("mensajeError", "La reserva no existe.");
+                return "redirect:/admin/reservas";
+            }
 
-        Reserva datos = new Reserva();
-        datos.setFechaHoraInicio(inicio);
-        datos.setFechaHoraFin(fin);
-        datos.setCliente(cliente);
-        datos.setEntrenador(entrenador);
-        datos.setActividad(actividad);
-        datos.setSala(sala);
-        datos.setComentarios(comentarios);
-        datos.setEstado(estado); // aunque en tu servicio ahora mismo no se usa mucho
+            Cliente cliente = clienteServicio.obtenerClientePorId(clienteId);
+            Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
+            Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
+            Sala sala = salaServicio.obtenerSalaPorId(salaId);
 
-        boolean ok = reservaServicio.actualizarReserva(id, datos);
+            if (cliente == null || entrenador == null || actividad == null || sala == null) {
+                model.addAttribute("mensajeError", "Datos inválidos: cliente, entrenador, actividad o sala no encontrados.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
 
-        if (!ok) {
-            redirectAttributes.addFlashAttribute("mensajeError",
-                    "No se ha podido actualizar la reserva. Puede que ya haya empezado o que no exista.");
-        } else {
+            Reserva datos = new Reserva();
+            datos.setFechaHoraInicio(inicio);
+            datos.setFechaHoraFin(fin);
+            datos.setCliente(cliente);
+            datos.setEntrenador(entrenador);
+            datos.setActividad(actividad);
+            datos.setSala(sala);
+            datos.setComentarios(comentarios);
+            datos.setEstado(estado);
+
+            boolean ok = reservaServicio.actualizarReserva(id, datos);
+
+            if (!ok) {
+                model.addAttribute("mensajeError",
+                        "No se ha podido actualizar la reserva. Puede que ya haya empezado o que exista solape.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
+
             redirectAttributes.addFlashAttribute("mensajeExito", "Reserva actualizada correctamente.");
-        }
+            return "redirect:/admin/reservas";
 
-        return "redirect:/admin/reservas";
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("mensajeError", ex.getMessage());
+            cargarCombos(model);
+            return "editarReservaAdmin";
+        } catch (Exception ex) {
+            model.addAttribute("mensajeError", "Error al actualizar la reserva: " + ex.getMessage());
+            cargarCombos(model);
+            return "editarReservaAdmin";
+        }
     }
 
     /* ========== ELIMINAR RESERVA ========== */
 
     @PostMapping("/eliminar/{id}")
     public String eliminarReserva(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            Reserva reserva = reservaServicio.obtenerPorId(id);
+            if (reserva == null) {
+                redirectAttributes.addFlashAttribute("mensajeError", "La reserva no existe.");
+                return "redirect:/admin/reservas";
+            }
 
-        boolean ok = reservaServicio.eliminarReserva(id);
+            boolean ok = reservaServicio.eliminarReserva(reserva.getIdReserva());
 
-        if (ok) {
-            redirectAttributes.addFlashAttribute("mensajeExito", "Reserva eliminada correctamente.");
-        } else {
-            redirectAttributes.addFlashAttribute("mensajeError", "No se ha podido eliminar la reserva.");
+            if (ok) {
+                redirectAttributes.addFlashAttribute("mensajeExito", "Reserva eliminada correctamente.");
+            } else {
+                redirectAttributes.addFlashAttribute("mensajeError", "No se ha podido eliminar la reserva.");
+            }
+
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "Error al eliminar la reserva: " + ex.getMessage());
         }
 
+        redirectAttributes.addFlashAttribute("timestamp", System.currentTimeMillis());
         return "redirect:/admin/reservas";
     }
 }
