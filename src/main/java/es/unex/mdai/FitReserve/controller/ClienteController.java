@@ -1,8 +1,10 @@
 package es.unex.mdai.FitReserve.controller;
 
+import es.unex.mdai.FitReserve.data.enume.Estado;
 import es.unex.mdai.FitReserve.data.model.Cliente;
+import es.unex.mdai.FitReserve.data.model.Reserva;
 import es.unex.mdai.FitReserve.data.model.Usuario;
-import es.unex.mdai.FitReserve.services.UsuarioServicio;
+import es.unex.mdai.FitReserve.services.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,11 +13,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import es.unex.mdai.FitReserve.data.enume.Genero;
-import es.unex.mdai.FitReserve.services.ClienteServicio;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
+import es.unex.mdai.FitReserve.data.model.*;
+import es.unex.mdai.FitReserve.data.enume.Estado;
+import es.unex.mdai.FitReserve.services.*;
+import jakarta.servlet.http.HttpSession;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/cliente")
@@ -26,6 +37,21 @@ public class ClienteController {
 
     @Autowired
     private ClienteServicio clienteService;
+
+    @Autowired
+    private ReservaServicio reservaService;
+
+    @Autowired
+    private SalaServicio salaService;
+
+    @Autowired
+    private ActividadServicio actividadService;
+
+    @Autowired
+    private MaquinariaServicio maquinariaService;
+
+    @Autowired
+    private EntrenadorServicio entrenadorService;
 
     @PostMapping("/eliminar-cuenta")
     public String eliminarCuenta(HttpSession session) {
@@ -110,4 +136,125 @@ public class ClienteController {
 
         return "redirect:/cliente/perfil";
     }
+
+    @GetMapping("/historial")
+    public String mostrarHistorial(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+        if (cliente == null) {
+            model.addAttribute("error", "No se encontró el cliente asociado al usuario.");
+            return "clientePage";
+        }
+
+        List<Reserva> historial = reservaService.listarHistorialCliente(cliente.getIdCliente());
+
+        List<Reserva> completadas = historial.stream()
+                .filter(r -> r.getEstado() == Estado.Completada)
+                .collect(Collectors.toList());
+
+        List<Reserva> canceladas = historial.stream()
+                .filter(r -> r.getEstado() == Estado.Cancelada)
+                .collect(Collectors.toList());
+
+        model.addAttribute("historialCompletadas", completadas);
+        model.addAttribute("historialCanceladas", canceladas);
+        model.addAttribute("usuario", usuario);
+
+        return "historialReservaCliente";
+    }
+
+    @GetMapping("/nueva-reserva")
+    public String mostrarFormularioReserva(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+        if (cliente == null) {
+            model.addAttribute("error", "No se encontró el cliente asociado al usuario.");
+            return "clientePage";
+        }
+
+        // Obtener datos necesarios para el formulario
+        List<Sala> salas = salaService.listarTodas();
+        List<Actividad> actividades = actividadService.listarTodas();
+        List<Entrenador> entrenadores = entrenadorService.listarTodos();
+        List<Maquinaria> maquinarias = maquinariaService.listarTodas();
+
+        model.addAttribute("salas", salas);
+        model.addAttribute("actividades", actividades);
+        model.addAttribute("entrenadores", entrenadores);
+        model.addAttribute("maquinarias", maquinarias);
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("cliente", cliente);
+
+        return "nuevaReserva";
+    }
+
+    @PostMapping("/nueva-reserva")
+    public String crearReserva(
+            @RequestParam Long idSala,
+            @RequestParam Long idActividad,
+            @RequestParam Long idEntrenador,
+            @RequestParam String fechaHoraInicio,
+            @RequestParam String fechaHoraFin,
+            @RequestParam(required = false) String comentarios,
+            @RequestParam(required = false) List<Long> maquinarias,
+            @RequestParam(required = false) List<Integer> cantidades,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+            Sala sala = salaService.obtenerSalaPorId(idSala);
+            Actividad actividad = actividadService.obtenerActividadPorId(idActividad);
+            Entrenador entrenador = entrenadorService.obtenerEntrenadorPorId(idEntrenador);
+
+            Reserva reserva = new Reserva();
+            reserva.setCliente(cliente);
+            reserva.setSala(sala);
+            reserva.setActividad(actividad);
+            reserva.setEntrenador(entrenador);
+            reserva.setFechaHoraInicio(LocalDateTime.parse(fechaHoraInicio));
+            reserva.setFechaHoraFin(LocalDateTime.parse(fechaHoraFin));
+            reserva.setComentarios(comentarios);
+            reserva.setEstado(Estado.Pendiente);
+
+            // Añadir maquinaria si se seleccionó
+            if (maquinarias != null && cantidades != null) {
+                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
+                    ReservaMaquinaria rm = new ReservaMaquinaria(reserva, maq, cantidades.get(i));
+                    reservaMaquinarias.add(rm);
+                }
+                reserva.setMaquinariaAsignada(reservaMaquinarias);
+            }
+
+            boolean creada = reservaService.crearReserva(reserva);
+
+            if (creada) {
+                redirectAttributes.addFlashAttribute("mensaje", "Reserva creada exitosamente");
+                return "redirect:/cliente";
+            } else {
+                redirectAttributes.addFlashAttribute("error", "No se pudo crear la reserva. Verifica disponibilidad.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al crear la reserva: " + e.getMessage());
+            return "redirect:/cliente/nueva-reserva";
+        }
+    }
+
 }

@@ -1,0 +1,125 @@
+<!-- src/main/resources/templates/historialCliente.html -->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial - FitReserve</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/historialReservaCliente.css}">
+</head>
+<body>
+<div class="page-container">
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <div>
+                <h1>Historial de clases</h1>
+                <p class="subtitle">Clases completadas y canceladas</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <span class="user-name" th:text="${session.usuarioSesion.getNombre()}">Usuario</span>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn-logout" type="submit">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <section class="summary-card">
+        <div class="summary-item">
+            <div class="summary-label">Completadas</div>
+            <div class="summary-value" th:text="${historialCompletadas != null ? historialCompletadas.size() : 0}">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Canceladas</div>
+            <div class="summary-value trainer" th:text="${historialCanceladas != null ? historialCanceladas.size() : 0}">0</div>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Clases completadas</h2>
+                    <p>Registro de clases finalizadas</p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Actividad</th>
+                        <th>Sala</th>
+                        <th>Entrenador</th>
+                        <th class="center">Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="reserva, stat : ${historialCompletadas}">
+                        <td th:text="${stat.count}">1</td>
+                        <td th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}">2025-01-01 09:00</td>
+                        <td th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}">2025-01-01 10:00</td>
+                        <td th:text="${reserva.actividad != null ? reserva.actividad.nombre : '—'}">Actividad</td>
+                        <td th:text="${reserva.sala != null ? reserva.sala.nombre : '—'}">Sala</td>
+                        <td th:text="${reserva.entrenador != null ? reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos : '—'}">Entrenador</td>
+                        <td class="center"><span class="status-badge status-completada">Completada</span></td>
+                    </tr>
+                    <tr th:if="${historialCompletadas == null or #lists.isEmpty(historialCompletadas)}">
+                        <td colspan="7" class="empty-state">No hay clases completadas.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Clases canceladas</h2>
+                    <p>Registro de clases canceladas</p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Actividad</th>
+                        <th>Sala</th>
+                        <th>Entrenador</th>
+                        <th class="center">Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="reserva, stat : ${historialCanceladas}">
+                        <td th:text="${stat.count}">1</td>
+                        <td th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}">2025-01-01 09:00</td>
+                        <td th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}">2025-01-01 10:00</td>
+                        <td th:text="${reserva.actividad != null ? reserva.actividad.nombre : '—'}">Actividad</td>
+                        <td th:text="${reserva.sala != null ? reserva.sala.nombre : '—'}">Sala</td>
+                        <td th:text="${reserva.entrenador != null ? reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos : '—'}">Entrenador</td>
+                        <td class="center"><span class="status-badge status-cancelada">Cancelada</span></td>
+                    </tr>
+                    <tr th:if="${historialCanceladas == null or #lists.isEmpty(historialCanceladas)}">
+                        <td colspan="7" class="empty-state">No hay clases canceladas.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-link">
+        <a th:href="@{/cliente}">← Volver al panel</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+/* src/main/resources/static/css/historialCliente.css */
+/* Importa la base de estilos del panel de gestión para mantener apariencia consistente */
+@import url('gestionUsuariosPage.css');
+
+/* Ajustes específicos para historial */
+.status-badge {
+    display: inline-block;
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.08);
+}
+
+.status-completada {
+    background: linear-gradient(180deg, #16a34a, #22c55e);
+}
+
+.status-cancelada {
+    background: linear-gradient(180deg, #dc2626, #ef4444);
+}
+
+/* Mejorar legibilidad de tablas en este template */
+.table thead {
+    background: rgba(6,95,70,0.9);
+    color: white;
+}
+
+.table tbody tr td {
+    vertical-align: middle;
+}
+
+/* Responsive: reducir columnas en pantallas pequeñas */
+@media (max-width: 768px) {
+    .table th:nth-child(4),
+    .table td:nth-child(4),
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        display: none;
+    }
+}

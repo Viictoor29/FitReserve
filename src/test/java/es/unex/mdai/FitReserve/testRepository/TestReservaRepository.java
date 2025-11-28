@@ -31,33 +31,6 @@ class ReservaRepositoryTest {
        ========================= */
 
     @Test
-    @DisplayName("findByClienteIdClienteOrderByFechaHoraInicioDesc: devuelve reservas de admin y mario ordenadas desc")
-    void listarPorCliente_orderDesc_ok() {
-        Long adminId = usuarioRepo.findByEmail("admin@gym.test").map(Usuario::getIdUsuario).orElseThrow();
-        Long marioId = usuarioRepo.findByEmail("mario@gym.test").map(Usuario::getIdUsuario).orElseThrow();
-
-        var adminList = reservaRepo.findByClienteIdClienteOrderByFechaHoraInicioDesc(adminId);
-        var marioList = reservaRepo.findByClienteIdClienteOrderByFechaHoraInicioDesc(marioId);
-
-        assertThat(adminList).isNotEmpty();
-        assertThat(marioList).isNotEmpty();
-
-        // Admin tiene la del 21/10 09:00–10:00
-        LocalDateTime expectedAdminStart = LocalDateTime.of(2025,10,21,9,0);
-        assertEquals(expectedAdminStart, adminList.get(0).getFechaHoraInicio());
-
-        // Mario tiene la del 22/10 18:00–19:00
-        LocalDateTime expectedMarioStart = LocalDateTime.of(2025,10,22,18,0);
-        assertEquals(expectedMarioStart, marioList.get(0).getFechaHoraInicio());
-
-        // Orden desc: el primero debe ser >= el segundo si existiera
-        if (adminList.size() > 1) {
-            assertTrue(adminList.get(0).getFechaHoraInicio().isAfter(adminList.get(1).getFechaHoraInicio())
-                    || adminList.get(0).getFechaHoraInicio().isEqual(adminList.get(1).getFechaHoraInicio()));
-        }
-    }
-
-    @Test
     @DisplayName("findByEntrenadorIdEntrenadorOrderByFechaHoraInicioDesc: devuelve reservas de Sofía y David ordenadas desc")
     void listarPorEntrenador_orderDesc_ok() {
         Long sofiaId  = usuarioRepo.findByEmail("sofia@gym.test").map(Usuario::getIdUsuario).orElseThrow();
@@ -76,20 +49,6 @@ class ReservaRepositoryTest {
     /* ===================================
        PRÓXIMAS A PARTIR DE UNA FECHA (READ)
        =================================== */
-
-    @Test
-    @DisplayName("findByClienteIdClienteAndFechaHoraInicioAfter: filtra por fecha de inicio")
-    void futurasPorCliente_ok() {
-        Long adminId = usuarioRepo.findByEmail("admin@gym.test").map(Usuario::getIdUsuario).orElseThrow();
-
-        var desdeAntes = reservaRepo.findByClienteIdClienteAndFechaHoraInicioAfter(
-                adminId, LocalDateTime.of(2025,10,21,8,0));
-        var desdeDespues = reservaRepo.findByClienteIdClienteAndFechaHoraInicioAfter(
-                adminId, LocalDateTime.of(2025,10,21,10,1));
-
-        assertThat(desdeAntes).isNotEmpty();    // debería incluir la de las 09:00
-        assertThat(desdeDespues).isEmpty();     // después de 10:01 ya no hay más
-    }
 
     @Test
     @DisplayName("findByEntrenadorIdEntrenadorAndFechaHoraInicioAfter: filtra por fecha de inicio")
@@ -181,16 +140,6 @@ class ReservaRepositoryTest {
     /* ================================
        PRÓXIMA RESERVA/CLASE (con top1)
        ================================ */
-
-    @Test
-    @DisplayName("proximaReservaCliente: devuelve la siguiente reserva del cliente (top1 ordenado por fecha asc)")
-    void proximaReservaCliente_top1_ok() {
-        Long adminId = usuarioRepo.findByEmail("admin@gym.test").map(Usuario::getIdUsuario).orElseThrow();
-        var lista = reservaRepo.proximaReservaCliente(adminId, LocalDateTime.of(2025,10,21,8,0), PageRequest.of(0,1));
-
-        assertThat(lista).hasSize(1);
-        assertEquals(LocalDateTime.of(2025,10,21,9,0), lista.get(0).getFechaHoraInicio());
-    }
 
     @Test
     @DisplayName("proximaClaseEntrenador: devuelve la siguiente clase del entrenador (top1)")

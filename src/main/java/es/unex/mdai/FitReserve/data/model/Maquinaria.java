@@ -1,5 +1,6 @@
 package es.unex.mdai.FitReserve.data.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import es.unex.mdai.FitReserve.data.enume.TipoActividad;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ public class Maquinaria {
     @OneToMany(mappedBy = "maquinaria",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @JsonIgnore
     private List<ReservaMaquinaria> reservas = new ArrayList<>();
 
     public Maquinaria() {}

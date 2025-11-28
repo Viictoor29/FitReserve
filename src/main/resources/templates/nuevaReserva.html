@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Reserva - FitReserve</title>
+    <link rel="stylesheet" th:href="@{/css/nuevaReserva.css}">
+</head>
+<body>
+<div class="page-container">
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <h1>FitReserve</h1>
+        </div>
+        <div class="user-info">
+            <span class="user-name" th:text="${session.usuarioSesion.getNombre()}">Usuario</span>
+            <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn-logout">Cerrar Sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="welcome-card">
+            <a th:href="@{/cliente}" class="back-arrow">←</a>
+            <h2>Nueva Reserva</h2>
+            <p class="tagline">Completa los datos para reservar tu sesión de entrenamiento</p>
+        </div>
+
+        <div th:if="${mensaje}" class="mensaje-exito" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="mensaje-error" th:text="${error}"></div>
+
+        <form th:action="@{/cliente/nueva-reserva}" method="post" class="reserva-form" id="reservaForm" novalidate>
+
+            <div class="form-section">
+                <h3>📍 Información Básica</h3>
+
+                <div class="field">
+                    <label for="idSala">Sala *</label>
+                    <select id="idSala" name="idSala" required>
+                        <option value="">Selecciona una sala</option>
+                        <option th:each="sala : ${salas}"
+                                th:value="${sala.idSala}"
+                                th:text="${sala.nombre + ' (Capacidad: ' + sala.capacidad + ')'}">
+                        </option>
+                    </select>
+                    <div class="error" id="salaError" aria-live="polite"></div>
+                </div>
+
+                <div class="field">
+                    <label for="idActividad">Actividad *</label>
+                    <select id="idActividad" name="idActividad" required>
+                        <option value="">Selecciona una actividad</option>
+                        <option th:each="actividad : ${actividades}"
+                                th:value="${actividad.idActividad}"
+                                th:text="${actividad.nombre + ' - ' + actividad.tipoActividad}">
+                        </option>
+                    </select>
+                    <div class="error" id="actividadError" aria-live="polite"></div>
+                </div>
+
+                <div class="field">
+                    <label for="idEntrenador">Entrenador *</label>
+                    <select id="idEntrenador" name="idEntrenador" required>
+                        <option value="">Selecciona un entrenador</option>
+                        <option th:each="entrenador : ${entrenadores}"
+                                th:value="${entrenador.idEntrenador}"
+                                th:text="${entrenador.usuario.nombre + ' ' + entrenador.usuario.apellidos + ' - ' + entrenador.especialidad}">
+                        </option>
+                    </select>
+                    <div class="error" id="entrenadorError" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🕐 Fecha y Hora</h3>
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="fechaHoraInicio">Inicio *</label>
+                        <input type="datetime-local" id="fechaHoraInicio" name="fechaHoraInicio" required>
+                        <div class="error" id="inicioError" aria-live="polite"></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="fechaHoraFin">Fin *</label>
+                        <input type="datetime-local" id="fechaHoraFin" name="fechaHoraFin" required>
+                        <div class="error" id="finError" aria-live="polite"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🏋️ Maquinaria (Opcional)</h3>
+
+                <div id="maquinaria-container">
+                    <button type="button" class="btn-add-maquinaria" onclick="agregarMaquinaria()">+ Añadir Maquinaria</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>💬 Comentarios</h3>
+
+                <div class="field">
+                    <label for="comentarios">Comentarios adicionales (Opcional)</label>
+                    <textarea id="comentarios" name="comentarios" rows="4"
+                              placeholder="Escribe cualquier comentario o solicitud especial..."
+                              maxlength="255"></textarea>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn-submit">Crear Reserva</button>
+                <a th:href="@{/cliente}" class="btn-cancel">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const maquinarias = /*[[${maquinarias}]]*/ [];
+    let maquinariaCount = 0;
+
+    function agregarMaquinaria() {
+        maquinariaCount++;
+        const container = document.getElementById('maquinaria-container');
+
+        const div = document.createElement('div');
+        div.className = 'maquinaria-item';
+        div.id = 'maquinaria-' + maquinariaCount;
+
+        div.innerHTML = `
+            <div class="field-row">
+                <div class="field flex-2">
+                    <label>Tipo de maquinaria</label>
+                    <select name="maquinarias" required>
+                        <option value="">Selecciona maquinaria</option>
+                        ${maquinarias.map(m =>
+                            `<option value="${m.idMaquinaria}">${m.nombre} - ${m.tipoActividad} (Disponibles: ${m.cantidadTotal})</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="field flex-1">
+                    <label>Cantidad</label>
+                    <input type="number" name="cantidades" min="1" value="1" required>
+                </div>
+                <button type="button" class="btn-remove" onclick="eliminarMaquinaria(${maquinariaCount})">✕</button>
+            </div>
+        `;
+
+        container.insertBefore(div, container.querySelector('.btn-add-maquinaria'));
+    }
+
+    function eliminarMaquinaria(id) {
+        const element = document.getElementById('maquinaria-' + id);
+        if (element) {
+            element.remove();
+        }
+    }
+
+    // Validación del formulario
+    (function() {
+        const form = document.getElementById('reservaForm');
+        const sala = document.getElementById('idSala');
+        const actividad = document.getElementById('idActividad');
+        const entrenador = document.getElementById('idEntrenador');
+        const inicio = document.getElementById('fechaHoraInicio');
+        const fin = document.getElementById('fechaHoraFin');
+
+        function showError(input, errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['salaError', 'actividadError', 'entrenadorError', 'inicioError', 'finError'].forEach(clearError);
+        }
+
+        form.addEventListener('submit', function(e) {
+            clearAllErrors();
+            let hasError = false;
+
+            if (!sala.value) {
+                showError(sala, 'salaError', 'Debes seleccionar una sala.');
+                hasError = true;
+            }
+
+            if (!actividad.value) {
+                showError(actividad, 'actividadError', 'Debes seleccionar una actividad.');
+                hasError = true;
+            }
+
+            if (!entrenador.value) {
+                showError(entrenador, 'entrenadorError', 'Debes seleccionar un entrenador.');
+                hasError = true;
+            }
+
+            if (!inicio.value) {
+                showError(inicio, 'inicioError', 'La fecha y hora de inicio son obligatorias.');
+                hasError = true;
+            }
+
+            if (!fin.value) {
+                showError(fin, 'finError', 'La fecha y hora de fin son obligatorias.');
+                hasError = true;
+            } else if (inicio.value && new Date(fin.value) <= new Date(inicio.value)) {
+                showError(fin, 'finError', 'La hora de fin debe ser posterior a la de inicio.');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+
+        // Validación en tiempo real
+        sala.addEventListener('change', () => sala.value ? clearError('salaError') : showError(sala, 'salaError', 'Debes seleccionar una sala.'));
+        actividad.addEventListener('change', () => actividad.value ? clearError('actividadError') : showError(actividad, 'actividadError', 'Debes seleccionar una actividad.'));
+        entrenador.addEventListener('change', () => entrenador.value ? clearError('entrenadorError') : showError(entrenador, 'entrenadorError', 'Debes seleccionar un entrenador.'));
+        inicio.addEventListener('change', () => inicio.value ? clearError('inicioError') : showError(inicio, 'inicioError', 'La fecha y hora de inicio son obligatorias.'));
+        fin.addEventListener('change', function() {
+            if (!fin.value) {
+                showError(fin, 'finError', 'La fecha y hora de fin son obligatorias.');
+            } else if (inicio.value && new Date(fin.value) <= new Date(inicio.value)) {
+                showError(fin, 'finError', 'La hora de fin debe ser posterior a la de inicio.');
+            } else {
+                clearError('finError');
+            }
+        });
+    })();
+    /*]]>*/
+</script>
+</body>
+</html>
