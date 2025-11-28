@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -422,5 +423,12 @@ public class ReservaServicioImpl implements  ReservaServicio {
         );
 
         return totalPendiente + totalCompletada;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Reserva> listarTodas() {
+        // Ordenadas de más reciente a más antigua
+        return reservaRepository.findAll(Sort.by(Sort.Direction.DESC, "fechaHoraInicio"));
     }
 }
