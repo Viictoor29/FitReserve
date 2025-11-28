@@ -22,7 +22,18 @@ public class SalaServicioImpl implements SalaServicio {
     @Override
     public boolean crearSala(Sala sala) {
         if (sala == null) {
-            throw new IllegalArgumentException("La sala no puede ser nula.");
+            return false;
+        }
+
+        // Validaciones básicas: si algo obligatorio falta, NO guardamos
+        if (sala.getNombre() == null || sala.getNombre().isBlank()) {
+            return false;
+        }
+        if (sala.getUbicacion() == null || sala.getUbicacion().isBlank()) {
+            return false;
+        }
+        if (sala.getCapacidad() <= 0) {
+            return false;
         }
 
         // No permitir nombres duplicados
@@ -30,6 +41,7 @@ public class SalaServicioImpl implements SalaServicio {
             return false;
         }
 
+        // Si llegamos aquí, los datos son válidos
         salaRepository.save(sala);
         return true;
     }

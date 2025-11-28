@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de reservas</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/adminGestion.css}">
+</head>
+<body>
+<div class="page-container">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <div>
+                <h1>Panel de gestión de reservas</h1>
+                <p class="subtitle">Administrador</p>
+            </div>
+        </div>
+
+        <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- MENSAJES -->
+    <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+    <div th:if="${mensajeError}" class="alert alert-error" th:text="${mensajeError}"></div>
+
+    <!-- TARJETA LISTADO -->
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>Todas las reservas</h2>
+                <p>Consulta, edita o elimina cualquier reserva del sistema</p>
+            </div>
+
+            <a th:href="@{/admin/reservas/nueva}" class="btn btn-primary">
+                + Nueva reserva
+            </a>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Cliente</th>
+                    <th>Entrenador</th>
+                    <th>Actividad</th>
+                    <th>Sala</th>
+                    <th>Estado</th>
+                    <th class="center">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="res, stat : ${reservas}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${#temporals.format(res.fechaHoraInicio, 'dd/MM/yyyy HH:mm')}">
+                        01/01/2025 10:00
+                    </td>
+                    <td th:text="${#temporals.format(res.fechaHoraFin, 'dd/MM/yyyy HH:mm')}">
+                        01/01/2025 11:00
+                    </td>
+                    <td th:text="${res.cliente.usuario.nombre + ' ' + res.cliente.usuario.apellidos}">
+                        Cliente
+                    </td>
+                    <td th:text="${res.entrenador.usuario.nombre + ' ' + res.entrenador.usuario.apellidos}">
+                        Entrenador
+                    </td>
+                    <td th:text="${res.actividad.nombre}">Spinning</td>
+                    <td th:text="${res.sala.nombre}">Sala 1</td>
+                    <td th:text="${res.estado}">Pendiente</td>
+
+                    <td class="center actions-cell">
+                        <a class="link link-view"
+                           th:href="@{'/admin/reservas/' + ${res.idReserva}}">
+                            Ver
+                        </a>
+
+                        <a class="link link-edit"
+                           th:href="@{'/admin/reservas/editar/' + ${res.idReserva}}">
+                            Editar
+                        </a>
+
+                        <button type="button"
+                                class="link link-delete"
+                                th:onclick="'confirmarEliminacionReserva(' + ${res.idReserva} + ');'">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(reservas)}">
+                    <td colspan="9" class="empty-state">
+                        No hay reservas registradas.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- BOTÓN VOLVER -->
+    <div style="margin-top:2rem;">
+        <a th:href="@{/admin}" class="btn-logout">← Volver al panel de administrador</a>
+    </div>
+</div>
+
+<script>
+    function confirmarEliminacionReserva(id) {
+        if (confirm('¿Está seguro de que desea eliminar esta reserva? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/reservas/eliminar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+</body>
+</html>

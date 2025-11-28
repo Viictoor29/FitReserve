@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de salas</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/adminGestion.css}">
+</head>
+
+<body>
+<div class="page-container">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <div>
+                <h1>Panel de gestión de salas</h1>
+                <p class="subtitle">Administrador</p>
+            </div>
+        </div>
+
+        <div class="user-info">
+            <span class="user-name">Administrador</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="btn-logout">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- MENSAJES -->
+    <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+    <div th:if="${mensajeError}" class="alert alert-error" th:text="${mensajeError}"></div>
+
+    <!-- TARJETA PRINCIPAL -->
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>Salas del centro</h2>
+                <p>Gestiona espacios, capacidades y disponibilidad</p>
+            </div>
+
+            <a th:href="@{/admin/salas/nueva}" class="btn btn-primary">
+                + Nueva sala
+            </a>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Capacidad</th>
+                    <th>Ubicación</th>
+                    <th>Descripción</th>
+                    <th class="center">Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="sala, stat : ${salas}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${sala.nombre}">Sala A</td>
+                    <td th:text="${sala.capacidad}">20</td>
+                    <td th:text="${sala.ubicacion}">Planta 1</td>
+                    <td th:text="${sala.descripcion}">Sala con espejos</td>
+
+                    <td class="center actions-cell">
+                        <a class="link link-edit"
+                           th:href="@{'/admin/salas/editar/' + ${sala.idSala}}">
+                            Editar
+                        </a>
+
+                        <button type="button"
+                                class="link link-delete"
+                                th:onclick="'confirmarEliminacionSala(' + ${sala.idSala} + ');'">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(salas)}">
+                    <td colspan="5" class="empty-state">
+                        No hay salas registradas.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <!-- BOTÓN VOLVER -->
+    <div style="margin-top:2rem;">
+        <a th:href="@{/admin}" class="btn-logout">← Volver al panel de administrador</a>
+    </div>
+
+</div>
+
+<script>
+    function confirmarEliminacionSala(id) {
+        if (confirm('¿Está seguro de que desea eliminar esta sala? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/salas/eliminar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+
+</body>
+</html>

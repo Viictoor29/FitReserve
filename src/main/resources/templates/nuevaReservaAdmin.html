@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva reserva</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/reservas}" class="back-arrow">←</a>
+
+    <h2>Crear nueva reserva</h2>
+
+    <form id="reservaForm" th:action="@{/admin/reservas/nueva}" method="post">
+
+        <!-- ================= INICIO ================= -->
+        <input type="hidden" id="fechaHoraInicioHidden" name="fechaHoraInicio"/>
+
+        <div class="field">
+            <label for="fechaInicio">Fecha de inicio</label>
+            <input id="fechaInicio" type="date" required>
+        </div>
+
+        <div class="field">
+            <label for="horaInicio">Hora de inicio</label>
+            <input id="horaInicio" type="time" required>
+        </div>
+
+        <!-- ================= FIN ================= -->
+        <input type="hidden" id="fechaHoraFinHidden" name="fechaHoraFin"/>
+
+        <div class="field">
+            <label for="fechaFin">Fecha de fin</label>
+            <input id="fechaFin" type="date" required>
+        </div>
+
+        <div class="field">
+            <label for="horaFin">Hora de fin</label>
+            <input id="horaFin" type="time" required>
+        </div>
+
+        <!-- ================= SELECCIONES ================= -->
+        <div class="field">
+            <label for="clienteId">Cliente</label>
+            <select id="clienteId" name="clienteId" required>
+                <option value="" disabled selected>Selecciona un cliente</option>
+                <option th:each="c : ${clientes}"
+                        th:value="${c.idCliente}"
+                        th:text="${c.usuario.nombre + ' ' + c.usuario.apellidos}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="entrenadorId">Entrenador</label>
+            <select id="entrenadorId" name="entrenadorId" required>
+                <option value="" disabled selected>Selecciona un entrenador</option>
+                <option th:each="e : ${entrenadores}"
+                        th:value="${e.idEntrenador}"
+                        th:text="${e.usuario.nombre + ' ' + e.usuario.apellidos}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="actividadId">Actividad</label>
+            <select id="actividadId" name="actividadId" required>
+                <option value="" disabled selected>Selecciona una actividad</option>
+                <option th:each="a : ${actividades}"
+                        th:value="${a.idActividad}"
+                        th:text="${a.nombre + ' (' + a.tipoActividad + ')'}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="salaId">Sala</label>
+            <select id="salaId" name="salaId" required>
+                <option value="" disabled selected>Selecciona una sala</option>
+                <option th:each="s : ${salas}"
+                        th:value="${s.idSala}"
+                        th:text="${s.nombre + ' - ' + s.ubicacion}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="comentarios">Comentarios</label>
+            <textarea id="comentarios" name="comentarios"
+                      placeholder="Notas adicionales sobre la reserva"></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Crear reserva</button>
+        </div>
+    </form>
+
+    <div class="footer-link">
+        <a th:href="@{/admin/reservas}">← Volver a gestión de reservas</a>
+    </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+    (function () {
+        const form = document.getElementById('reservaForm');
+
+        function combina(fechaId, horaId, hiddenId) {
+            const fecha = document.getElementById(fechaId).value;
+            const hora = document.getElementById(horaId).value;
+            const hidden = document.getElementById(hiddenId);
+
+            if (fecha && hora) {
+                hidden.value = fecha + "T" + hora;
+                return true;
+            }
+            return false;
+        }
+
+        form.addEventListener('submit', function (e) {
+            let ok1 = combina("fechaInicio", "horaInicio", "fechaHoraInicioHidden");
+            let ok2 = combina("fechaFin", "horaFin", "fechaHoraFinHidden");
+
+            if (!ok1 || !ok2) {
+                e.preventDefault();
+                alert("Debes rellenar fecha y hora para inicio y fin.");
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>

@@ -129,4 +129,10 @@ public interface ReservaServicio {
                                             LocalDateTime inicio,
                                             LocalDateTime fin,
                                             TipoActividad tipoActividadestadosActivos);
+
+    /**
+     * Lista todas las reservas (uso admin).
+     */
+    List<Reserva> listarTodas();
+
 }

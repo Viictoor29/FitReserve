@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva sala</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/salas}" class="back-arrow">←</a>
+
+    <h2>Crear nueva sala</h2>
+
+    <form th:action="@{/admin/salas/nueva}"
+          th:object="${salaForm}" method="post">
+
+        <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" th:field="*{nombre}"
+                   placeholder="Sala A, Sala cardio..." required maxlength="30">
+            <div class="error" id="nombreError"></div>
+        </div>
+
+        <div class="field">
+            <label for="capacidad">Capacidad</label>
+            <input id="capacidad" type="number" min="1" max="500"
+                   th:field="*{capacidad}" required>
+            <div class="error" id="capacidadError"></div>
+        </div>
+
+        <div class="field">
+            <label for="ubicacion">Ubicación</label>
+            <input id="ubicacion" type="text" th:field="*{ubicacion}"
+                   placeholder="Planta 1, zona cardio..." required maxlength="50">
+            <div class="error" id="ubicacionError"></div>
+        </div>
+
+        <div class="field">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" th:field="*{descripcion}"
+                      placeholder="Sala con espejos, mancuernas..."></textarea>
+            <div class="error" id="descripcionError"></div>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Crear sala</button>
+        </div>
+    </form>
+
+</div>
+</body>
+</html>
