@@ -13,18 +13,35 @@
 
     <h2>Crear nueva reserva</h2>
 
-    <form th:action="@{/admin/reservas/nueva}" method="post">
+    <form id="reservaForm" th:action="@{/admin/reservas/nueva}" method="post">
+
+        <!-- ================= INICIO ================= -->
+        <input type="hidden" id="fechaHoraInicioHidden" name="fechaHoraInicio"/>
 
         <div class="field">
-            <label for="inicio">Fecha y hora de inicio</label>
-            <input id="inicio" name="inicio" type="datetime-local" required>
+            <label for="fechaInicio">Fecha de inicio</label>
+            <input id="fechaInicio" type="date" required>
         </div>
 
         <div class="field">
-            <label for="fin">Fecha y hora de fin</label>
-            <input id="fin" name="fin" type="datetime-local" required>
+            <label for="horaInicio">Hora de inicio</label>
+            <input id="horaInicio" type="time" required>
         </div>
 
+        <!-- ================= FIN ================= -->
+        <input type="hidden" id="fechaHoraFinHidden" name="fechaHoraFin"/>
+
+        <div class="field">
+            <label for="fechaFin">Fecha de fin</label>
+            <input id="fechaFin" type="date" required>
+        </div>
+
+        <div class="field">
+            <label for="horaFin">Hora de fin</label>
+            <input id="horaFin" type="time" required>
+        </div>
+
+        <!-- ================= SELECCIONES ================= -->
         <div class="field">
             <label for="clienteId">Cliente</label>
             <select id="clienteId" name="clienteId" required>
@@ -84,5 +101,35 @@
         <a th:href="@{/admin/reservas}">← Volver a gestión de reservas</a>
     </div>
 </div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+    (function () {
+        const form = document.getElementById('reservaForm');
+
+        function combina(fechaId, horaId, hiddenId) {
+            const fecha = document.getElementById(fechaId).value;
+            const hora = document.getElementById(horaId).value;
+            const hidden = document.getElementById(hiddenId);
+
+            if (fecha && hora) {
+                hidden.value = fecha + "T" + hora;
+                return true;
+            }
+            return false;
+        }
+
+        form.addEventListener('submit', function (e) {
+            let ok1 = combina("fechaInicio", "horaInicio", "fechaHoraInicioHidden");
+            let ok2 = combina("fechaFin", "horaFin", "fechaHoraFinHidden");
+
+            if (!ok1 || !ok2) {
+                e.preventDefault();
+                alert("Debes rellenar fecha y hora para inicio y fin.");
+            }
+        });
+    })();
+</script>
+
 </body>
 </html>

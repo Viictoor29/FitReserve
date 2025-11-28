@@ -2,87 +2,76 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Detalle de reserva</title>
+    <title>Detalle reserva</title>
     <link rel="icon" th:href="@{/img/favicon.ico}">
+    <!-- MISMO CSS QUE DETALLE CLIENTE -->
     <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
 </head>
 <body>
-<div class="page-container">
+<div class="registro-container">
+    <a th:href="@{/admin/reservas}" class="back-arrow">←</a>
 
-    <header class="header">
-        <div class="logo-section">
-            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
-            <div>
-                <h1>Detalle de reserva</h1>
-                <p class="subtitle">Información completa de la reserva</p>
-            </div>
-        </div>
+    <h2>Detalle de la reserva</h2>
 
-        <div class="user-info">
-            <span class="user-name">Administrador</span>
-            <form th:action="@{/logout}" method="post" style="display:inline;">
-                <button type="submit" class="btn-logout">Cerrar sesión</button>
-            </form>
-        </div>
-    </header>
+    <div class="field">
+        <label>ID de la reserva</label>
+        <p th:text="${reserva.idReserva}">1</p>
+    </div>
 
-    <section class="card">
-        <div class="card-header">
-            <div>
-                <h2 th:text="'Reserva #' + ${reserva.idReserva}">Reserva #1</h2>
-                <p th:text="${#temporals.format(reserva.fechaHoraInicio, 'dd/MM/yyyy HH:mm')} + ' - ' +
-                            ${#temporals.format(reserva.fechaHoraFin, 'dd/MM/yyyy HH:mm')}">
-                    01/01/2025 10:00 - 11:00
-                </p>
-            </div>
+    <div class="field">
+        <label>Fecha y hora de inicio</label>
+        <p th:text="${#temporals.format(reserva.fechaHoraInicio, 'dd/MM/yyyy HH:mm')}">
+            01/01/2025 10:00
+        </p>
+    </div>
 
-            <span th:text="${reserva.estado}" style="font-weight:700;"></span>
-        </div>
+    <div class="field">
+        <label>Fecha y hora de fin</label>
+        <p th:text="${#temporals.format(reserva.fechaHoraFin, 'dd/MM/yyyy HH:mm')}">
+            01/01/2025 11:00
+        </p>
+    </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:1.2rem;">
-            <div class="summary-item">
-                <div class="summary-label">Cliente</div>
-                <div class="summary-value total"
-                     th:text="${reserva.cliente.usuario.nombre + ' ' + reserva.cliente.usuario.apellidos}">
-                    Cliente
-                </div>
-            </div>
+    <div class="field">
+        <label>Estado</label>
+        <p th:text="${reserva.estado}">Pendiente</p>
+    </div>
 
-            <div class="summary-item">
-                <div class="summary-label">Entrenador</div>
-                <div class="summary-value trainer"
-                     th:text="${reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos}">
-                    Entrenador
-                </div>
-            </div>
+    <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid rgba(148,163,184,0.5);">
 
-            <div class="summary-item">
-                <div class="summary-label">Actividad</div>
-                <div class="summary-value"
-                     th:text="${reserva.actividad.nombre + ' (' + reserva.actividad.tipoActividad + ')'}">
-                    Spinning (CARDIO)
-                </div>
-            </div>
+    <div class="field">
+        <label>Cliente</label>
+        <p th:text="${reserva.cliente.usuario.nombre + ' ' + reserva.cliente.usuario.apellidos}">
+            Nombre Cliente
+        </p>
+    </div>
 
-            <div class="summary-item">
-                <div class="summary-label">Sala</div>
-                <div class="summary-value"
-                     th:text="${reserva.sala.nombre + ' - ' + reserva.sala.ubicacion}">
-                    Sala 1 - Planta 1
-                </div>
-            </div>
-        </div>
+    <div class="field">
+        <label>Entrenador</label>
+        <p th:text="${reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos}">
+            Nombre Entrenador
+        </p>
+    </div>
 
-        <div style="margin-top:1.5rem;">
-            <h3 style="margin:0 0 0.5rem 0; font-size:1rem;">Comentarios</h3>
-            <p th:text="${reserva.comentarios != null ? reserva.comentarios : 'Sin comentarios adicionales.'}">
-                Sin comentarios adicionales.
-            </p>
-        </div>
-    </section>
+    <div class="field">
+        <label>Actividad</label>
+        <p th:text="${reserva.actividad.nombre + ' (' + reserva.actividad.tipoActividad + ', ' + reserva.actividad.nivel + ')'}">
+            Spinning (CARDIO, INTERMEDIO)
+        </p>
+    </div>
 
-    <div style="margin-top:2rem;">
-        <a th:href="@{/admin/reservas}" class="btn-logout">← Volver a gestión de reservas</a>
+    <div class="field">
+        <label>Sala</label>
+        <p th:text="${reserva.sala.nombre + ' - ' + reserva.sala.ubicacion}">
+            Sala 1 - Planta 1
+        </p>
+    </div>
+
+    <div class="field">
+        <label>Comentarios</label>
+        <p th:text="${reserva.comentarios != null ? reserva.comentarios : 'Sin comentarios adicionales.'}">
+            Sin comentarios adicionales.
+        </p>
     </div>
 </div>
 </body>
