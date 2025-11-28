@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle cliente</title>
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
+
+    <h2>Detalle del cliente</h2>
+
+    <div class="field">
+        <label>Nombre completo</label>
+        <p th:text="${cliente.usuario.nombre + ' ' + cliente.usuario.apellidos}"></p>
+    </div>
+
+    <div class="field">
+        <label>Email</label>
+        <p th:text="${cliente.usuario.email}"></p>
+    </div>
+
+    <div class="field">
+        <label>Teléfono</label>
+        <p th:text="${cliente.usuario.telefono}"></p>
+    </div>
+
+    <div class="field">
+        <label>Fecha de nacimiento</label>
+        <p th:text="${cliente.fechaNacimiento}"></p>
+    </div>
+
+    <div class="field">
+        <label>Género</label>
+        <p th:text="${cliente.genero}"></p>
+    </div>
+
+    <div class="field">
+        <label>Objetivos</label>
+        <p th:text="${cliente.objetivos}"></p>
+    </div>
+</div>
+</body>
+</html>

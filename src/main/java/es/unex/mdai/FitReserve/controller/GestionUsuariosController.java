@@ -34,8 +34,7 @@ public class GestionUsuariosController {
 
     @GetMapping
     public String mostrarGestionUsuarios(Model model) {
-        model.addAttribute("clientes", clienteServicio.listarTodos());
-        model.addAttribute("entrenadores", entrenadorServicio.listarTodos());
+        cargarListas(model);
         return "gestionUsuariosPage";
     }
 
@@ -46,7 +45,7 @@ public class GestionUsuariosController {
     public String verCliente(@PathVariable Long id, Model model) {
         Cliente cliente = clienteServicio.obtenerClientePorId(id);
         model.addAttribute("cliente", cliente);
-        return "admin/verCliente"; // crea esta vista
+        return "verCliente"; // crea esta vista
     }
 
     // FORMULARIO EDITAR CLIENTE
@@ -54,7 +53,7 @@ public class GestionUsuariosController {
     public String mostrarEditarCliente(@PathVariable Long id, Model model) {
         Cliente cliente = clienteServicio.obtenerClientePorId(id);
         model.addAttribute("clienteForm", cliente);
-        return "admin/editarCliente"; // crea esta vista
+        return "editarCliente"; // crea esta vista
     }
 
     // PROCESAR EDITAR CLIENTE
@@ -65,17 +64,16 @@ public class GestionUsuariosController {
                                         RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-            return "admin/editarCliente";
+            return "editarCliente";
         }
 
-        // aquí solo se actualizan los campos propios de Cliente
-        // (fechaNacimiento, genero, objetivos), según tu servicio
         clienteServicio.actualizarCliente(id, clienteForm);
 
         redirectAttributes.addFlashAttribute("mensajeExito",
                 "Cliente actualizado correctamente.");
         return "redirect:/admin/usuarios";
     }
+
 
     // ELIMINAR CLIENTE
     @PostMapping("/clientes/eliminar/{id}")
@@ -95,6 +93,7 @@ public class GestionUsuariosController {
         return "redirect:/admin/usuarios";
     }
 
+
     /* ========== ENTRENADORES ========== */
 
     // VER ENTRENADOR
@@ -102,7 +101,7 @@ public class GestionUsuariosController {
     public String verEntrenador(@PathVariable Long id, Model model) {
         Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(id);
         model.addAttribute("entrenador", entrenador);
-        return "admin/verEntrenador"; // crea esta vista
+        return "verEntrenador"; // crea esta vista
     }
 
     // FORMULARIO EDITAR ENTRENADOR
@@ -110,7 +109,7 @@ public class GestionUsuariosController {
     public String mostrarEditarEntrenador(@PathVariable Long id, Model model) {
         Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(id);
         model.addAttribute("entrenadorForm", entrenador);
-        return "admin/editarEntrenador"; // crea esta vista
+        return "editarEntrenador"; // crea esta vista
     }
 
     // PROCESAR EDITAR ENTRENADOR
@@ -121,7 +120,7 @@ public class GestionUsuariosController {
                                            RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-            return "admin/editarEntrenador";
+            return "editarEntrenador";
         }
 
         entrenadorServicio.actualizarEntrenador(id, entrenadorForm);
@@ -130,6 +129,7 @@ public class GestionUsuariosController {
                 "Entrenador actualizado correctamente.");
         return "redirect:/admin/usuarios";
     }
+
 
     // ELIMINAR ENTRENADOR
     @PostMapping("/entrenadores/eliminar/{id}")
@@ -148,6 +148,7 @@ public class GestionUsuariosController {
 
         return "redirect:/admin/usuarios";
     }
+
 
     /* ==================== NUEVO CLIENTE ==================== */
 
@@ -237,5 +238,20 @@ public class GestionUsuariosController {
         redirectAttributes.addFlashAttribute("mensajeExito",
                 "Entrenador registrado correctamente.");
         return "redirect:/admin/usuarios";
+    }
+
+    private void cargarListas(Model model) {
+        var clientes = clienteServicio.listarTodos().stream()
+                .filter(c -> c.getUsuario() != null
+                        && c.getUsuario().getTipoUsuario() == TipoUsuario.CLIENTE)
+                .toList();
+
+        var entrenadores = entrenadorServicio.listarTodos().stream()
+                .filter(e -> e.getUsuario() != null
+                        && e.getUsuario().getTipoUsuario() == TipoUsuario.ENTRENADOR)
+                .toList();
+
+        model.addAttribute("clientes", clientes);
+        model.addAttribute("entrenadores", entrenadores);
     }
 }

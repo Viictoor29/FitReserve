@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar entrenador</title>
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
+
+    <h2>Editar entrenador</h2>
+
+    <form th:action="@{'/admin/usuarios/entrenadores/editar/' + ${entrenadorForm.idEntrenador}}"
+          th:object="${entrenadorForm}" method="post">
+
+        <!-- DATOS DE USUARIO -->
+        <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" th:field="*{usuario.nombre}" required maxlength="20">
+        </div>
+
+        <div class="field">
+            <label for="apellidos">Apellidos</label>
+            <input id="apellidos" type="text" th:field="*{usuario.apellidos}" required maxlength="50">
+        </div>
+
+        <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" th:field="*{usuario.email}" required maxlength="100">
+        </div>
+
+        <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" type="tel" th:field="*{usuario.telefono}"
+                   pattern="[0-9]{9}" maxlength="9" required>
+        </div>
+
+        <div class="field">
+            <label for="contrasenia">Contraseña</label>
+            <input id="contrasenia" type="password" th:field="*{usuario.contrasenia}"
+                   placeholder="Nueva contraseña (o deja la actual)" maxlength="20" >
+        </div>
+
+        <!-- DATOS DE ENTRENADOR -->
+        <div class="field">
+            <label for="especialidad">Especialidad</label>
+            <input id="especialidad" type="text" th:field="*{especialidad}" required maxlength="50">
+        </div>
+
+        <div class="field">
+            <label for="experiencia">Experiencia (años)</label>
+            <input id="experiencia" type="number" th:field="*{experiencia}" min="1" max="50" required>
+        </div>
+
+        <div class="field">
+            <label for="horaInicioTrabajo">Hora inicio trabajo</label>
+            <input id="horaInicioTrabajo" type="time" th:field="*{horaInicioTrabajo}" required>
+        </div>
+
+        <div class="field">
+            <label for="horaFinTrabajo">Hora fin trabajo</label>
+            <input id="horaFinTrabajo" type="time" th:field="*{horaFinTrabajo}" required>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo entrenador</title>
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="registro-container">
+
+    <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
+
+    <h2>Registrar nuevo entrenador</h2>
+
+    <form id="registroForm" th:action="@{/admin/usuarios/entrenadores/nuevo}"
+          th:object="${entrenadorForm}" method="post">
+
+        <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" th:field="*{usuario.nombre}"
+                   placeholder="Tu nombre" required maxlength="20">
+            <div class="error" id="nombreError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="apellidos">Apellidos</label>
+            <input id="apellidos" type="text" th:field="*{usuario.apellidos}"
+                   placeholder="Tus apellidos" required maxlength="50">
+            <div class="error" id="apellidosError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" th:field="*{usuario.email}"
+                   placeholder="ejemplo@correo.com" required maxlength="100">
+            <div class="error" id="emailError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="contrasenia">Contraseña</label>
+            <input type="password" id="contrasenia" th:field="*{usuario.contrasenia}"
+                   placeholder="Contraseña" required maxlength="20">
+            <div class="error" id="contraseniaError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="contrasenia2">Confirmar contraseña</label>
+            <input type="password" id="contrasenia2" name="confirmContrasenia"
+                   placeholder="Repite la contraseña" required maxlength="20">
+            <div class="error" id="contrasenia2Error" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" type="tel" th:field="*{usuario.telefono}"
+                   placeholder="9 dígitos" required pattern="\d{9}" maxlength="9">
+            <div class="error" id="telefonoError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="especialidad">Especialidad</label>
+            <input id="especialidad" type="text" th:field="*{especialidad}" required
+                   placeholder="Crossfit, Yoga, Pilates..." maxlength="50">
+            <div class="error" id="especialidadError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="experiencia">Experiencia (años)</label>
+            <input id="experiencia" type="number" min="1" max="50" th:field="*{experiencia}" required>
+            <div class="error" id="experienciaError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="horaInicioTrabajo">Hora inicio trabajo</label>
+            <input id="horaInicioTrabajo" type="time" th:field="*{horaInicioTrabajo}" required>
+            <div class="error" id="horaInicioError" aria-live="polite"></div>
+        </div>
+
+        <div class="field">
+            <label for="horaFinTrabajo">Hora fin trabajo</label>
+            <input id="horaFinTrabajo" type="time" th:field="*{horaFinTrabajo}" required>
+            <div class="error" id="horaFinError" aria-live="polite"></div>
+        </div>
+
+        <div class="error" th:if="${regError}" th:text="${regError}" aria-live="assertive"></div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Crear entrenador</button>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    (function () {
+        const form = document.getElementById('registroForm');
+        const nombre = document.getElementById('nombre');
+        const apellidos = document.getElementById('apellidos');
+        const email = document.getElementById('email');
+        const contrasenia = document.getElementById('contrasenia');
+        const contrasenia2 = document.getElementById('contrasenia2');
+        const telefono = document.getElementById('telefono');
+
+        const emailRegex = /^\S+@\S+\.\S+$/;
+        const telefonoRegex = /^\d{9}$/;
+
+        function showError(input, errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['nombreError', 'apellidosError', 'emailError', 'contraseniaError',
+                'contrasenia2Error', 'telefonoError',
+                'especialidadError', 'experienciaError',
+                'horaInicioError', 'horaFinError'].forEach(id => clearError(id));
+        }
+
+        function passwordsMatch() {
+            return contrasenia.value.trim() === contrasenia2.value.trim();
+        }
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                clearAllErrors();
+                let hasError = false;
+
+                if (!nombre.value.trim()) {
+                    showError(nombre, 'nombreError', 'El nombre es obligatorio.');
+                    hasError = true;
+                }
+
+                if (!apellidos.value.trim()) {
+                    showError(apellidos, 'apellidosError', 'Los apellidos son obligatorios.');
+                    hasError = true;
+                }
+
+                if (!email.value.trim()) {
+                    showError(email, 'emailError', 'El correo es obligatorio.');
+                    hasError = true;
+                } else if (!emailRegex.test(email.value.trim())) {
+                    showError(email, 'emailError', 'El correo no tiene un formato válido.');
+                    hasError = true;
+                }
+
+                if (!contrasenia.value.trim()) {
+                    showError(contrasenia, 'contraseniaError', 'La contraseña es obligatoria.');
+                    hasError = true;
+                }
+
+                if (!contrasenia2.value.trim()) {
+                    showError(contrasenia2, 'contrasenia2Error', 'Por favor confirma la contraseña.');
+                    hasError = true;
+                } else if (contrasenia.value.trim() && !passwordsMatch()) {
+                    showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                    hasError = true;
+                }
+
+                if (!telefono.value.trim()) {
+                    showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
+                    hasError = true;
+                } else if (!telefonoRegex.test(telefono.value.trim())) {
+                    showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
+                    hasError = true;
+                }
+
+                const especialidad = document.getElementById('especialidad');
+                const experiencia = document.getElementById('experiencia');
+                const horaInicioTrabajo = document.getElementById('horaInicioTrabajo');
+                const horaFinTrabajo = document.getElementById('horaFinTrabajo');
+
+                if (especialidad && !especialidad.value.trim()) {
+                    showError(especialidad, 'especialidadError', 'La especialidad es obligatoria.');
+                    hasError = true;
+                }
+
+                if (experiencia && (!experiencia.value || experiencia.value < 1)) {
+                    showError(experiencia, 'experienciaError', 'La experiencia es obligatoria y debe ser >= 1.');
+                    hasError = true;
+                }
+
+                if (horaInicioTrabajo && !horaInicioTrabajo.value) {
+                    showError(horaInicioTrabajo, 'horaInicioError', 'La hora de inicio es obligatoria.');
+                    hasError = true;
+                }
+
+                if (horaFinTrabajo && !horaFinTrabajo.value) {
+                    showError(horaFinTrabajo, 'horaFinError', 'La hora de fin es obligatoria.');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // Validación en tiempo real (igual que en nuevoCliente)
+        if (nombre) nombre.addEventListener('input', function () {
+            if (!nombre.value.trim()) showError(nombre, 'nombreError', 'El nombre es obligatorio.');
+            else clearError('nombreError');
+        });
+
+        if (apellidos) apellidos.addEventListener('input', function () {
+            if (!apellidos.value.trim()) showError(apellidos, 'apellidosError', 'Los apellidos son obligatorios.');
+            else clearError('apellidosError');
+        });
+
+        if (email) email.addEventListener('input', function () {
+            if (!email.value.trim()) showError(email, 'emailError', 'El correo es obligatorio.');
+            else if (!emailRegex.test(email.value.trim())) showError(email, 'emailError', 'El correo no tiene un formato válido.');
+            else clearError('emailError');
+        });
+
+        if (contrasenia) contrasenia.addEventListener('input', function () {
+            if (!contrasenia.value.trim()) showError(contrasenia, 'contraseniaError', 'La contraseña es obligatoria.');
+            else clearError('contraseniaError');
+
+            if (contrasenia2.value.trim()) {
+                if (!passwordsMatch()) showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+                else clearError('contrasenia2Error');
+            }
+        });
+
+        if (contrasenia2) contrasenia2.addEventListener('input', function () {
+            if (!contrasenia2.value.trim()) showError(contrasenia2, 'contrasenia2Error', 'Por favor confirma la contraseña.');
+            else if (!passwordsMatch()) showError(contrasenia2, 'contrasenia2Error', 'Las contraseñas no coinciden.');
+            else clearError('contrasenia2Error');
+        });
+
+        if (telefono) telefono.addEventListener('input', function () {
+            if (!telefono.value.trim()) showError(telefono, 'telefonoError', 'El teléfono es obligatorio.');
+            else if (!telefonoRegex.test(telefono.value.trim())) showError(telefono, 'telefonoError', 'El teléfono debe tener exactamente 9 dígitos.');
+            else clearError('telefonoError');
+        });
+    })();
+</script>
+</body>
+</html>

@@ -50,6 +50,21 @@ public class EntrenadorServicioImpl implements  EntrenadorServicio {
         Entrenador existente = entrenadorRepository.findByIdEntrenador(idEntrenador)
                 .orElseThrow(() -> new IllegalArgumentException("No existe entrenador con id: " + idEntrenador));
 
+        // ---------- ACTUALIZAR USUARIO ----------
+        if (datosActualizados.getUsuario() != null) {
+            var uNuevo = datosActualizados.getUsuario();
+            var uExistente = existente.getUsuario();
+
+            if (uNuevo.getNombre() != null)      uExistente.setNombre(uNuevo.getNombre());
+            if (uNuevo.getApellidos() != null)   uExistente.setApellidos(uNuevo.getApellidos());
+            if (uNuevo.getEmail() != null)       uExistente.setEmail(uNuevo.getEmail());
+            if (uNuevo.getTelefono() != null)    uExistente.setTelefono(uNuevo.getTelefono());
+            if (uNuevo.getContrasenia() != null && !uNuevo.getContrasenia().isBlank()) {
+                uExistente.setContrasenia(uNuevo.getContrasenia());
+            }
+        }
+
+        // ---------- ACTUALIZAR CAMPOS ENTRENADOR ----------
         if (datosActualizados.getEspecialidad() != null) {
             existente.setEspecialidad(datosActualizados.getEspecialidad());
         }
@@ -66,6 +81,7 @@ public class EntrenadorServicioImpl implements  EntrenadorServicio {
         entrenadorRepository.save(existente);
         return true;
     }
+
 
     @Override
     public boolean eliminarEntrenador(Long idEntrenador) {

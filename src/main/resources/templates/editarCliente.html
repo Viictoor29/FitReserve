@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar cliente</title>
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+    <link rel="icon" th:href="@{/img/favicon.ico}">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
+
+    <h2>Editar cliente</h2>
+
+    <form th:action="@{'/admin/usuarios/clientes/editar/' + ${clienteForm.idCliente}}"
+          th:object="${clienteForm}" method="post">
+
+        <!-- DATOS DE USUARIO -->
+        <div class="field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" type="text" th:field="*{usuario.nombre}" required maxlength="20">
+        </div>
+
+        <div class="field">
+            <label for="apellidos">Apellidos</label>
+            <input id="apellidos" type="text" th:field="*{usuario.apellidos}" required maxlength="50">
+        </div>
+
+        <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" th:field="*{usuario.email}" required maxlength="100">
+        </div>
+
+        <div class="field">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" type="tel" th:field="*{usuario.telefono}"
+                   pattern="[0-9]{9}" maxlength="9" required>
+        </div>
+
+        <div class="field">
+            <label for="contrasenia">Contraseña</label>
+            <input id="contrasenia" type="password" th:field="*{usuario.contrasenia}"
+                   placeholder="Nueva contraseña (o deja la actual)" maxlength="20" >
+        </div>
+
+        <!-- DATOS DE CLIENTE -->
+        <div class="field">
+            <label for="fechaNacimiento">Fecha de nacimiento</label>
+            <input id="fechaNacimiento" type="date" th:field="*{fechaNacimiento}">
+        </div>
+
+        <div class="field">
+            <label for="genero">Género</label>
+            <select id="genero" th:field="*{genero}" required>
+                <option value="" disabled>Selecciona un género</option>
+                <option th:each="g : ${T(es.unex.mdai.FitReserve.data.enume.Genero).values()}"
+                        th:value="${g}"
+                        th:text="${g}">
+                </option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="objetivos">Objetivos</label>
+            <textarea id="objetivos" th:field="*{objetivos}"
+                      placeholder="Actualiza los objetivos del cliente"></textarea>
+        </div>
+
+        <div class="actions">
+            <button class="btn" type="submit">Guardar cambios</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

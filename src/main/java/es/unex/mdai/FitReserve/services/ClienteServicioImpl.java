@@ -58,7 +58,21 @@ public class ClienteServicioImpl implements ClienteServicio{
         Cliente existente = clienteRepository.findByIdCliente(idCliente)
                 .orElseThrow(() -> new IllegalArgumentException("No existe cliente con id: " + idCliente));
 
-        // Actualizamos sólo los campos propios del cliente
+        // ---------- ACTUALIZAR USUARIO ----------
+        if (datosActualizados.getUsuario() != null) {
+            var uNuevo = datosActualizados.getUsuario();
+            var uExistente = existente.getUsuario();
+
+            if (uNuevo.getNombre() != null)      uExistente.setNombre(uNuevo.getNombre());
+            if (uNuevo.getApellidos() != null)   uExistente.setApellidos(uNuevo.getApellidos());
+            if (uNuevo.getEmail() != null)       uExistente.setEmail(uNuevo.getEmail());
+            if (uNuevo.getTelefono() != null)    uExistente.setTelefono(uNuevo.getTelefono());
+            if (uNuevo.getContrasenia() != null && !uNuevo.getContrasenia().isBlank()) {
+                uExistente.setContrasenia(uNuevo.getContrasenia());
+            }
+        }
+
+        // ---------- ACTUALIZAR CAMPOS CLIENTE ----------
         if (datosActualizados.getFechaNacimiento() != null) {
             existente.setFechaNacimiento(datosActualizados.getFechaNacimiento());
         }
@@ -71,8 +85,8 @@ public class ClienteServicioImpl implements ClienteServicio{
 
         clienteRepository.save(existente);
         return true;
-
     }
+
 
     @Override
     public boolean eliminarCliente(Long idCliente) {

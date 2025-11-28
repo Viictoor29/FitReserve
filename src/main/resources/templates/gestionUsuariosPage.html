@@ -79,8 +79,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="cliente : ${clientes}">
-                        <td th:text="${cliente.idCliente}">1</td>
+                    <tr th:each="cliente, stat : ${clientes}">
+                        <td th:text="${stat.count}">1</td>
                         <td th:text="${cliente.usuario.nombre + ' ' + cliente.usuario.apellidos}">Nombre Apellidos</td>
                         <td th:text="${cliente.usuario.email}">correo@ejemplo.com</td>
                         <td th:text="${cliente.usuario.telefono}">600000000</td>
@@ -88,19 +88,24 @@
                         <td th:text="${cliente.genero}">MASCULINO</td>
                         <td th:text="${cliente.objetivos}">Perder peso</td>
                         <td class="center actions-cell">
+                            <!-- VER CLIENTE -->
                             <a class="link link-view"
-                               th:href="@{'/admin/clientes/' + ${cliente.idCliente}}">
+                               th:href="@{'/admin/usuarios/clientes/' + ${cliente.idCliente}}">
                                 Ver
                             </a>
+
+                            <!-- EDITAR CLIENTE -->
                             <a class="link link-edit"
-                               th:href="@{'/admin/clientes/editar/' + ${cliente.idCliente}}">
+                               th:href="@{'/admin/usuarios/clientes/editar/' + ${cliente.idCliente}}">
                                 Editar
                             </a>
-                            <form th:action="@{'/admin/usuarios/clientes/eliminar/' + ${cliente.idCliente}}"
-                                  method="post" class="inline-form"
-                                  onsubmit="return confirmarEliminacion('cliente');">
-                                <button type="submit" class="link link-delete">Eliminar</button>
-                            </form>
+
+                            <!-- ELIMINAR CLIENTE -->
+                            <button type="button"
+                                    class="link link-delete"
+                                    th:onclick="'confirmarEliminacionCliente(' + ${cliente.idCliente} + ');'">
+                                Eliminar
+                            </button>
                         </td>
                     </tr>
                     <tr th:if="${clientes == null or #lists.isEmpty(clientes)}">
@@ -154,19 +159,24 @@
                             <span th:text="${entrenador.horaFinTrabajo}">16:00</span>
                         </td>
                         <td class="center actions-cell">
+                            <!-- VER ENTRENADOR -->
                             <a class="link link-view"
-                               th:href="@{'/admin/entrenadores/' + ${entrenador.idEntrenador}}">
+                               th:href="@{'/admin/usuarios/entrenadores/' + ${entrenador.idEntrenador}}">
                                 Ver
                             </a>
+
+                            <!-- EDITAR ENTRENADOR -->
                             <a class="link link-edit"
-                               th:href="@{'/admin/entrenadores/editar/' + ${entrenador.idEntrenador}}">
+                               th:href="@{'/admin/usuarios/entrenadores/editar/' + ${entrenador.idEntrenador}}">
                                 Editar
                             </a>
-                            <form th:action="@{'/admin/usuarios/entrenadores/eliminar/' + ${entrenador.idEntrenador}}"
-                                  method="post" class="inline-form"
-                                  onsubmit="return confirmarEliminacion('entrenador');">
-                                <button type="submit" class="link link-delete">Eliminar</button>
-                            </form>
+
+                            <!-- ELIMINAR ENTRENADOR -->
+                            <button type="button"
+                                    class="link link-delete"
+                                    th:onclick="'confirmarEliminacionEntrenador(' + ${entrenador.idEntrenador} + ');'">
+                                Eliminar
+                            </button>
                         </td>
                     </tr>
                     <tr th:if="${entrenadores == null or #lists.isEmpty(entrenadores)}">
@@ -193,5 +203,25 @@
 <script>
     function confirmarEliminacion(tipo) {
         return confirm("¿Seguro que deseas eliminar este " + tipo + "?\nEsta acción no se puede deshacer.");
+    }
+
+    function confirmarEliminacionCliente(id) {
+        if (confirm('¿Está seguro de que desea eliminar este cliente? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/usuarios/clientes/eliminar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    function confirmarEliminacionEntrenador(id) {
+        if (confirm('¿Está seguro de que desea eliminar este entrenador? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/usuarios/entrenadores/eliminar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
     }
 </script>

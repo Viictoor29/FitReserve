@@ -9,11 +9,11 @@
 </head>
 <body>
 <div class="registro-container">
-    <a class="back-arrow" th:href="@{/}">←</a>
+    <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
+    <h2>Registrar nuevo cliente</h2>
 
-    <h2>Creé una cuenta como cliente</h2>
-
-    <form th:action="@{/registro}" th:object="${cliente}" method="post" id="registroForm" novalidate>
+    <form th:action="@{/admin/usuarios/clientes/nuevo}"
+          th:object="${clienteForm}" method="post">
 
         <div class="field">
             <label for="nombre">Nombre</label>
@@ -87,9 +87,6 @@
             <button type="submit" class="btn">Registrarme</button>
         </div>
 
-        <div class="footer-link">
-            <a th:href="@{/login}">Ya tengo cuenta</a>
-        </div>
     </form>
 </div>
 
@@ -120,7 +117,7 @@
 
         function clearAllErrors() {
             ['nombreError', 'apellidosError', 'emailError', 'contraseniaError',
-             'contrasenia2Error', 'telefonoError', 'fechaError', 'generoError'].forEach(id => clearError(id));
+                'contrasenia2Error', 'telefonoError', 'fechaError', 'generoError'].forEach(id => clearError(id));
         }
 
         function passwordsMatch() {

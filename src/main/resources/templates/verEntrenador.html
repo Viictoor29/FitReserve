@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle entrenador</title>
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+</head>
+<body>
+<div class="registro-container">
+    <a th:href="@{/admin/usuarios}" class="back-arrow">←</a>
+
+    <h2>Detalle del entrenador</h2>
+
+    <div class="field">
+        <label>Nombre completo</label>
+        <p th:text="${entrenador.usuario.nombre + ' ' + entrenador.usuario.apellidos}"></p>
+    </div>
+
+    <div class="field">
+        <label>Email</label>
+        <p th:text="${entrenador.usuario.email}"></p>
+    </div>
+
+    <div class="field">
+        <label>Teléfono</label>
+        <p th:text="${entrenador.usuario.telefono}"></p>
+    </div>
+
+    <div class="field">
+        <label>Especialidad</label>
+        <p th:text="${entrenador.especialidad}"></p>
+    </div>
+
+    <div class="field">
+        <label>Experiencia (años)</label>
+        <p th:text="${entrenador.experiencia}"></p>
+    </div>
+
+    <div class="field">
+        <label>Horario</label>
+        <p>
+            <span th:text="${entrenador.horaInicioTrabajo}"></span>
+            -
+            <span th:text="${entrenador.horaFinTrabajo}"></span>
+        </p>
+    </div>
+</div>
+</body>
+</html>
