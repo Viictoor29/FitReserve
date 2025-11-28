@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - FitReserve</title>
+    <link rel="stylesheet" th:href="@{/css/perfilCliente.css}">
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <a th:href="@{/cliente}" class="back-btn">← Volver</a>
+        <div class="logo-header">
+            <img th:src="@{/img/logo.png}" alt="FitReserve" class="mini-logo">
+            <span>FitReserve</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="logout-btn">Cerrar Sesión</button>
+        </form>
+    </header>
+
+    <main class="profile-section">
+        <div class="profile-header">
+            <div class="avatar">👤</div>
+            <h1>Mi Perfil</h1>
+            <p class="subtitle">Actualiza tus datos personales y objetivos fitness</p>
+        </div>
+
+        <div th:if="${mensaje}" class="alert success">
+            <span>✓</span> <span th:text="${mensaje}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert error">
+            <span>✗</span> <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/cliente/perfil/actualizar}" method="post" class="profile-form">
+            <div class="form-section">
+                <h2>📋 Información Personal</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input type="text" id="nombre" name="nombre"
+                               th:value="${usuario.nombre}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos *</label>
+                        <input type="text" id="apellidos" name="apellidos"
+                               th:value="${usuario.apellidos}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico *</label>
+                        <input type="email" id="email" name="email"
+                               th:value="${usuario.email}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono *</label>
+                        <input type="tel" id="telefono" name="telefono"
+                               th:value="${usuario.telefono}"
+                               pattern="[0-9]{9}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>🏋️ Datos de Cliente</h2>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaNacimiento">Fecha de Nacimiento *</label>
+                        <input type="date" id="fechaNacimiento" name="fechaNacimiento"
+                               th:value="${cliente.fechaNacimiento}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="genero">Género *</label>
+                        <select id="genero" name="genero" required>
+                            <option value="MASCULINO" th:selected="${cliente.genero.name() == 'MASCULINO'}">Masculino</option>
+                            <option value="FEMENINO" th:selected="${cliente.genero.name() == 'FEMENINO'}">Femenino</option>
+                            <option value="OTRO" th:selected="${cliente.genero.name() == 'OTRO'}">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="objetivos">Objetivos Fitness</label>
+                    <textarea id="objetivos" name="objetivos" rows="4"
+                              placeholder="Ej: Pérdida de peso, ganar masa muscular, mejorar resistencia..."
+                              th:text="${cliente.objetivos}"></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>🔒 Seguridad</h2>
+
+                <div class="form-group">
+                    <label for="contrasenia">Nueva Contraseña (dejar en blanco para no cambiar)</label>
+                    <input type="password" id="contrasenia" name="contrasenia" placeholder="••••••••">
+                    <input type="password" id="contrasenia2" name="confirmContrasenia" placeholder="Repite la nueva contraseña">
+                    <div class="error" id="contraseniaError" aria-live="polite"></div>
+                    <small>Solo completa estos campos si deseas cambiar tu contraseña</small>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save">💾 Guardar Cambios</button>
+                <a th:href="@{/cliente}" class="btn-cancel">Cancelar</a>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        (function() {
+            const form = document.querySelector('.profile-form');
+            const pass = document.getElementById('contrasenia');
+            const pass2 = document.getElementById('contrasenia2');
+            const errorDiv = document.getElementById('contraseniaError');
+
+            function showError(msg) { errorDiv.textContent = msg || ''; }
+
+            form.addEventListener('submit', function(e) {
+                // Si no se escribe nueva contraseña, no se fuerza confirmación
+                if (pass.value.trim()) {
+                    if (!pass2.value.trim()) {
+                        showError('Por favor repite la nueva contraseña.');
+                        e.preventDefault();
+                        return;
+                    }
+                    if (pass.value !== pass2.value) {
+                        showError('Las contraseñas no coinciden.');
+                        e.preventDefault();
+                        return;
+                    }
+                }
+                showError('');
+            });
+
+            // validación en tiempo real
+            pass.addEventListener('input', function() {
+                if (pass.value && pass2.value && pass.value !== pass2.value) {
+                    showError('Las contraseñas no coinciden.');
+                } else {
+                    showError('');
+                }
+            });
+
+            pass2.addEventListener('input', function() {
+                if (pass.value && pass2.value && pass.value !== pass2.value) {
+                    showError('Las contraseñas no coinciden.');
+                } else {
+                    showError('');
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>
