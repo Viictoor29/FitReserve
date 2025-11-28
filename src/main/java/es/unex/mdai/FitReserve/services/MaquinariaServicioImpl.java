@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class MaquinariaServicioImpl implements  MaquinariaServicio {
+public class MaquinariaServicioImpl implements MaquinariaServicio {
 
     private final MaquinariaRepository maquinariaRepository;
 
@@ -20,9 +20,17 @@ public class MaquinariaServicioImpl implements  MaquinariaServicio {
     }
 
     @Override
+    @Transactional
     public boolean crearMaquinaria(Maquinaria maquinaria) {
         if (maquinaria == null) {
             throw new IllegalArgumentException("La maquinaria no puede ser nula.");
+        }
+
+        if (maquinaria.getNombre() == null || maquinaria.getNombre().isBlank()) {
+            return false;
+        }
+        if (maquinaria.getCantidadTotal() <= 0) {
+            return false;
         }
 
         // No permitir nombres duplicados
@@ -35,6 +43,7 @@ public class MaquinariaServicioImpl implements  MaquinariaServicio {
     }
 
     @Override
+    @Transactional
     public boolean actualizarMaquinaria(Long idMaquinaria, Maquinaria maquinariaActualizada) {
         if (idMaquinaria == null) {
             throw new IllegalArgumentException("El idMaquinaria no puede ser nulo.");
@@ -43,8 +52,12 @@ public class MaquinariaServicioImpl implements  MaquinariaServicio {
             throw new IllegalArgumentException("Los datos actualizados no pueden ser nulos.");
         }
 
-        Maquinaria existente = maquinariaRepository.findByIdMaquinaria(idMaquinaria)
-                .orElseThrow(() -> new IllegalArgumentException("No existe maquinaria con id: " + idMaquinaria));
+        var opt = maquinariaRepository.findByIdMaquinaria(idMaquinaria);
+        if (opt.isEmpty()) {
+            return false;
+        }
+
+        Maquinaria existente = opt.get();
 
         // Actualizaciones parciales
         if (maquinariaActualizada.getNombre() != null) {
@@ -68,6 +81,7 @@ public class MaquinariaServicioImpl implements  MaquinariaServicio {
     }
 
     @Override
+    @Transactional
     public boolean eliminarMaquinaria(Long idMaquinaria) {
         if (idMaquinaria == null) {
             throw new IllegalArgumentException("El idMaquinaria no puede ser nulo.");
@@ -88,8 +102,8 @@ public class MaquinariaServicioImpl implements  MaquinariaServicio {
             throw new IllegalArgumentException("El idMaquinaria no puede ser nulo.");
         }
 
-        return maquinariaRepository.findByIdMaquinaria(idMaquinaria)
-                .orElseThrow(() -> new IllegalArgumentException("No existe maquinaria con id: " + idMaquinaria));
+        // devolvemos null si no existe, igual que en salas/actividades
+        return maquinariaRepository.findByIdMaquinaria(idMaquinaria).orElse(null);
     }
 
     @Override
@@ -120,6 +134,7 @@ public class MaquinariaServicioImpl implements  MaquinariaServicio {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Maquinaria> buscarDisponibles(LocalDateTime inicio, LocalDateTime fin, TipoActividad tipoActividad) {
         if (inicio == null || fin == null) {
             throw new IllegalArgumentException("El intervalo no puede ser nulo.");

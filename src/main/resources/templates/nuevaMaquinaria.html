@@ -13,7 +13,10 @@
 
     <h2>Registrar nueva maquinaria</h2>
 
-    <form th:action="@{/admin/maquinaria/nueva}"
+    <div class="error" th:if="${regError}" th:text="${regError}" aria-live="assertive"></div>
+
+    <form id="nuevaMaquinariaForm"
+          th:action="@{/admin/maquinaria/nueva}"
           th:object="${maquinariaForm}" method="post">
 
         <div class="field">
@@ -21,25 +24,26 @@
             <input id="nombre" type="text" th:field="*{nombre}"
                    placeholder="Cinta, Elíptica, Banco de pesas..."
                    required maxlength="20">
-            <div class="error" id="nombreError"></div>
+            <div class="error" id="nombreError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="cantidadTotal">Cantidad total</label>
             <input id="cantidadTotal" type="number" min="1" max="500"
                    th:field="*{cantidadTotal}" required>
-            <div class="error" id="cantidadError"></div>
+            <div class="error" id="cantidadError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="tipoActividad">Tipo de actividad asociada</label>
             <select id="tipoActividad" th:field="*{tipoActividad}" required>
-                <option value="" disabled>Selecciona un tipo</option>
-                <option th:each="t : ${T(es.unex.mdai.FitReserve.data.enume.TipoActividad).values()}"
+                <option value="">Selecciona un tipo</option>
+                <option th:each="t : ${tiposActividad}"
                         th:value="${t}"
                         th:text="${t}">
                 </option>
             </select>
+            <div class="error" id="tipoActividadError" aria-live="polite"></div>
         </div>
 
         <div class="field">
@@ -47,6 +51,7 @@
             <textarea id="descripcion" th:field="*{descripcion}"
                       placeholder="Descripción breve de la máquina"
                       maxlength="255"></textarea>
+            <div class="error" id="descripcionError" aria-live="polite"></div>
         </div>
 
         <div class="actions">
@@ -58,5 +63,119 @@
         <a th:href="@{/admin/maquinaria}">← Volver a gestión de maquinaria</a>
     </div>
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('nuevaMaquinariaForm');
+        const nombre = document.getElementById('nombre');
+        const cantidadTotal = document.getElementById('cantidadTotal');
+        const tipoActividad = document.getElementById('tipoActividad');
+        const descripcion = document.getElementById('descripcion');
+
+        function showError(errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['nombreError', 'cantidadError', 'tipoActividadError', 'descripcionError']
+                .forEach(clearError);
+        }
+
+        form.addEventListener('submit', function (e) {
+            clearAllErrors();
+            let hasError = false;
+
+            // Nombre
+            const nombreVal = nombre.value.trim();
+            if (!nombreVal) {
+                showError('nombreError', 'El nombre es obligatorio.');
+                hasError = true;
+            } else if (nombreVal.length > 20) {
+                showError('nombreError', 'El nombre no puede superar 20 caracteres.');
+                hasError = true;
+            }
+
+            // Cantidad total
+            const cantidadVal = cantidadTotal.value.trim();
+            const cantidadNum = Number(cantidadVal);
+            if (!cantidadVal) {
+                showError('cantidadError', 'La cantidad total es obligatoria.');
+                hasError = true;
+            } else if (isNaN(cantidadNum)) {
+                showError('cantidadError', 'La cantidad total debe ser un número.');
+                hasError = true;
+            } else if (cantidadNum < 1 || cantidadNum > 500) {
+                showError('cantidadError', 'La cantidad total debe estar entre 1 y 500.');
+                hasError = true;
+            }
+
+            // Tipo de actividad
+            if (!tipoActividad.value) {
+                showError('tipoActividadError', 'El tipo de actividad es obligatorio.');
+                hasError = true;
+            }
+
+            // Descripción
+            const descVal = descripcion.value.trim();
+            if (descVal.length > 255) {
+                showError('descripcionError', 'La descripción no puede superar 255 caracteres.');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+
+        // Validación en tiempo real
+        nombre.addEventListener('input', function () {
+            const val = nombre.value.trim();
+            if (!val) {
+                showError('nombreError', 'El nombre es obligatorio.');
+            } else if (val.length > 20) {
+                showError('nombreError', 'El nombre no puede superar 20 caracteres.');
+            } else {
+                clearError('nombreError');
+            }
+        });
+
+        cantidadTotal.addEventListener('input', function () {
+            const val = cantidadTotal.value.trim();
+            const num = Number(val);
+            if (!val) {
+                showError('cantidadError', 'La cantidad total es obligatoria.');
+            } else if (isNaN(num)) {
+                showError('cantidadError', 'La cantidad total debe ser un número.');
+            } else if (num < 1 || num > 500) {
+                showError('cantidadError', 'La cantidad total debe estar entre 1 y 500.');
+            } else {
+                clearError('cantidadError');
+            }
+        });
+
+        tipoActividad.addEventListener('change', function () {
+            if (!tipoActividad.value) {
+                showError('tipoActividadError', 'El tipo de actividad es obligatorio.');
+            } else {
+                clearError('tipoActividadError');
+            }
+        });
+
+        descripcion.addEventListener('input', function () {
+            const val = descripcion.value.trim();
+            if (val.length > 255) {
+                showError('descripcionError', 'La descripción no puede superar 255 caracteres.');
+            } else {
+                clearError('descripcionError');
+            }
+        });
+    })();
+</script>
 </body>
 </html>
