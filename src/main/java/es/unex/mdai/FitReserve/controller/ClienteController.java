@@ -8,10 +8,7 @@ import es.unex.mdai.FitReserve.services.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import es.unex.mdai.FitReserve.data.enume.Genero;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -256,5 +253,122 @@ public class ClienteController {
             return "redirect:/cliente/nueva-reserva";
         }
     }
+
+    @GetMapping("/mis-reservas")
+    public String mostrarMisReservas(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+        if (cliente == null) {
+            model.addAttribute("error", "No se encontró el cliente asociado al usuario.");
+            return "clientePage";
+        }
+
+        // Obtener todas las reservas del cliente
+        List<Reserva> todasReservas = reservaService.listarHistorialCliente(cliente.getIdCliente());
+
+        // Filtrar solo reservas activas (Pendiente) que aún no han comenzado
+        LocalDateTime ahora = LocalDateTime.now();
+        List<Reserva> reservasActivas = todasReservas.stream()
+                .filter(r -> r.getEstado() == Estado.Pendiente
+                        && r.getFechaHoraInicio().isAfter(ahora))
+                .collect(Collectors.toList());
+
+        // Filtrar reservas de los próximos 7 días
+        LocalDateTime dentroDe7Dias = ahora.plusDays(7);
+        List<Reserva> reservasProximas = reservasActivas.stream()
+                .filter(r -> r.getFechaHoraInicio().isBefore(dentroDe7Dias))
+                .collect(Collectors.toList());
+
+        model.addAttribute("reservasActivas", reservasActivas);
+        model.addAttribute("reservasProximas", reservasProximas);
+        model.addAttribute("usuario", usuario);
+
+        return "misReservas";
+    }
+
+    @GetMapping("/reserva/{id}")
+    public String verDetalleReserva(@PathVariable Long id, HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+        Reserva reserva = reservaService.obtenerPorId(id);
+
+        // Verificar que la reserva pertenece al cliente
+        if (reserva == null || !reserva.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
+            model.addAttribute("error", "Reserva no encontrada o no autorizada.");
+            return "redirect:/cliente/mis-reservas";
+        }
+
+        model.addAttribute("reserva", reserva);
+        model.addAttribute("usuario", usuario);
+
+        return "detalleReserva";
+    }
+
+    @GetMapping("/reserva/editar/{id}")
+    public String editarReserva(@PathVariable Long id, HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+        Reserva reserva = reservaService.obtenerPorId(id);
+
+        // Verificar que la reserva pertenece al cliente
+        if (reserva == null || !reserva.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
+            model.addAttribute("error", "Reserva no encontrada o no autorizada.");
+            return "redirect:/cliente/mis-reservas";
+        }
+
+        // Cargar datos para el formulario
+        List<Sala> salas = salaService.listarTodas();
+        List<Actividad> actividades = actividadService.listarTodas();
+        List<Entrenador> entrenadores = entrenadorService.listarTodos();
+        List<Maquinaria> maquinarias = maquinariaService.listarTodas();
+
+        model.addAttribute("reserva", reserva);
+        model.addAttribute("salas", salas);
+        model.addAttribute("actividades", actividades);
+        model.addAttribute("entrenadores", entrenadores);
+        model.addAttribute("maquinarias", maquinarias);
+        model.addAttribute("usuario", usuario);
+
+        return "editarReserva";
+    }
+
+    @PostMapping("/reserva/cancelar/{id}")
+    public String cancelarReserva(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
+
+            // Usar el método específico de cancelación por cliente
+            boolean cancelada = reservaService.cancelarPorCliente(id, cliente.getIdCliente());
+
+            if (cancelada) {
+                redirectAttributes.addFlashAttribute("mensaje", "Reserva cancelada exitosamente");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "No se pudo cancelar la reserva. Verifica que no haya comenzado y pertenezca a tu cuenta.");
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al cancelar la reserva: " + e.getMessage());
+        }
+
+        return "redirect:/cliente/mis-reservas";
+    }
+
 
 }

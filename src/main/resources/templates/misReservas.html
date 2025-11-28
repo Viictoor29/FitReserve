@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Reservas - FitReserve</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/misReservas.css}">
+</head>
+<body>
+<div class="page-container">
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <div>
+                <h1>Mis Reservas</h1>
+                <p class="subtitle">Gestiona tus clases activas y próximas</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <span class="user-name" th:text="${session.usuarioSesion.getNombre()}">Usuario</span>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn-logout" type="submit">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Mensaje de éxito/error -->
+    <div th:if="${mensaje}" class="alert alert-success">
+        <span th:text="${mensaje}">Mensaje de éxito</span>
+    </div>
+    <div th:if="${error}" class="alert alert-error">
+        <span th:text="${error}">Mensaje de error</span>
+    </div>
+
+    <section class="summary-card">
+        <div class="summary-item">
+            <div class="summary-label">Reservas activas</div>
+            <div class="summary-value" th:text="${reservasActivas != null ? reservasActivas.size() : 0}">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="summary-label">Próximas 7 días</div>
+            <div class="summary-value trainer" th:text="${reservasProximas != null ? reservasProximas.size() : 0}">0</div>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Reservas activas</h2>
+                    <p>Consulta, modifica o cancela tus reservas pendientes</p>
+                </div>
+                <a class="btn btn-secondary" th:href="@{/cliente/nueva-reserva}">
+                    + Nueva reserva
+                </a>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Actividad</th>
+                        <th>Sala</th>
+                        <th>Entrenador</th>
+                        <th class="center">Estado</th>
+                        <th class="center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="reserva, stat : ${reservasActivas}">
+                        <td th:text="${stat.count}">1</td>
+                        <td th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}">2025-01-01 09:00</td>
+                        <td th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}">2025-01-01 10:00</td>
+                        <td th:text="${reserva.actividad != null ? reserva.actividad.nombre : '—'}">Actividad</td>
+                        <td th:text="${reserva.sala != null ? reserva.sala.nombre : '—'}">Sala</td>
+                        <td th:text="${reserva.entrenador != null ? reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos : '—'}">Entrenador</td>
+                        <td class="center">
+                            <span class="status-badge status-pendiente">
+                                <span th:text="${reserva.estado}">Pendiente</span>
+                            </span>
+                        </td>
+                        <td class="center actions-cell">
+                            <!-- VER RESERVA -->
+                            <a class="link link-view"
+                               th:href="@{'/cliente/reserva/' + ${reserva.idReserva}}">
+                                Ver
+                            </a>
+
+                            <!-- EDITAR RESERVA -->
+                            <a class="link link-edit"
+                               th:href="@{'/cliente/reserva/editar/' + ${reserva.idReserva}}">
+                                Editar
+                            </a>
+
+                            <!-- CANCELAR RESERVA -->
+                            <button type="button"
+                                    class="link link-delete"
+                                    th:onclick="'confirmarCancelacion(' + ${reserva.idReserva} + ');'">
+                                Cancelar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${reservasActivas == null or #lists.isEmpty(reservasActivas)}">
+                        <td colspan="8" class="empty-state">
+                            No tienes reservas activas. ¡Haz tu primera reserva!
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-link">
+        <a th:href="@{/cliente}">← Volver al panel</a>
+    </div>
+</div>
+
+<script>
+    function confirmarCancelacion(id) {
+        if (confirm('¿Está seguro de que desea cancelar esta reserva? Esta acción no se puede deshacer.')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/cliente/reserva/cancelar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+</body>
+</html>
