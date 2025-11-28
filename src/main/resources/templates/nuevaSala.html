@@ -13,35 +13,39 @@
 
     <h2>Crear nueva sala</h2>
 
-    <form th:action="@{/admin/salas/nueva}"
+    <div class="error" th:if="${regError}" th:text="${regError}" aria-live="assertive"></div>
+
+    <form id="nuevaSalaForm"
+          th:action="@{/admin/salas/nueva}"
           th:object="${salaForm}" method="post">
 
         <div class="field">
             <label for="nombre">Nombre</label>
             <input id="nombre" type="text" th:field="*{nombre}"
                    placeholder="Sala A, Sala cardio..." required maxlength="30">
-            <div class="error" id="nombreError"></div>
+            <div class="error" id="nombreError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="capacidad">Capacidad</label>
             <input id="capacidad" type="number" min="1" max="500"
                    th:field="*{capacidad}" required>
-            <div class="error" id="capacidadError"></div>
+            <div class="error" id="capacidadError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="ubicacion">Ubicación</label>
             <input id="ubicacion" type="text" th:field="*{ubicacion}"
                    placeholder="Planta 1, zona cardio..." required maxlength="50">
-            <div class="error" id="ubicacionError"></div>
+            <div class="error" id="ubicacionError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="descripcion">Descripción</label>
             <textarea id="descripcion" th:field="*{descripcion}"
-                      placeholder="Sala con espejos, mancuernas..."></textarea>
-            <div class="error" id="descripcionError"></div>
+                      placeholder="Sala con espejos, mancuernas..."
+                      maxlength="255"></textarea>
+            <div class="error" id="descripcionError" aria-live="polite"></div>
         </div>
 
         <div class="actions">
@@ -50,5 +54,126 @@
     </form>
 
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('nuevaSalaForm');
+        const nombre = document.getElementById('nombre');
+        const capacidad = document.getElementById('capacidad');
+        const ubicacion = document.getElementById('ubicacion');
+        const descripcion = document.getElementById('descripcion');
+
+        function showError(errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = message;
+        }
+
+        function clearError(errorId) {
+            const errorDiv = document.getElementById(errorId);
+            if (errorDiv) errorDiv.textContent = '';
+        }
+
+        function clearAllErrors() {
+            ['nombreError', 'capacidadError', 'ubicacionError', 'descripcionError']
+                .forEach(clearError);
+        }
+
+        form.addEventListener('submit', function (e) {
+            clearAllErrors();
+            let hasError = false;
+
+            // Nombre
+            const nombreVal = nombre.value.trim();
+            if (!nombreVal) {
+                showError('nombreError', 'El nombre es obligatorio.');
+                hasError = true;
+            } else if (nombreVal.length > 30) {
+                showError('nombreError', 'El nombre no puede superar 30 caracteres.');
+                hasError = true;
+            }
+
+            // Capacidad
+            const capacidadVal = capacidad.value.trim();
+            const capacidadNum = Number(capacidadVal);
+            if (!capacidadVal) {
+                showError('capacidadError', 'La capacidad es obligatoria.');
+                hasError = true;
+            } else if (isNaN(capacidadNum)) {
+                showError('capacidadError', 'La capacidad debe ser un número.');
+                hasError = true;
+            } else if (capacidadNum < 1 || capacidadNum > 500) {
+                showError('capacidadError', 'La capacidad debe estar entre 1 y 500.');
+                hasError = true;
+            }
+
+            // Ubicación
+            const ubicacionVal = ubicacion.value.trim();
+            if (!ubicacionVal) {
+                showError('ubicacionError', 'La ubicación es obligatoria.');
+                hasError = true;
+            } else if (ubicacionVal.length > 50) {
+                showError('ubicacionError', 'La ubicación no puede superar 50 caracteres.');
+                hasError = true;
+            }
+
+            // Descripción (opcional)
+            const descVal = descripcion.value.trim();
+            if (descVal.length > 255) {
+                showError('descripcionError', 'La descripción no puede superar 255 caracteres.');
+                hasError = true;
+            }
+
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+
+        // Validación en tiempo real
+        nombre.addEventListener('input', function () {
+            const val = nombre.value.trim();
+            if (!val) {
+                showError('nombreError', 'El nombre es obligatorio.');
+            } else if (val.length > 30) {
+                showError('nombreError', 'El nombre no puede superar 30 caracteres.');
+            } else {
+                clearError('nombreError');
+            }
+        });
+
+        capacidad.addEventListener('input', function () {
+            const val = capacidad.value.trim();
+            const num = Number(val);
+            if (!val) {
+                showError('capacidadError', 'La capacidad es obligatoria.');
+            } else if (isNaN(num)) {
+                showError('capacidadError', 'La capacidad debe ser un número.');
+            } else if (num < 1 || num > 500) {
+                showError('capacidadError', 'La capacidad debe estar entre 1 y 500.');
+            } else {
+                clearError('capacidadError');
+            }
+        });
+
+        ubicacion.addEventListener('input', function () {
+            const val = ubicacion.value.trim();
+            if (!val) {
+                showError('ubicacionError', 'La ubicación es obligatoria.');
+            } else if (val.length > 50) {
+                showError('ubicacionError', 'La ubicación no puede superar 50 caracteres.');
+            } else {
+                clearError('ubicacionError');
+            }
+        });
+
+        descripcion.addEventListener('input', function () {
+            const val = descripcion.value.trim();
+            if (val.length > 255) {
+                showError('descripcionError', 'La descripción no puede superar 255 caracteres.');
+            } else {
+                clearError('descripcionError');
+            }
+        });
+    })();
+</script>
 </body>
 </html>

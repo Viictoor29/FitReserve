@@ -2,6 +2,7 @@ package es.unex.mdai.FitReserve.controller;
 
 import es.unex.mdai.FitReserve.data.model.Sala;
 import es.unex.mdai.FitReserve.services.SalaServicio;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,85 +19,149 @@ public class GestionSalasController {
         this.salaServicio = salaServicio;
     }
 
-    // LISTADO PRINCIPAL
+    /* ========== LISTADO PRINCIPAL ========== */
+
     @GetMapping
     public String listarSalas(Model model) {
-        model.addAttribute("salas", salaServicio.listarTodas()); // o listarTodas()
+        model.addAttribute("salas", salaServicio.listarTodas());
         return "gestionSalasPage";
     }
 
-    // NUEVA SALA - FORM
+    /* ========== NUEVA SALA ========== */
+
+    // FORM NUEVA SALA
     @GetMapping("/nueva")
     public String mostrarNuevaSala(Model model) {
-        model.addAttribute("salaForm", new Sala());
+        if (!model.containsAttribute("salaForm")) {
+            model.addAttribute("salaForm", new Sala());
+        }
         return "nuevaSala";
     }
 
-    // NUEVA SALA - POST
+    // POST NUEVA SALA
     @PostMapping("/nueva")
-    public String procesarNuevaSala(@ModelAttribute("salaForm") Sala salaForm,
-                                    BindingResult result,
-                                    RedirectAttributes redirectAttributes) {
+    public String procesarNuevaSala(
+            @Valid @ModelAttribute("salaForm") Sala salaForm,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
-        // Errores de binding (tipos incorrectos, etc.)
-        if (result.hasErrors()) {
+        // Errores de validación/binding
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("regError", "El registro no ha funcionado. Revisa los campos.");
             return "nuevaSala";
         }
 
-        boolean ok = salaServicio.crearSala(salaForm);
-
-        if (!ok) {
-            redirectAttributes.addFlashAttribute("mensajeError",
-                    "No se ha podido registrar la sala. Revisa nombre y capacidad.");
-        } else {
-            redirectAttributes.addFlashAttribute("mensajeExito",
-                    "Sala creada correctamente.");
+        if (salaForm == null) {
+            model.addAttribute("regError", "Datos de sala incompletos.");
+            return "nuevaSala";
         }
 
-        return "redirect:/admin/salas";
+        try {
+            boolean creada = salaServicio.crearSala(salaForm);
+
+            if (!creada) {
+                model.addAttribute("regError", "No se ha podido registrar la sala. Revisa nombre y capacidad.");
+                return "nuevaSala";
+            }
+
+            redirectAttributes.addFlashAttribute("mensajeExito", "Sala creada correctamente.");
+            return "redirect:/admin/salas";
+
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("regError", ex.getMessage());
+            return "nuevaSala";
+        } catch (Exception ex) {
+            model.addAttribute("regError", "Error inesperado durante el registro de la sala.");
+            return "nuevaSala";
+        }
     }
 
-    // EDITAR SALA - FORM
+    /* ========== EDITAR SALA ========== */
+
+    // FORM EDITAR
     @GetMapping("/editar/{id}")
-    public String mostrarEditarSala(@PathVariable Long id, Model model) {
+    public String mostrarEditarSala(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Sala sala = salaServicio.obtenerSalaPorId(id);
+
+        if (sala == null) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Sala no encontrada.");
+            return "redirect:/admin/salas";
+        }
+
         model.addAttribute("salaForm", sala);
         return "editarSala";
     }
 
-    // EDITAR SALA - POST
+    // POST EDITAR
     @PostMapping("/editar/{id}")
-    public String procesarEditarSala(@PathVariable Long id,
-                                     @ModelAttribute("salaForm") Sala salaForm,
-                                     BindingResult result,
-                                     RedirectAttributes redirectAttributes) {
+    public String procesarEditarSala(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("salaForm") Sala salaForm,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
-        if (result.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "editarSala";
         }
 
-        salaServicio.actualizarSala(id, salaForm);
+        try {
+            Sala salaExistente = salaServicio.obtenerSalaPorId(id);
+            if (salaExistente == null) {
+                redirectAttributes.addFlashAttribute("mensajeError", "Sala no encontrada.");
+                return "redirect:/admin/salas";
+            }
 
-        redirectAttributes.addFlashAttribute("mensajeExito",
-                "Sala actualizada correctamente.");
-        return "redirect:/admin/salas";
+            // Actualizamos campos (por si no quieres confiar en el ID del form)
+            salaExistente.setNombre(salaForm.getNombre());
+            salaExistente.setCapacidad(salaForm.getCapacidad());
+            salaExistente.setUbicacion(salaForm.getUbicacion());
+            salaExistente.setDescripcion(salaForm.getDescripcion());
+
+            salaServicio.actualizarSala(id, salaExistente);
+
+            redirectAttributes.addFlashAttribute("mensajeExito", "Sala actualizada correctamente.");
+            return "redirect:/admin/salas";
+
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("mensajeError", ex.getMessage());
+            return "editarSala";
+        } catch (Exception ex) {
+            model.addAttribute("mensajeError", "Error al actualizar la sala: " + ex.getMessage());
+            return "editarSala";
+        }
     }
 
-    // ELIMINAR SALA (POST con confirm JS)
+    /* ========== ELIMINAR SALA ========== */
+
     @PostMapping("/eliminar/{id}")
-    public String eliminarSala(@PathVariable Long id,
-                               RedirectAttributes redirectAttributes) {
+    public String eliminarSala(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            // Igual que en GestionUsuarios: primero recuperar la entidad
+            Sala sala = salaServicio.obtenerSalaPorId(id);
+            if (sala == null) {
+                redirectAttributes.addFlashAttribute("mensajeError", "Sala no encontrada.");
+                return "redirect:/admin/salas";
+            }
 
-        boolean ok = salaServicio.eliminarSala(id);
+            boolean ok = salaServicio.eliminarSala(sala.getIdSala());
 
-        if (ok) {
-            redirectAttributes.addFlashAttribute("mensajeExito",
-                    "Sala eliminada correctamente.");
-        } else {
+            if (ok) {
+                redirectAttributes.addFlashAttribute("mensajeExito", "Sala eliminada correctamente.");
+            } else {
+                redirectAttributes.addFlashAttribute("mensajeError", "No se ha podido eliminar la sala.");
+            }
+
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("mensajeError", ex.getMessage());
+        } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError",
-                    "No se ha podido eliminar la sala (no existe).");
+                    "Error al eliminar la sala: " + e.getMessage());
         }
 
+        // Igual que en GestionUsuarios: truco para evitar caché
+        redirectAttributes.addFlashAttribute("timestamp", System.currentTimeMillis());
         return "redirect:/admin/salas";
     }
 }
