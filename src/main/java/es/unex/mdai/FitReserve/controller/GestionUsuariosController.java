@@ -1,9 +1,13 @@
 package es.unex.mdai.FitReserve.controller;
 
+import es.unex.mdai.FitReserve.data.enume.Genero;
+import es.unex.mdai.FitReserve.data.enume.TipoUsuario;
 import es.unex.mdai.FitReserve.data.model.Cliente;
 import es.unex.mdai.FitReserve.data.model.Entrenador;
+import es.unex.mdai.FitReserve.data.model.Usuario;
 import es.unex.mdai.FitReserve.services.ClienteServicio;
 import es.unex.mdai.FitReserve.services.EntrenadorServicio;
+import es.unex.mdai.FitReserve.services.UsuarioServicio;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,11 +20,14 @@ public class GestionUsuariosController {
 
     private final ClienteServicio clienteServicio;
     private final EntrenadorServicio entrenadorServicio;
+    private final UsuarioServicio usuarioServicio;
 
     public GestionUsuariosController(ClienteServicio clienteServicio,
-                                     EntrenadorServicio entrenadorServicio) {
+                                     EntrenadorServicio entrenadorServicio,
+                                     UsuarioServicio usuarioServicio) {
         this.clienteServicio = clienteServicio;
         this.entrenadorServicio = entrenadorServicio;
+        this.usuarioServicio = usuarioServicio;
     }
 
     /* ========== LISTA PRINCIPAL ========== */
@@ -139,6 +146,96 @@ public class GestionUsuariosController {
                     "No se ha podido eliminar el entrenador (no existe).");
         }
 
+        return "redirect:/admin/usuarios";
+    }
+
+    /* ==================== NUEVO CLIENTE ==================== */
+
+    // Mostrar formulario
+    @GetMapping("/clientes/nuevo")
+    public String mostrarNuevoCliente(Model model) {
+        Cliente cliente = new Cliente();
+        cliente.setUsuario(new Usuario()); // para poder hacer usuario.nombre, etc. en Thymeleaf
+
+        model.addAttribute("clienteForm", cliente);
+        model.addAttribute("generos", Genero.values());
+
+        return "nuevoCliente";
+    }
+
+    // Procesar envío del formulario
+    @PostMapping("/clientes/nuevo")
+    public String procesarNuevoCliente(
+            @ModelAttribute("clienteForm") Cliente clienteForm,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            return "nuevoCliente";
+        }
+
+        Usuario usuario = clienteForm.getUsuario();
+        // marcamos tipo de usuario como CLIENTE
+        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
+
+        // 1) Guardar usuario (para que tenga idUsuario)
+        // (ajusta el nombre del método si en tu UsuarioServicio se llama distinto)
+        usuarioServicio.registrarUsuario(usuario);
+
+        // 2) Registrar cliente; por @MapsId usará usuario.idUsuario
+        boolean ok = clienteServicio.registrarCliente(clienteForm);
+
+        if (!ok) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "No se ha podido registrar el cliente (puede que ya exista).");
+            return "redirect:/admin/usuarios";
+        }
+
+        redirectAttributes.addFlashAttribute("mensajeExito",
+                "Cliente registrado correctamente.");
+        return "redirect:/admin/usuarios";
+    }
+
+    /* ==================== NUEVO ENTRENADOR ==================== */
+
+    // Mostrar formulario
+    @GetMapping("/entrenadores/nuevo")
+    public String mostrarNuevoEntrenador(Model model) {
+        Entrenador entrenador = new Entrenador();
+        entrenador.setUsuario(new Usuario());
+
+        model.addAttribute("entrenadorForm", entrenador);
+        return "nuevoEntrenador";
+    }
+
+    // Procesar envío del formulario
+    @PostMapping("/entrenadores/nuevo")
+    public String procesarNuevoEntrenador(
+            @ModelAttribute("entrenadorForm") Entrenador entrenadorForm,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            return "nuevoEntrenador";
+        }
+
+        Usuario usuario = entrenadorForm.getUsuario();
+        usuario.setTipoUsuario(TipoUsuario.ENTRENADOR);
+
+        // 1) Guardar usuario
+        usuarioServicio.registrarUsuario(usuario);
+
+        // 2) Registrar entrenador
+        boolean ok = entrenadorServicio.registrarEntrenador(entrenadorForm);
+
+        if (!ok) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "No se ha podido registrar el entrenador (puede que ya exista).");
+            return "redirect:/admin/usuarios";
+        }
+
+        redirectAttributes.addFlashAttribute("mensajeExito",
+                "Entrenador registrado correctamente.");
         return "redirect:/admin/usuarios";
     }
 }
