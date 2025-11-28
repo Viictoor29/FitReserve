@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar cliente</title>
-    <link rel="stylesheet" th:href="@{/css/registro.css}">
+    <!-- Fondo / estilo de formulario -->
+    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
     <link rel="icon" th:href="@{/img/favicon.ico}">
 </head>
 <body>
@@ -12,41 +13,55 @@
 
     <h2>Editar cliente</h2>
 
-    <form th:action="@{'/admin/usuarios/clientes/editar/' + ${clienteForm.idCliente}}"
+    <form id="editarClienteForm"
+          th:action="@{'/admin/usuarios/clientes/editar/' + ${clienteForm.idCliente}}"
           th:object="${clienteForm}" method="post">
 
         <!-- DATOS DE USUARIO -->
         <div class="field">
             <label for="nombre">Nombre</label>
             <input id="nombre" type="text" th:field="*{usuario.nombre}" required maxlength="20">
+            <div class="error" id="nombreError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="apellidos">Apellidos</label>
             <input id="apellidos" type="text" th:field="*{usuario.apellidos}" required maxlength="50">
+            <div class="error" id="apellidosError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="email">Correo electrónico</label>
             <input id="email" type="email" th:field="*{usuario.email}" required maxlength="100">
+            <div class="error" id="emailError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="telefono">Teléfono</label>
             <input id="telefono" type="tel" th:field="*{usuario.telefono}"
                    pattern="[0-9]{9}" maxlength="9" required>
+            <div class="error" id="telefonoError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="contrasenia">Contraseña</label>
             <input id="contrasenia" type="password" th:field="*{usuario.contrasenia}"
-                   placeholder="Nueva contraseña (o deja la actual)" maxlength="20" >
+                   placeholder="Nueva contraseña (o deja la actual)" maxlength="20">
+            <div class="error" id="contraseniaError"></div>
+        </div>
+
+        <div class="field">
+            <label for="contrasenia2">Confirmar contraseña</label>
+            <input id="contrasenia2" type="password"
+                   placeholder="Repite la contraseña" maxlength="20">
+            <div class="error" id="contrasenia2Error"></div>
         </div>
 
         <!-- DATOS DE CLIENTE -->
         <div class="field">
             <label for="fechaNacimiento">Fecha de nacimiento</label>
             <input id="fechaNacimiento" type="date" th:field="*{fechaNacimiento}">
+            <div class="error" id="fechaError" aria-live="polite"></div>
         </div>
 
         <div class="field">
@@ -58,12 +73,14 @@
                         th:text="${g}">
                 </option>
             </select>
+            <div class="error" id="generoError" aria-live="polite"></div>
         </div>
 
         <div class="field">
             <label for="objetivos">Objetivos</label>
             <textarea id="objetivos" th:field="*{objetivos}"
                       placeholder="Actualiza los objetivos del cliente"></textarea>
+            <div class="error" id="objetivosError" aria-live="polite"></div>
         </div>
 
         <div class="actions">
@@ -71,5 +88,64 @@
         </div>
     </form>
 </div>
+
+<script>
+    (function () {
+        const form = document.getElementById('editarClienteForm');
+        const contrasenia = document.getElementById('contrasenia');
+        const contrasenia2 = document.getElementById('contrasenia2');
+
+        const contraseniaError = document.getElementById('contraseniaError');
+        const contrasenia2Error = document.getElementById('contrasenia2Error');
+
+        function clearError() {
+            if (contraseniaError) contraseniaError.textContent = '';
+            if (contrasenia2Error) contrasenia2Error.textContent = '';
+        }
+
+        function passwordsMatch() {
+            const v1 = contrasenia.value.trim();
+            const v2 = contrasenia2.value.trim();
+
+            // Si no se ha escrito nada en la contraseña nueva, no exigimos confirmación
+            if (v1 === '' && v2 === '') {
+                clearError();
+                return true;
+            }
+
+            if (v1 !== v2) {
+                if (contrasenia2Error) {
+                    contrasenia2Error.textContent = 'Las contraseñas no coinciden.';
+                }
+                return false;
+            }
+
+            clearError();
+            return true;
+        }
+
+        if (contrasenia2) {
+            contrasenia2.addEventListener('input', passwordsMatch);
+        }
+        if (contrasenia) {
+            contrasenia.addEventListener('input', passwordsMatch);
+        }
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                // Solo validamos coincidencia si se ha escrito algo en al menos uno de los campos
+                const nuevaPass = contrasenia.value.trim();
+                const confirm = contrasenia2.value.trim();
+
+                if (nuevaPass !== '' || confirm !== '') {
+                    if (!passwordsMatch()) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        }
+    })();
+</script>
+
 </body>
 </html>
