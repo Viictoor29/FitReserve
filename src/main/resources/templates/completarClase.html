@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Completar Clase - FitReserve</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/misReservas.css}">
+</head>
+<body>
+<div class="page-container">
+    <header class="header">
+        <div class="logo-section">
+            <img th:src="@{/img/logo.png}" alt="FitReserve Logo" class="logo-small">
+            <div>
+                <h1>Completar Clase</h1>
+                <p class="subtitle">Marca como completadas las clases finalizadas</p>
+            </div>
+        </div>
+        <div class="user-info">
+            <span class="user-name" th:text="${session.usuarioSesion.getNombre()}">Usuario</span>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn-logout" type="submit">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <!-- Mensaje de éxito/error -->
+    <div th:if="${mensaje}" class="alert alert-success">
+        <span th:text="${mensaje}">Mensaje de éxito</span>
+    </div>
+    <div th:if="${error}" class="alert alert-error">
+        <span th:text="${error}">Mensaje de error</span>
+    </div>
+
+    <section class="summary-card">
+        <div class="summary-item">
+            <div class="summary-label">Clases por completar</div>
+            <div class="summary-value trainer" th:text="${clasesParaCompletar != null ? clasesParaCompletar.size() : 0}">0</div>
+        </div>
+    </section>
+
+    <section class="grid">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Clases finalizadas</h2>
+                    <p>Marca como completadas las clases que ya han terminado</p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Actividad</th>
+                        <th>Sala</th>
+                        <th>Cliente</th>
+                        <th class="center">Estado</th>
+                        <th class="center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="clase, stat : ${clasesParaCompletar}">
+                        <td th:text="${stat.count}">1</td>
+                        <td th:text="${#temporals.format(clase.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}">2025-01-01 09:00</td>
+                        <td th:text="${#temporals.format(clase.fechaHoraFin, 'yyyy-MM-dd HH:mm')}">2025-01-01 10:00</td>
+                        <td th:text="${clase.actividad != null ? clase.actividad.nombre : '—'}">Actividad</td>
+                        <td th:text="${clase.sala != null ? clase.sala.nombre : '—'}">Sala</td>
+                        <td th:text="${clase.cliente != null ? clase.cliente.usuario.nombre + ' ' + clase.cliente.usuario.apellidos : '—'}">Cliente</td>
+                        <td class="center">
+                            <span class="status-badge status-pendiente">
+                                <span th:text="${clase.estado}">Pendiente</span>
+                            </span>
+                        </td>
+                        <td class="center actions-cell">
+                            <button type="button"
+                                    class="link link-success"
+                                    th:onclick="'confirmarCompletado(' + ${clase.idReserva} + ');'">
+                                Completar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr th:if="${clasesParaCompletar == null or #lists.isEmpty(clasesParaCompletar)}">
+                        <td colspan="8" class="empty-state">
+                            No tienes clases finalizadas pendientes de marcar como completadas.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer-link">
+        <a th:href="@{/entrenador}">← Volver al panel</a>
+    </div>
+</div>
+
+<script>
+    function confirmarCompletado(id) {
+        if (confirm('¿Está seguro de que desea marcar esta clase como completada?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/entrenador/clase/completar/' + id;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+</body>
+</html>

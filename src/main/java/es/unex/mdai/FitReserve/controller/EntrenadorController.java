@@ -174,4 +174,59 @@ public class EntrenadorController {
         return "redirect:/entrenador/mis-clases";
     }
 
+    @GetMapping("/completar-clase")
+    public String mostrarClasesParaCompletar(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Entrenador entrenador = entrenadorService.obtenerPorIdUsuario(usuario.getIdUsuario());
+        if (entrenador == null) {
+            model.addAttribute("error", "No se encontró el entrenador asociado al usuario.");
+            return "entrenadorPage";
+        }
+
+        List<Reserva> todasReservas = reservaService.listarHistorialEntrenador(entrenador.getIdEntrenador());
+
+        LocalDateTime ahora = LocalDateTime.now();
+        // Mostrar solo reservas pendientes cuya fecha de fin ya haya pasado
+        List<Reserva> clasesParaCompletar = todasReservas.stream()
+                .filter(r -> r != null
+                        && r.getEstado() == Estado.Pendiente
+                        && r.getFechaHoraFin() != null
+                        && r.getFechaHoraFin().isBefore(ahora))
+                .collect(Collectors.toList());
+
+        model.addAttribute("clasesParaCompletar", clasesParaCompletar);
+        model.addAttribute("usuario", usuario);
+
+        return "completarClase";
+    }
+
+    @PostMapping("/clase/completar/{id}")
+    public String completarClase(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioSesion");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Entrenador entrenador = entrenadorService.obtenerPorIdUsuario(usuario.getIdUsuario());
+
+            boolean completada = reservaService.marcarComoCompletada(id, entrenador.getIdEntrenador());
+
+            if (completada) {
+                redirectAttributes.addFlashAttribute("mensaje", "Clase completada exitosamente");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "No se pudo completar la clase. Verifica que ya haya finalizado y pertenezca a tu cuenta.");
+            }
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al completar la clase");
+        }
+
+        return "redirect:/entrenador/completar-clase";
+    }
+
 }
