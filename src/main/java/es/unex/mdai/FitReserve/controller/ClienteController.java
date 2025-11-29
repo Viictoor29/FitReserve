@@ -244,12 +244,12 @@ public class ClienteController {
                 redirectAttributes.addFlashAttribute("mensaje", "Reserva creada exitosamente");
                 return "redirect:/cliente";
             } else {
-                redirectAttributes.addFlashAttribute("error", "No se pudo crear la reserva. Verifica disponibilidad.");
+                redirectAttributes.addFlashAttribute("error", "No se pudo crear la reserva. Verifica disponibilidad o la validez de lo campos.");
                 return "redirect:/cliente/nueva-reserva";
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al crear la reserva: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al crear la reserva");
             return "redirect:/cliente/nueva-reserva";
         }
     }
