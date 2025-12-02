@@ -1,10 +1,10 @@
+<!-- src/main/resources/templates/verReservaAdmin.html -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Detalle reserva</title>
     <link rel="icon" th:href="@{/img/favicon.ico}">
-    <!-- MISMO CSS QUE DETALLE CLIENTE -->
     <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
 </head>
 <body>
@@ -13,6 +13,7 @@
 
     <h2>Detalle de la reserva</h2>
 
+    <!-- campos existentes... -->
     <div class="field">
         <label>ID de la reserva</label>
         <p th:text="${reserva.idReserva}">1</p>
@@ -20,16 +21,12 @@
 
     <div class="field">
         <label>Fecha y hora de inicio</label>
-        <p th:text="${#temporals.format(reserva.fechaHoraInicio, 'dd/MM/yyyy HH:mm')}">
-            01/01/2025 10:00
-        </p>
+        <p th:text="${#temporals.format(reserva.fechaHoraInicio, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:00</p>
     </div>
 
     <div class="field">
         <label>Fecha y hora de fin</label>
-        <p th:text="${#temporals.format(reserva.fechaHoraFin, 'dd/MM/yyyy HH:mm')}">
-            01/01/2025 11:00
-        </p>
+        <p th:text="${#temporals.format(reserva.fechaHoraFin, 'dd/MM/yyyy HH:mm')}">01/01/2025 11:00</p>
     </div>
 
     <div class="field">
@@ -41,37 +38,38 @@
 
     <div class="field">
         <label>Cliente</label>
-        <p th:text="${reserva.cliente.usuario.nombre + ' ' + reserva.cliente.usuario.apellidos}">
-            Nombre Cliente
-        </p>
+        <p th:text="${reserva.cliente.usuario.nombre + ' ' + reserva.cliente.usuario.apellidos}">Nombre Cliente</p>
     </div>
 
     <div class="field">
         <label>Entrenador</label>
-        <p th:text="${reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos}">
-            Nombre Entrenador
-        </p>
+        <p th:text="${reserva.entrenador.usuario.nombre + ' ' + reserva.entrenador.usuario.apellidos}">Nombre Entrenador</p>
     </div>
 
     <div class="field">
         <label>Actividad</label>
-        <p th:text="${reserva.actividad.nombre + ' (' + reserva.actividad.tipoActividad + ', ' + reserva.actividad.nivel + ')'}">
-            Spinning (CARDIO, INTERMEDIO)
-        </p>
+        <p th:text="${reserva.actividad.nombre + ' (' + reserva.actividad.tipoActividad + ', ' + reserva.actividad.nivel + ')'}">Spinning (CARDIO, INTERMEDIO)</p>
     </div>
 
     <div class="field">
         <label>Sala</label>
-        <p th:text="${reserva.sala.nombre + ' - ' + reserva.sala.ubicacion}">
-            Sala 1 - Planta 1
-        </p>
+        <p th:text="${reserva.sala.nombre + ' - ' + reserva.sala.ubicacion}">Sala 1 - Planta 1</p>
+    </div>
+
+    <div class="field">
+        <label>Maquinaria asignada</label>
+        <div th:if="${reserva.maquinariaAsignada != null && !reserva.maquinariaAsignada.isEmpty()}">
+            <ul>
+                <li th:each="rm : ${reserva.maquinariaAsignada}"
+                    th:text="${rm.maquinaria.nombre + ' — ' + rm.cantidad}">Esterillas — 10</li>
+            </ul>
+        </div>
+        <p th:if="${reserva.maquinariaAsignada == null || reserva.maquinariaAsignada.isEmpty()}">Sin maquinaria asignada.</p>
     </div>
 
     <div class="field">
         <label>Comentarios</label>
-        <p th:text="${reserva.comentarios != null ? reserva.comentarios : 'Sin comentarios adicionales.'}">
-            Sin comentarios adicionales.
-        </p>
+        <p th:text="${reserva.comentarios != null ? reserva.comentarios : 'Sin comentarios adicionales.'}">Sin comentarios adicionales.</p>
     </div>
 </div>
 </body>

@@ -1,173 +1,225 @@
-<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar reserva</title>
-    <link rel="icon" th:href="@{/img/favicon.ico}">
-    <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-<div class="registro-container">
-    <a th:href="@{/admin/reservas}" class="back-arrow">←</a>
+<!-- src/main/resources/templates/editarReservaAdmin.html -->
+    <!DOCTYPE html>
+    <html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Editar reserva</title>
+        <link rel="icon" th:href="@{/img/favicon.ico}">
+        <link rel="stylesheet" th:href="@{/css/registroAdmin.css}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+    <div class="registro-container">
+        <a th:href="@{/admin/reservas}" class="back-arrow">←</a>
 
-    <h2>Editar reserva</h2>
+        <h2>Editar reserva</h2>
 
-    <div class="error" th:if="${mensajeError}" th:text="${mensajeError}" aria-live="assertive"></div>
+        <div class="error" th:if="${mensajeError}" th:text="${mensajeError}" aria-live="assertive"></div>
 
-    <form id="editarReservaForm"
-          th:action="@{'/admin/reservas/editar/' + ${reserva.idReserva}}"
-          method="post">
+        <form id="editarReservaForm"
+              th:action="@{'/admin/reservas/editar/' + ${reserva.idReserva}}"
+              method="post">
 
-        <!-- ================= INICIO ================= -->
-        <!-- Campo oculto que recibe el valor final yyyy-MM-ddTHH:mm para el controlador -->
-        <input type="hidden" id="inicioHidden" name="inicio"/>
+            <input type="hidden" id="inicioHidden" name="inicio"/>
+            <div class="field">
+                <label for="fechaInicio">Fecha de inicio</label>
+                <input id="fechaInicio" type="date"
+                       th:value="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd')}"
+                       required>
+            </div>
 
-        <div class="field">
-            <label for="fechaInicio">Fecha de inicio</label>
-            <input id="fechaInicio" type="date"
-                   th:value="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd')}"
-                   required>
-        </div>
+            <div class="field">
+                <label for="horaInicio">Hora de inicio</label>
+                <input id="horaInicio" type="time"
+                       th:value="${#temporals.format(reserva.fechaHoraInicio, 'HH:mm')}"
+                       required>
+            </div>
 
-        <div class="field">
-            <label for="horaInicio">Hora de inicio</label>
-            <input id="horaInicio" type="time"
-                   th:value="${#temporals.format(reserva.fechaHoraInicio, 'HH:mm')}"
-                   required>
-        </div>
+            <input type="hidden" id="finHidden" name="fin"/>
+            <div class="field">
+                <label for="fechaFin">Fecha de fin</label>
+                <input id="fechaFin" type="date"
+                       th:value="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd')}"
+                       required>
+            </div>
 
-        <!-- ================= FIN ================= -->
-        <!-- Campo oculto que recibe el valor final yyyy-MM-ddTHH:mm para el controlador -->
-        <input type="hidden" id="finHidden" name="fin"/>
+            <div class="field">
+                <label for="horaFin">Hora de fin</label>
+                <input id="horaFin" type="time"
+                       th:value="${#temporals.format(reserva.fechaHoraFin, 'HH:mm')}"
+                       required>
+            </div>
 
-        <div class="field">
-            <label for="fechaFin">Fecha de fin</label>
-            <input id="fechaFin" type="date"
-                   th:value="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd')}"
-                   required>
-        </div>
+            <!-- selecciones existentes (cliente/entrenador/actividad/sala/estado) kept as before -->
+            <div class="field">
+                <label for="clienteId">Cliente</label>
+                <select id="clienteId" name="clienteId" required>
+                    <option value="" disabled>Selecciona un cliente</option>
+                    <option th:each="c : ${clientes}"
+                            th:value="${c.idCliente}"
+                            th:text="${c.usuario.nombre + ' ' + c.usuario.apellidos}"
+                            th:selected="${c.idCliente} == ${reserva.cliente.idCliente}">
+                    </option>
+                </select>
+            </div>
 
-        <div class="field">
-            <label for="horaFin">Hora de fin</label>
-            <input id="horaFin" type="time"
-                   th:value="${#temporals.format(reserva.fechaHoraFin, 'HH:mm')}"
-                   required>
-        </div>
+            <div class="field">
+                <label for="entrenadorId">Entrenador</label>
+                <select id="entrenadorId" name="entrenadorId" required>
+                    <option value="" disabled>Selecciona un entrenador</option>
+                    <option th:each="e : ${entrenadores}"
+                            th:value="${e.idEntrenador}"
+                            th:text="${e.usuario.nombre + ' ' + e.usuario.apellidos}"
+                            th:selected="${e.idEntrenador} == ${reserva.entrenador.idEntrenador}">
+                    </option>
+                </select>
+            </div>
 
-        <!-- ================= SELECCIONES ================= -->
-        <div class="field">
-            <label for="clienteId">Cliente</label>
-            <select id="clienteId" name="clienteId" required>
-                <option value="" disabled>Selecciona un cliente</option>
-                <option th:each="c : ${clientes}"
-                        th:value="${c.idCliente}"
-                        th:text="${c.usuario.nombre + ' ' + c.usuario.apellidos}"
-                        th:selected="${c.idCliente} == ${reserva.cliente.idCliente}">
-                </option>
-            </select>
-        </div>
+            <div class="field">
+                <label for="actividadId">Actividad</label>
+                <select id="actividadId" name="actividadId" required>
+                    <option value="" disabled>Selecciona una actividad</option>
+                    <option th:each="a : ${actividades}"
+                            th:value="${a.idActividad}"
+                            th:text="${a.nombre + ' (' + a.tipoActividad + ')'}"
+                            th:selected="${a.idActividad} == ${reserva.actividad.idActividad}">
+                    </option>
+                </select>
+            </div>
 
-        <div class="field">
-            <label for="entrenadorId">Entrenador</label>
-            <select id="entrenadorId" name="entrenadorId" required>
-                <option value="" disabled>Selecciona un entrenador</option>
-                <option th:each="e : ${entrenadores}"
-                        th:value="${e.idEntrenador}"
-                        th:text="${e.usuario.nombre + ' ' + e.usuario.apellidos}"
-                        th:selected="${e.idEntrenador} == ${reserva.entrenador.idEntrenador}">
-                </option>
-            </select>
-        </div>
+            <div class="field">
+                <label for="salaId">Sala</label>
+                <select id="salaId" name="salaId" required>
+                    <option value="" disabled>Selecciona una sala</option>
+                    <option th:each="s : ${salas}"
+                            th:value="${s.idSala}"
+                            th:text="${s.nombre + ' - ' + s.ubicacion}"
+                            th:selected="${s.idSala} == ${reserva.sala.idSala}">
+                    </option>
+                </select>
+            </div>
 
-        <div class="field">
-            <label for="actividadId">Actividad</label>
-            <select id="actividadId" name="actividadId" required>
-                <option value="" disabled>Selecciona una actividad</option>
-                <option th:each="a : ${actividades}"
-                        th:value="${a.idActividad}"
-                        th:text="${a.nombre + ' (' + a.tipoActividad + ')'}"
-                        th:selected="${a.idActividad} == ${reserva.actividad.idActividad}">
-                </option>
-            </select>
-        </div>
+            <div class="field">
+                <label for="estado">Estado</label>
+                <select id="estado" name="estado" required>
+                    <option th:each="e : ${estados}"
+                            th:value="${e}"
+                            th:text="${e}"
+                            th:selected="${e} == ${reserva.estado}">
+                    </option>
+                </select>
+            </div>
 
-        <div class="field">
-            <label for="salaId">Sala</label>
-            <select id="salaId" name="salaId" required>
-                <option value="" disabled>Selecciona una sala</option>
-                <option th:each="s : ${salas}"
-                        th:value="${s.idSala}"
-                        th:text="${s.nombre + ' - ' + s.ubicacion}"
-                        th:selected="${s.idSala} == ${reserva.sala.idSala}">
-                </option>
-            </select>
-        </div>
+            <div class="field">
+                <label for="comentarios">Comentarios</label>
+                <textarea id="comentarios" name="comentarios"
+                          th:text="${reserva.comentarios}"></textarea>
+            </div>
 
-        <div class="field">
-            <label for="estado">Estado</label>
-            <select id="estado" name="estado" required>
-                <option th:each="e : ${estados}"
-                        th:value="${e}"
-                        th:text="${e}"
-                        th:selected="${e} == ${reserva.estado}">
-                </option>
-            </select>
-        </div>
+            <!-- SECCIÓN MAQUINARIA: prepopulada con reserva.maquinariaAsignada -->
+            <div class="field maquinaria-section">
+                <label>Maquinaria (Opcional)</label>
+                <div id="maquinaria-container">
+                    <div th:each="rm, iterStat : ${reserva.maquinariaAsignada}"
+                         class="maquinaria-item"
+                         th:id="'maquinaria-' + ${iterStat.index}">
+                        <div class="field-row">
+                            <select name="maquinarias" class="select-maquinaria">
+                                <option value="">Selecciona maquinaria</option>
+                                <option th:each="maq : ${maquinarias}"
+                                        th:value="${maq.idMaquinaria}"
+                                        th:text="${maq.nombre + ' - ' + maq.tipoActividad + ' (Disponibles: ' + maq.cantidadTotal + ')'}"
+                                        th:selected="${rm.maquinaria.idMaquinaria == maq.idMaquinaria}">
+                                </option>
+                            </select>
+                            <input type="number" name="cantidades" min="1"
+                                   th:value="${rm.cantidad}" class="input-cantidad">
+                            <button type="button" class="btn-remove"
+                                    th:onclick="'eliminarMaquinaria(' + ${iterStat.index} + ')'">✕
+                            </button>
+                        </div>
+                    </div>
 
-        <div class="field">
-            <label for="comentarios">Comentarios</label>
-            <textarea id="comentarios" name="comentarios"
-                      th:text="${reserva.comentarios}"></textarea>
-        </div>
+                    <button type="button" class="btn-add-maquinaria" onclick="agregarMaquinaria()">+ Añadir Maquinaria
+                    </button>
+                </div>
+            </div>
 
-        <div class="actions">
-            <button class="btn" type="submit">Guardar cambios</button>
-        </div>
-    </form>
+            <div class="actions">
+                <button class="btn" type="submit">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
 
-</div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const maquinarias = /*[[${maquinarias}]]*/ [];
+        let maquinariaCount = /*[[${reserva.maquinariaAsignada != null ? reserva.maquinariaAsignada.size() : 0}]]*/ 0;
 
-<script>
-    (function () {
-        const form = document.getElementById('editarReservaForm');
+        function agregarMaquinaria() {
+            const container = document.getElementById('maquinaria-container');
+            const div = document.createElement('div');
+            div.className = 'maquinaria-item';
+            div.id = 'maquinaria-' + maquinariaCount;
 
-        function combina(fechaId, horaId, hiddenId) {
-            const fecha = document.getElementById(fechaId).value;
-            const hora = document.getElementById(horaId).value;
-            const hidden = document.getElementById(hiddenId);
+            let optionsHTML = '<option value="">Selecciona maquinaria</option>';
+            maquinarias.forEach(maq => {
+                optionsHTML += `<option value="${maq.idMaquinaria}">${maq.nombre} - ${maq.tipoActividad} (Disponibles: ${maq.cantidadTotal})</option>`;
+            });
 
-            if (fecha && hora) {
-                hidden.value = fecha + "T" + hora;
-                return true;
-            }
-            return false;
+            div.innerHTML = `
+                <div class="field-row">
+                    <select name="maquinarias" class="select-maquinaria">
+                        ${optionsHTML}
+                    </select>
+                    <input type="number" name="cantidades" min="1" value="1" class="input-cantidad">
+                    <button type="button" class="btn-remove" onclick="eliminarMaquinaria(${maquinariaCount})">✕</button>
+                </div>
+            `;
+
+            container.insertBefore(div, container.querySelector('.btn-add-maquinaria'));
+            maquinariaCount++;
         }
 
-        form.addEventListener('submit', function (e) {
-            const ok1 = combina("fechaInicio", "horaInicio", "inicioHidden");
-            const ok2 = combina("fechaFin", "horaFin", "finHidden");
+        function eliminarMaquinaria(id) {
+            const element = document.getElementById('maquinaria-' + id);
+            if (element) element.remove();
+        }
 
-            if (!ok1 || !ok2) {
-                e.preventDefault();
-                alert("Debes rellenar fecha y hora para inicio y fin.");
-                return;
+        (function () {
+            const form = document.getElementById('editarReservaForm');
+
+            function combina(fechaId, horaId, hiddenId) {
+                const fecha = document.getElementById(fechaId).value;
+                const hora = document.getElementById(horaId).value;
+                const hidden = document.getElementById(hiddenId);
+                if (fecha && hora) {
+                    hidden.value = fecha + "T" + hora;
+                    return true;
+                }
+                return false;
             }
 
-            // Validación: fin > inicio
-            const inicioVal = document.getElementById("inicioHidden").value;
-            const finVal = document.getElementById("finHidden").value;
+            form.addEventListener('submit', function (e) {
+                const ok1 = combina("fechaInicio", "horaInicio", "inicioHidden");
+                const ok2 = combina("fechaFin", "horaFin", "finHidden");
+                if (!ok1 || !ok2) {
+                    e.preventDefault();
+                    alert("Debes rellenar fecha y hora para inicio y fin.");
+                    return;
+                }
+                const inicioVal = document.getElementById("inicioHidden").value;
+                const finVal = document.getElementById("finHidden").value;
+                const inicioDate = new Date(inicioVal);
+                const finDate = new Date(finVal);
+                if (!(finDate > inicioDate)) {
+                    e.preventDefault();
+                    alert("La fecha/hora de fin debe ser posterior a la de inicio.");
+                }
+            });
+        })();
+        /*]]>*/
+    </script>
 
-            const inicioDate = new Date(inicioVal);
-            const finDate = new Date(finVal);
-
-            if (!(finDate > inicioDate)) {
-                e.preventDefault();
-                alert("La fecha/hora de fin debe ser posterior a la de inicio.");
-            }
-        });
-    })();
-</script>
-
-</body>
-</html>
+    </body>
+    </html>

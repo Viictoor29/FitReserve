@@ -1,3 +1,4 @@
+// src/main/java/es/unex/mdai/FitReserve/controller/GestionReservasController.java
 package es.unex.mdai.FitReserve.controller;
 
 import es.unex.mdai.FitReserve.data.enume.Estado;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -21,17 +23,20 @@ public class GestionReservasController {
     private final EntrenadorServicio entrenadorServicio;
     private final ActividadServicio actividadServicio;
     private final SalaServicio salaServicio;
+    private final MaquinariaServicio maquinariaServicio;
 
     public GestionReservasController(ReservaServicio reservaServicio,
                                      ClienteServicio clienteServicio,
                                      EntrenadorServicio entrenadorServicio,
                                      ActividadServicio actividadServicio,
-                                     SalaServicio salaServicio) {
+                                     SalaServicio salaServicio,
+                                     MaquinariaServicio maquinariaServicio) {
         this.reservaServicio = reservaServicio;
         this.clienteServicio = clienteServicio;
         this.entrenadorServicio = entrenadorServicio;
         this.actividadServicio = actividadServicio;
         this.salaServicio = salaServicio;
+        this.maquinariaServicio = maquinariaServicio;
     }
 
     private void cargarCombos(Model model) {
@@ -40,6 +45,7 @@ public class GestionReservasController {
         model.addAttribute("actividades", actividadServicio.listarTodas());
         model.addAttribute("salas", salaServicio.listarTodas());
         model.addAttribute("estados", Estado.values());
+        model.addAttribute("maquinarias", maquinariaServicio.listarTodas());
     }
 
     /* ========== LISTADO PRINCIPAL ========== */
@@ -85,6 +91,8 @@ public class GestionReservasController {
             @RequestParam("actividadId") Long actividadId,
             @RequestParam("salaId") Long salaId,
             @RequestParam(name = "comentarios", required = false) String comentarios,
+            @RequestParam(required = false) List<Long> maquinarias,
+            @RequestParam(required = false) List<Integer> cantidades,
             RedirectAttributes redirectAttributes,
             Model model) {
 
@@ -108,6 +116,20 @@ public class GestionReservasController {
             reserva.setActividad(actividad);
             reserva.setSala(sala);
             reserva.setComentarios(comentarios);
+            reserva.setEstado(Estado.Pendiente);
+
+            // Añadir maquinaria si se seleccionó
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
+                    if (maq != null) {
+                        ReservaMaquinaria rm = new ReservaMaquinaria(reserva, maq, cantidades.get(i));
+                        reservaMaquinarias.add(rm);
+                    }
+                }
+                reserva.setMaquinariaAsignada(reservaMaquinarias);
+            }
 
             boolean ok = reservaServicio.crearReserva(reserva);
 
@@ -161,6 +183,8 @@ public class GestionReservasController {
             @RequestParam("salaId") Long salaId,
             @RequestParam("estado") Estado estado,
             @RequestParam(name = "comentarios", required = false) String comentarios,
+            @RequestParam(required = false) List<Long> maquinarias,
+            @RequestParam(required = false) List<Integer> cantidades,
             RedirectAttributes redirectAttributes,
             Model model) {
 
@@ -192,6 +216,19 @@ public class GestionReservasController {
             datos.setSala(sala);
             datos.setComentarios(comentarios);
             datos.setEstado(estado);
+
+            // Maquinaria
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
+                    if (maq != null) {
+                        ReservaMaquinaria rm = new ReservaMaquinaria(datos, maq, cantidades.get(i));
+                        reservaMaquinarias.add(rm);
+                    }
+                }
+                datos.setMaquinariaAsignada(reservaMaquinarias);
+            }
 
             boolean ok = reservaServicio.actualizarReserva(id, datos);
 
