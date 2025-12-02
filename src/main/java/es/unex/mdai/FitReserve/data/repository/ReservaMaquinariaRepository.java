@@ -16,6 +16,9 @@ public interface ReservaMaquinariaRepository extends JpaRepository<ReservaMaquin
     List<ReservaMaquinaria> findByReservaIdReserva(Long idReserva);
     void deleteByReservaIdReserva(Long idReserva);
 
+    // Buscar todas las relaciones por ID de maquinaria
+    List<ReservaMaquinaria> findByMaquinariaIdMaquinaria(Long idMaquinaria);
+
     @Query("""
         SELECT COALESCE(SUM(rm.cantidad), 0)
         FROM ReservaMaquinaria rm
