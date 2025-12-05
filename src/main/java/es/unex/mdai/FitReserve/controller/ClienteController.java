@@ -213,27 +213,128 @@ public class ClienteController {
 
         try {
             Cliente cliente = clienteService.obtenerPorIdUsuario(usuario.getIdUsuario());
-            Sala sala = salaService.obtenerSalaPorId(idSala);
-            Actividad actividad = actividadService.obtenerActividadPorId(idActividad);
-            Entrenador entrenador = entrenadorService.obtenerEntrenadorPorId(idEntrenador);
 
+            // Validar que todos los recursos existen
+            Sala sala = salaService.obtenerSalaPorId(idSala);
+            if (sala == null) {
+                redirectAttributes.addFlashAttribute("error", "La sala seleccionada no existe.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            Actividad actividad = actividadService.obtenerActividadPorId(idActividad);
+            if (actividad == null) {
+                redirectAttributes.addFlashAttribute("error", "La actividad seleccionada no existe.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            Entrenador entrenador = entrenadorService.obtenerEntrenadorPorId(idEntrenador);
+            if (entrenador == null) {
+                redirectAttributes.addFlashAttribute("error", "El entrenador seleccionado no existe.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            // Parsear fechas
+            LocalDateTime inicio;
+            LocalDateTime fin;
+            try {
+                inicio = LocalDateTime.parse(fechaHoraInicio);
+                fin = LocalDateTime.parse(fechaHoraFin);
+            } catch (Exception pe) {
+                redirectAttributes.addFlashAttribute("error", "Formato de fecha inválido.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            // Validar que fin sea posterior a inicio
+            if (!fin.isAfter(inicio)) {
+                redirectAttributes.addFlashAttribute("error", "La fecha de fin debe ser posterior a la de inicio.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            // No permitir reservas en el pasado
+            if (inicio.isBefore(LocalDateTime.now())) {
+                redirectAttributes.addFlashAttribute("error", "No se pueden crear reservas en el pasado.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            // Comprobar que el entrenador trabaja en ese horario
+            if (entrenador.getHoraInicioTrabajo() != null && entrenador.getHoraFinTrabajo() != null) {
+                if (inicio.toLocalTime().isBefore(entrenador.getHoraInicioTrabajo()) ||
+                        fin.toLocalTime().isAfter(entrenador.getHoraFinTrabajo())) {
+                    redirectAttributes.addFlashAttribute("error",
+                            "El entrenador no trabaja en ese horario. Horario de trabajo: " +
+                                    entrenador.getHoraInicioTrabajo() + " - " + entrenador.getHoraFinTrabajo());
+                    return "redirect:/cliente/nueva-reserva";
+                }
+            }
+
+            // Comprobar disponibilidad del entrenador
+            if (reservaService.haySolapeEntrenador(entrenador.getIdEntrenador(), inicio, fin)) {
+                redirectAttributes.addFlashAttribute("error",
+                        "El entrenador no está disponible en el intervalo seleccionado.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            // Comprobar disponibilidad de la sala
+            if (reservaService.haySolapeSala(sala.getIdSala(), inicio, fin)) {
+                redirectAttributes.addFlashAttribute("error",
+                        "La sala no está disponible en el intervalo seleccionado.");
+                return "redirect:/cliente/nueva-reserva";
+            }
+
+            // Validar maquinaria solicitada
+            List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Long idMaq = maquinarias.get(i);
+                    Integer cantidad = (i < cantidades.size()) ? cantidades.get(i) : 0;
+
+                    if (cantidad == null || cantidad <= 0) {
+                        continue;
+                    }
+
+                    Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(idMaq);
+                    if (maq == null) {
+                        redirectAttributes.addFlashAttribute("error", "Maquinaria no encontrada.");
+                        return "redirect:/cliente/nueva-reserva";
+                    }
+
+                    // Verificar disponibilidad
+                    int totalEnUso = reservaService.totalMaquinariaReservadaEnIntervalo(
+                            idMaq, inicio, fin, actividad.getTipoActividad()
+                    );
+
+                    if (totalEnUso + cantidad > maq.getCantidadTotal()) {
+                        redirectAttributes.addFlashAttribute("error",
+                                "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. " +
+                                        "Disponible: " + (maq.getCantidadTotal() - totalEnUso) +
+                                        ", solicitado: " + cantidad);
+                        return "redirect:/cliente/nueva-reserva";
+                    }
+                }
+            }
+
+            // Crear la reserva
             Reserva reserva = new Reserva();
             reserva.setCliente(cliente);
             reserva.setSala(sala);
             reserva.setActividad(actividad);
             reserva.setEntrenador(entrenador);
-            reserva.setFechaHoraInicio(LocalDateTime.parse(fechaHoraInicio));
-            reserva.setFechaHoraFin(LocalDateTime.parse(fechaHoraFin));
+            reserva.setFechaHoraInicio(inicio);
+            reserva.setFechaHoraFin(fin);
             reserva.setComentarios(comentarios);
             reserva.setEstado(Estado.Pendiente);
 
-            // Añadir maquinaria si se seleccionó
-            if (maquinarias != null && cantidades != null) {
-                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+            // Añadir maquinaria
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
                 for (int i = 0; i < maquinarias.size(); i++) {
-                    Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
-                    ReservaMaquinaria rm = new ReservaMaquinaria(reserva, maq, cantidades.get(i));
-                    reservaMaquinarias.add(rm);
+                    Integer cantidad = (i < cantidades.size()) ? cantidades.get(i) : 0;
+                    if (cantidad != null && cantidad > 0) {
+                        Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
+                        if (maq != null) {
+                            ReservaMaquinaria rm = new ReservaMaquinaria(reserva, maq, cantidad);
+                            reservaMaquinarias.add(rm);
+                        }
+                    }
                 }
                 reserva.setMaquinariaAsignada(reservaMaquinarias);
             }
@@ -244,12 +345,13 @@ public class ClienteController {
                 redirectAttributes.addFlashAttribute("mensaje", "Reserva creada exitosamente");
                 return "redirect:/cliente";
             } else {
-                redirectAttributes.addFlashAttribute("error", "No se pudo crear la reserva. Verifica disponibilidad o la validez de lo campos.");
+                redirectAttributes.addFlashAttribute("error",
+                        "No se pudo crear la reserva. Verifica la disponibilidad o la validez de los campos.");
                 return "redirect:/cliente/nueva-reserva";
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al crear la reserva");
+            redirectAttributes.addFlashAttribute("error", "Error al crear la reserva: " + e.getMessage());
             return "redirect:/cliente/nueva-reserva";
         }
     }
@@ -394,62 +496,182 @@ public class ClienteController {
             Reserva reservaExistente = reservaService.obtenerPorId(id);
 
             // Verificar propiedad
-            if (reservaExistente == null || !reservaExistente.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
+            if (reservaExistente == null ||
+                    !reservaExistente.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
                 redirectAttributes.addFlashAttribute("error", "Reserva no encontrada o no autorizada.");
+                return "redirect:/cliente/mis-reservas";
+            }
+
+            // No permitir editar si ya ha comenzado
+            if (!LocalDateTime.now().isBefore(reservaExistente.getFechaHoraInicio())) {
+                redirectAttributes.addFlashAttribute("error", "No se puede editar una reserva que ya ha comenzado.");
+                return "redirect:/cliente/mis-reservas";
+            }
+
+            // No permitir editar reservas canceladas o completadas
+            if (reservaExistente.getEstado() == Estado.Cancelada ||
+                    reservaExistente.getEstado() == Estado.Completada) {
+                redirectAttributes.addFlashAttribute("error", "No se puede editar una reserva " +
+                        reservaExistente.getEstado().toString().toLowerCase() + ".");
                 return "redirect:/cliente/mis-reservas";
             }
 
             // Crear objeto con datos actualizados
             Reserva datosActualizados = new Reserva();
 
+            // Validar recursos si cambian
+            Sala salaFinal = reservaExistente.getSala();
             if (idSala != null) {
                 Sala sala = salaService.obtenerSalaPorId(idSala);
+                if (sala == null) {
+                    redirectAttributes.addFlashAttribute("error", "La sala seleccionada no existe.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
                 datosActualizados.setSala(sala);
+                salaFinal = sala;
             }
 
+            Actividad actividadFinal = reservaExistente.getActividad();
             if (idActividad != null) {
                 Actividad actividad = actividadService.obtenerActividadPorId(idActividad);
+                if (actividad == null) {
+                    redirectAttributes.addFlashAttribute("error", "La actividad seleccionada no existe.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
                 datosActualizados.setActividad(actividad);
+                actividadFinal = actividad;
             }
 
+            Entrenador entrenadorFinal = reservaExistente.getEntrenador();
             if (idEntrenador != null) {
                 Entrenador entrenador = entrenadorService.obtenerEntrenadorPorId(idEntrenador);
+                if (entrenador == null) {
+                    redirectAttributes.addFlashAttribute("error", "El entrenador seleccionado no existe.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
                 datosActualizados.setEntrenador(entrenador);
+                entrenadorFinal = entrenador;
             }
 
+            // Parsear y validar fechas
+            LocalDateTime inicioFinal = reservaExistente.getFechaHoraInicio();
+            LocalDateTime finFinal = reservaExistente.getFechaHoraFin();
+
             if (fechaHoraInicio != null && !fechaHoraInicio.isBlank()) {
-                datosActualizados.setFechaHoraInicio(LocalDateTime.parse(fechaHoraInicio));
+                try {
+                    inicioFinal = LocalDateTime.parse(fechaHoraInicio);
+                    datosActualizados.setFechaHoraInicio(inicioFinal);
+                } catch (Exception e) {
+                    redirectAttributes.addFlashAttribute("error", "Formato de fecha de inicio inválido.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
             }
 
             if (fechaHoraFin != null && !fechaHoraFin.isBlank()) {
-                datosActualizados.setFechaHoraFin(LocalDateTime.parse(fechaHoraFin));
+                try {
+                    finFinal = LocalDateTime.parse(fechaHoraFin);
+                    datosActualizados.setFechaHoraFin(finFinal);
+                } catch (Exception e) {
+                    redirectAttributes.addFlashAttribute("error", "Formato de fecha de fin inválido.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
+            }
+
+            // Validar lógica de fechas
+            if (!finFinal.isAfter(inicioFinal)) {
+                redirectAttributes.addFlashAttribute("error", "La fecha de fin debe ser posterior a la de inicio.");
+                return "redirect:/cliente/reserva/editar/" + id;
+            }
+
+            if (inicioFinal.isBefore(LocalDateTime.now())) {
+                redirectAttributes.addFlashAttribute("error", "No se pueden programar reservas en el pasado.");
+                return "redirect:/cliente/reserva/editar/" + id;
+            }
+
+            // Comprobar horario de trabajo del entrenador
+            if (entrenadorFinal.getHoraInicioTrabajo() != null && entrenadorFinal.getHoraFinTrabajo() != null) {
+                if (inicioFinal.toLocalTime().isBefore(entrenadorFinal.getHoraInicioTrabajo()) ||
+                        finFinal.toLocalTime().isAfter(entrenadorFinal.getHoraFinTrabajo())) {
+                    redirectAttributes.addFlashAttribute("error",
+                            "El entrenador no trabaja en ese horario. Horario de trabajo: " +
+                                    entrenadorFinal.getHoraInicioTrabajo() + " - " +
+                                    entrenadorFinal.getHoraFinTrabajo());
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
+            }
+
+            // Comprobar disponibilidad del entrenador (ignorando la propia reserva)
+            if (reservaService.haySolapeEntrenador(entrenadorFinal.getIdEntrenador(), inicioFinal, finFinal)) {
+                boolean solapeReal = false;
+                List<Reserva> reservasEntrenador = reservaService.listarHistorialEntrenador(
+                        entrenadorFinal.getIdEntrenador()
+                );
+                for (Reserva r : reservasEntrenador) {
+                    if (r.getIdReserva().equals(id) || r.getEstado() != Estado.Pendiente) continue;
+                    if (r.getFechaHoraInicio().isBefore(finFinal) &&
+                            r.getFechaHoraFin().isAfter(inicioFinal)) {
+                        solapeReal = true;
+                        break;
+                    }
+                }
+                if (solapeReal) {
+                    redirectAttributes.addFlashAttribute("error",
+                            "El entrenador no está disponible en el intervalo seleccionado.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
+            }
+
+            // Comprobar disponibilidad de la sala (ignorando la propia reserva)
+            if (reservaService.haySolapeSala(salaFinal.getIdSala(), inicioFinal, finFinal)) {
+                boolean solapeRealSala = false;
+                List<Reserva> todasReservas = reservaService.listarTodas();
+                for (Reserva r : todasReservas) {
+                    if (r.getIdReserva().equals(id) || r.getEstado() != Estado.Pendiente) continue;
+                    if (r.getSala() == null || !salaFinal.getIdSala().equals(r.getSala().getIdSala())) continue;
+                    if (r.getFechaHoraInicio().isBefore(finFinal) &&
+                            r.getFechaHoraFin().isAfter(inicioFinal)) {
+                        solapeRealSala = true;
+                        break;
+                    }
+                }
+                if (solapeRealSala) {
+                    redirectAttributes.addFlashAttribute("error",
+                            "La sala no está disponible en el intervalo seleccionado.");
+                    return "redirect:/cliente/reserva/editar/" + id;
+                }
+            }
+
+            // Validar y actualizar maquinaria
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Integer cantidad = (i < cantidades.size()) ? cantidades.get(i) : 0;
+                    if (cantidad == null || cantidad <= 0) continue;
+
+                    Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
+                    if (maq == null) continue;
+
+                    // Verificar disponibilidad
+                    int totalEnUso = reservaService.totalMaquinariaReservadaEnIntervalo(
+                            maq.getIdMaquinaria(), inicioFinal, finFinal, actividadFinal.getTipoActividad()
+                    );
+
+                    if (totalEnUso + cantidad > maq.getCantidadTotal()) {
+                        redirectAttributes.addFlashAttribute("error",
+                                "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. " +
+                                        "Disponible: " + (maq.getCantidadTotal() - totalEnUso) +
+                                        ", solicitado: " + cantidad);
+                        return "redirect:/cliente/reserva/editar/" + id;
+                    }
+
+                    ReservaMaquinaria rm = new ReservaMaquinaria(reservaExistente, maq, cantidad);
+                    reservaMaquinarias.add(rm);
+                }
+                datosActualizados.setMaquinariaAsignada(reservaMaquinarias);
             }
 
             if (comentarios != null) {
                 datosActualizados.setComentarios(comentarios);
-            }
-
-            // Maquinaria: validar que no se solicite más de la disponible
-            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
-                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
-                for (int i = 0; i < maquinarias.size(); i++) {
-                    Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
-                    int cantidadSolicitada = 0;
-                    if (i < cantidades.size() && cantidades.get(i) != null) {
-                        cantidadSolicitada = cantidades.get(i);
-                    }
-                    if (maq != null) {
-                        if (cantidadSolicitada > maq.getCantidadTotal()) {
-                            redirectAttributes.addFlashAttribute("error",
-                                    "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. Disponible: "
-                                            + maq.getCantidadTotal() + ", solicitado: " + cantidadSolicitada);
-                            return "redirect:/cliente/reserva/editar/" + id;
-                        }
-                        ReservaMaquinaria rm = new ReservaMaquinaria(reservaExistente, maq, cantidadSolicitada);
-                        reservaMaquinarias.add(rm);
-                    }
-                }
-                datosActualizados.setMaquinariaAsignada(reservaMaquinarias);
             }
 
             boolean actualizada = reservaService.actualizarReserva(id, datosActualizados);
@@ -457,11 +679,12 @@ public class ClienteController {
             if (actualizada) {
                 redirectAttributes.addFlashAttribute("mensaje", "Reserva actualizada correctamente");
             } else {
-                redirectAttributes.addFlashAttribute("error", "No se pudo actualizar la reserva. Verifica disponibilidad.");
+                redirectAttributes.addFlashAttribute("error",
+                        "No se pudo actualizar la reserva. Verifica disponibilidad.");
             }
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al actualizar la reserva ");
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar la reserva: " + e.getMessage());
         }
 
         return "redirect:/cliente/mis-reservas";
