@@ -14,7 +14,7 @@
 
     <h2>Crear nueva reserva</h2>
 
-    <div class="error" th:if="${regError}" th:text="${regError}" aria-live="assertive"></div>
+    <div class="error" th:if="${mensajeError}" th:text="${mensajeError}" aria-live="assertive"></div>
 
     <form id="reservaForm" th:action="@{/admin/reservas/nueva}" method="post">
 

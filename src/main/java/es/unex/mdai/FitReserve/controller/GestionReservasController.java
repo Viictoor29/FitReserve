@@ -97,17 +97,112 @@ public class GestionReservasController {
             Model model) {
 
         try {
+            // Validar que todos los recursos existen
             Cliente cliente = clienteServicio.obtenerClientePorId(clienteId);
-            Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
-            Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
-            Sala sala = salaServicio.obtenerSalaPorId(salaId);
-
-            if (cliente == null || entrenador == null || actividad == null || sala == null) {
-                model.addAttribute("regError", "Datos inválidos: cliente, entrenador, actividad o sala no encontrados.");
+            if (cliente == null) {
+                model.addAttribute("mensajeError", "El cliente seleccionado no existe.");
                 cargarCombos(model);
                 return "nuevaReservaAdmin";
             }
 
+            Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
+            if (entrenador == null) {
+                model.addAttribute("mensajeError", "El entrenador seleccionado no existe.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
+            if (actividad == null) {
+                model.addAttribute("mensajeError", "La actividad seleccionada no existe.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            Sala sala = salaServicio.obtenerSalaPorId(salaId);
+            if (sala == null) {
+                model.addAttribute("mensajeError", "La sala seleccionada no existe.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            // Validar que fin sea posterior a inicio
+            if (!fin.isAfter(inicio)) {
+                model.addAttribute("mensajeError", "La fecha de fin debe ser posterior a la de inicio.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            // No permitir reservas en el pasado
+            if (inicio.isBefore(LocalDateTime.now())) {
+                model.addAttribute("mensajeError", "No se pueden crear reservas en el pasado.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            // Comprobar que el entrenador trabaja en ese horario
+            if (entrenador.getHoraInicioTrabajo() != null && entrenador.getHoraFinTrabajo() != null) {
+                if (inicio.toLocalTime().isBefore(entrenador.getHoraInicioTrabajo()) ||
+                        fin.toLocalTime().isAfter(entrenador.getHoraFinTrabajo())) {
+                    model.addAttribute("mensajeError",
+                            "El entrenador no trabaja en ese horario. Horario: " +
+                                    entrenador.getHoraInicioTrabajo() + " - " + entrenador.getHoraFinTrabajo());
+                    cargarCombos(model);
+                    return "nuevaReservaAdmin";
+                }
+            }
+
+            // Comprobar disponibilidad del entrenador
+            if (reservaServicio.haySolapeEntrenador(entrenador.getIdEntrenador(), inicio, fin)) {
+                model.addAttribute("mensajeError",
+                        "El entrenador no está disponible en el intervalo seleccionado.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            // Comprobar disponibilidad de la sala
+            if (reservaServicio.haySolapeSala(sala.getIdSala(), inicio, fin)) {
+                model.addAttribute("mensajeError",
+                        "La sala no está disponible en el intervalo seleccionado.");
+                cargarCombos(model);
+                return "nuevaReservaAdmin";
+            }
+
+            // Validar maquinaria solicitada
+            List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Long idMaq = maquinarias.get(i);
+                    Integer cantidad = (i < cantidades.size()) ? cantidades.get(i) : 0;
+
+                    if (cantidad == null || cantidad <= 0) {
+                        continue;
+                    }
+
+                    Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(idMaq);
+                    if (maq == null) {
+                        model.addAttribute("mensajeError", "Maquinaria no encontrada.");
+                        cargarCombos(model);
+                        return "nuevaReservaAdmin";
+                    }
+
+                    // Verificar disponibilidad
+                    int totalEnUso = reservaServicio.totalMaquinariaReservadaEnIntervalo(
+                            idMaq, inicio, fin, actividad.getTipoActividad()
+                    );
+
+                    if (totalEnUso + cantidad > maq.getCantidadTotal()) {
+                        model.addAttribute("mensajeError",
+                                "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. " +
+                                        "Disponible: " + (maq.getCantidadTotal() - totalEnUso) +
+                                        ", solicitado: " + cantidad);
+                        cargarCombos(model);
+                        return "nuevaReservaAdmin";
+                    }
+                }
+            }
+
+            // Crear la reserva
             Reserva reserva = new Reserva();
             reserva.setFechaHoraInicio(inicio);
             reserva.setFechaHoraFin(fin);
@@ -118,14 +213,16 @@ public class GestionReservasController {
             reserva.setComentarios(comentarios);
             reserva.setEstado(Estado.Pendiente);
 
-            // Añadir maquinaria si se seleccionó
+            // Añadir maquinaria
             if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
-                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
                 for (int i = 0; i < maquinarias.size(); i++) {
-                    Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
-                    if (maq != null) {
-                        ReservaMaquinaria rm = new ReservaMaquinaria(reserva, maq, cantidades.get(i));
-                        reservaMaquinarias.add(rm);
+                    Integer cantidad = (i < cantidades.size()) ? cantidades.get(i) : 0;
+                    if (cantidad != null && cantidad > 0) {
+                        Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
+                        if (maq != null) {
+                            ReservaMaquinaria rm = new ReservaMaquinaria(reserva, maq, cantidad);
+                            reservaMaquinarias.add(rm);
+                        }
                     }
                 }
                 reserva.setMaquinariaAsignada(reservaMaquinarias);
@@ -134,20 +231,21 @@ public class GestionReservasController {
             boolean ok = reservaServicio.crearReserva(reserva);
 
             if (!ok) {
-                model.addAttribute("regError", "No se ha podido crear la reserva. Revisa horarios y disponibilidad.");
+                model.addAttribute("mensajeError",
+                        "No se pudo crear la reserva. Verifica disponibilidad.");
                 cargarCombos(model);
                 return "nuevaReservaAdmin";
             }
 
-            redirectAttributes.addFlashAttribute("mensajeExito", "Reserva creada correctamente.");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Reserva creada exitosamente.");
             return "redirect:/admin/reservas";
 
         } catch (IllegalArgumentException ex) {
-            model.addAttribute("regError", ex.getMessage());
+            model.addAttribute("mensajeError", "Error: " + ex.getMessage());
             cargarCombos(model);
             return "nuevaReservaAdmin";
         } catch (Exception ex) {
-            model.addAttribute("regError", "Error inesperado al crear la reserva.");
+            model.addAttribute("mensajeError", "Error inesperado: " + ex.getMessage());
             cargarCombos(model);
             return "nuevaReservaAdmin";
         }
@@ -195,18 +293,141 @@ public class GestionReservasController {
                 return "redirect:/admin/reservas";
             }
 
+            // Validar que todos los recursos existen
             Cliente cliente = clienteServicio.obtenerClientePorId(clienteId);
-            Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
-            Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
-            Sala sala = salaServicio.obtenerSalaPorId(salaId);
-
-            if (cliente == null || entrenador == null || actividad == null || sala == null) {
-                model.addAttribute("mensajeError", "Datos inválidos: cliente, entrenador, actividad o sala no encontrados.");
+            if (cliente == null) {
+                model.addAttribute("mensajeError", "El cliente seleccionado no existe.");
                 model.addAttribute("reserva", existente);
                 cargarCombos(model);
                 return "editarReservaAdmin";
             }
 
+            Entrenador entrenador = entrenadorServicio.obtenerEntrenadorPorId(entrenadorId);
+            if (entrenador == null) {
+                model.addAttribute("mensajeError", "El entrenador seleccionado no existe.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
+
+            Actividad actividad = actividadServicio.obtenerActividadPorId(actividadId);
+            if (actividad == null) {
+                model.addAttribute("mensajeError", "La actividad seleccionada no existe.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
+
+            Sala sala = salaServicio.obtenerSalaPorId(salaId);
+            if (sala == null) {
+                model.addAttribute("mensajeError", "La sala seleccionada no existe.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
+
+            // Validar lógica de fechas
+            if (!fin.isAfter(inicio)) {
+                model.addAttribute("mensajeError", "La fecha de fin debe ser posterior a la de inicio.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
+
+            if (inicio.isBefore(LocalDateTime.now())) {
+                model.addAttribute("mensajeError", "No se pueden programar reservas en el pasado.");
+                model.addAttribute("reserva", existente);
+                cargarCombos(model);
+                return "editarReservaAdmin";
+            }
+
+            // Comprobar horario de trabajo del entrenador
+            if (entrenador.getHoraInicioTrabajo() != null && entrenador.getHoraFinTrabajo() != null) {
+                if (inicio.toLocalTime().isBefore(entrenador.getHoraInicioTrabajo()) ||
+                        fin.toLocalTime().isAfter(entrenador.getHoraFinTrabajo())) {
+                    model.addAttribute("mensajeError",
+                            "El entrenador no trabaja en ese horario. Horario: " +
+                                    entrenador.getHoraInicioTrabajo() + " - " + entrenador.getHoraFinTrabajo());
+                    model.addAttribute("reserva", existente);
+                    cargarCombos(model);
+                    return "editarReservaAdmin";
+                }
+            }
+
+            // Comprobar disponibilidad del entrenador (ignorando la propia reserva)
+            if (reservaServicio.haySolapeEntrenador(entrenador.getIdEntrenador(), inicio, fin)) {
+                boolean solapeReal = false;
+                List<Reserva> reservasEntrenador = reservaServicio.listarHistorialEntrenador(
+                        entrenador.getIdEntrenador()
+                );
+                for (Reserva r : reservasEntrenador) {
+                    if (r.getIdReserva().equals(id) || r.getEstado() != Estado.Pendiente) continue;
+                    if (r.getFechaHoraInicio().isBefore(fin) && r.getFechaHoraFin().isAfter(inicio)) {
+                        solapeReal = true;
+                        break;
+                    }
+                }
+                if (solapeReal) {
+                    model.addAttribute("mensajeError",
+                            "El entrenador no está disponible en el intervalo seleccionado.");
+                    model.addAttribute("reserva", existente);
+                    cargarCombos(model);
+                    return "editarReservaAdmin";
+                }
+            }
+
+            // Comprobar disponibilidad de la sala (ignorando la propia reserva)
+            if (reservaServicio.haySolapeSala(sala.getIdSala(), inicio, fin)) {
+                boolean solapeRealSala = false;
+                List<Reserva> todasReservas = reservaServicio.listarTodas();
+                for (Reserva r : todasReservas) {
+                    if (r.getIdReserva().equals(id) || r.getEstado() != Estado.Pendiente) continue;
+                    if (r.getSala() == null || !sala.getIdSala().equals(r.getSala().getIdSala())) continue;
+                    if (r.getFechaHoraInicio().isBefore(fin) && r.getFechaHoraFin().isAfter(inicio)) {
+                        solapeRealSala = true;
+                        break;
+                    }
+                }
+                if (solapeRealSala) {
+                    model.addAttribute("mensajeError",
+                            "La sala no está disponible en el intervalo seleccionado.");
+                    model.addAttribute("reserva", existente);
+                    cargarCombos(model);
+                    return "editarReservaAdmin";
+                }
+            }
+
+            // Validar y actualizar maquinaria
+            List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
+            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
+                for (int i = 0; i < maquinarias.size(); i++) {
+                    Integer cantidad = (i < cantidades.size()) ? cantidades.get(i) : 0;
+                    if (cantidad == null || cantidad <= 0) continue;
+
+                    Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
+                    if (maq == null) continue;
+
+                    // Verificar disponibilidad
+                    int totalEnUso = reservaServicio.totalMaquinariaReservadaEnIntervalo(
+                            maq.getIdMaquinaria(), inicio, fin, actividad.getTipoActividad()
+                    );
+
+                    if (totalEnUso + cantidad > maq.getCantidadTotal()) {
+                        model.addAttribute("mensajeError",
+                                "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. " +
+                                        "Disponible: " + (maq.getCantidadTotal() - totalEnUso) +
+                                        ", solicitado: " + cantidad);
+                        model.addAttribute("reserva", existente);
+                        cargarCombos(model);
+                        return "editarReservaAdmin";
+                    }
+
+                    ReservaMaquinaria rm = new ReservaMaquinaria(existente, maq, cantidad);
+                    reservaMaquinarias.add(rm);
+                }
+            }
+
+            // Crear objeto con todos los datos actualizados
             Reserva datos = new Reserva();
             datos.setFechaHoraInicio(inicio);
             datos.setFechaHoraFin(fin);
@@ -216,40 +437,13 @@ public class GestionReservasController {
             datos.setSala(sala);
             datos.setComentarios(comentarios);
             datos.setEstado(estado);
-
-            // Maquinaria: validar que no se solicite más de la disponible
-            if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
-                List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
-                for (int i = 0; i < maquinarias.size(); i++) {
-                    Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
-                    int cantidadSolicitada = 0;
-                    if (i < cantidades.size() && cantidades.get(i) != null) {
-                        cantidadSolicitada = cantidades.get(i);
-                    }
-                    if (maq != null) {
-                        // Comprueba contra la cantidad total disponible en la entidad Maquinaria.
-                        // Si su modelo usa otro nombre de getter (por ejemplo getStock o getCantidadDisponible),
-                        // sustituir getCantidad() por el getter correspondiente.
-                        if (cantidadSolicitada > maq.getCantidadTotal()) {
-                            model.addAttribute("mensajeError",
-                                    "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. Disponible: "
-                                            + maq.getCantidadTotal() + ", solicitado: " + cantidadSolicitada);
-                            model.addAttribute("reserva", existente);
-                            cargarCombos(model);
-                            return "editarReservaAdmin";
-                        }
-                        ReservaMaquinaria rm = new ReservaMaquinaria(datos, maq, cantidadSolicitada);
-                        reservaMaquinarias.add(rm);
-                    }
-                }
-                datos.setMaquinariaAsignada(reservaMaquinarias);
-            }
+            datos.setMaquinariaAsignada(reservaMaquinarias);
 
             boolean ok = reservaServicio.actualizarReserva(id, datos);
 
             if (!ok) {
                 model.addAttribute("mensajeError",
-                        "No se ha podido actualizar la reserva. Puede que ya haya empezado o que exista solape.");
+                        "No se pudo actualizar la reserva. Verifica disponibilidad.");
                 model.addAttribute("reserva", existente);
                 cargarCombos(model);
                 return "editarReservaAdmin";
@@ -258,12 +452,10 @@ public class GestionReservasController {
             redirectAttributes.addFlashAttribute("mensajeExito", "Reserva actualizada correctamente.");
             return "redirect:/admin/reservas";
 
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("mensajeError", "Error al actualizar la reserva");
-            cargarCombos(model);
-            return "editarReservaAdmin";
         } catch (Exception ex) {
-            model.addAttribute("mensajeError", "Error al actualizar la reserva");
+            model.addAttribute("mensajeError", "Error al actualizar la reserva: " + ex.getMessage());
+            Reserva existente = reservaServicio.obtenerPorId(id);
+            model.addAttribute("reserva", existente);
             cargarCombos(model);
             return "editarReservaAdmin";
         }
