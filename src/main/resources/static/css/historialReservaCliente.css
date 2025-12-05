@@ -1,5 +1,196 @@
-/* ================= IMPORT BASE ================= */
-@import url('gestionUsuariosPage.css');
+:root {
+    --accent-1: #166534;
+    --accent-2: #22c55e;
+    --accent-3: #86efac;
+    --accent-soft: #bbf7d0;
+    --text-main: #020617;
+    --text-dark: #020617;
+    --muted: #166534;
+    --card-bg: #ffffff;
+    --border-subtle: #e5e7eb;
+    --shadow-soft: 0 18px 40px rgba(15,23,42,0.16);
+    --radius-lg: 1.4rem;
+    --radius-xl: 1.6rem;
+    --transition-fast: 180ms;
+}
+
+/* ================= BODY / LAYOUT ================= */
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    min-height: 100vh;
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(
+        to bottom,
+        rgba(22,101,52,0.35) 0%,
+        rgba(34,197,94,0.22) 28%,
+        rgba(255,255,255,0.95) 80%
+    );
+}
+
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.7rem 2.3rem 2.3rem;
+    box-sizing: border-box;
+}
+
+/* ================= HEADER ================= */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4rem 1.8rem;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.6rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-small {
+    width: 52px;
+    height: 52px;
+    background: #ffffff;
+    border-radius: 50%;
+    padding: 0.4rem;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.18);
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    color: var(--text-main);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    margin: 0.15rem 0 0 0;
+    font-size: 0.95rem;
+    color: var(--muted);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #065f46;
+    font-size: 1.05rem;
+}
+
+.btn-logout {
+    padding: 0.6rem 1.3rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    color: #b91c1c;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 16px rgba(15,23,42,0.08);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+.btn-logout:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15,23,42,0.16);
+    background-color: #fef2f2;
+}
+
+/* ================= SUMMARY / STATS ================= */
+
+.summary-card {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.summary-item {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.3rem;
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 8px 20px rgba(15,23,42,0.14);
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+}
+
+.summary-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #047857;
+}
+
+.summary-value.trainer {
+    color: #7c3aed;
+}
+
+/* ================= GRID TARJETAS ================= */
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+}
+
+.card {
+    width: 100%;
+    max-width: 100%;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.6rem;
+    box-shadow: 0 12px 30px rgba(15,23,42,0.22);
+    border: 1px solid var(--border-subtle);
+    box-sizing: border-box;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    gap: 1rem;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.card-header p {
+    margin: 0.2rem 0 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
 
 /* ================= BADGES DE ESTADO ================= */
 
@@ -10,39 +201,130 @@
     font-weight: 700;
     font-size: 0.85rem;
     color: #ffffff;
-
-    box-shadow: 0 10px 22px rgba(22, 101, 52, 0.25);
+    box-shadow: 0 10px 22px rgba(22,101,52,0.25);
 }
 
-/* Completada → Verde consistente con la app */
 .status-completada {
     background: linear-gradient(135deg, #166534, #22c55e);
 }
 
-/* Cancelada → Mantiene rojo pero en estilo más suave */
 .status-cancelada {
     background: linear-gradient(135deg, #dc2626, #ef4444);
 }
 
-/* ================= TABLA ================= */
+/* ================= TABLAS ================= */
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 1.1rem;
+    box-shadow: 0 10px 24px rgba(15,23,42,0.22);
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 0;
+}
 
 .table thead {
     background: linear-gradient(90deg, #14532d, #16a34a);
     color: #ffffff;
 }
 
+.table th,
+.table td {
+    padding: 0.7rem 0.8rem;
+    text-align: left;
+}
+
+.table th:first-child {
+    border-top-left-radius: 1rem;
+}
+
+.table th:last-child {
+    border-top-right-radius: 1rem;
+}
+
 .table tbody tr td {
     vertical-align: middle;
 }
 
-/* Hover consistente */
+.table tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+.table tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
 .table tbody tr:hover {
     background: #dcfce7;
+}
+
+.center {
+    text-align: center;
+}
+
+/* ================= FOOTER-LINK ================= */
+
+.footer-link {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.footer-link a {
+    color: #065f46;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 1.1rem;
+    border-radius: 0.7rem;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 10px 24px rgba(15,23,42,0.18);
+    transition: background-color var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.footer-link a:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(15,23,42,0.26);
+}
+
+/* ================= ESTADO VACÍO ================= */
+
+.empty-state {
+    text-align: center;
+    padding: 1.3rem 0.8rem;
+    color: var(--muted);
+    font-style: italic;
 }
 
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .page-container {
+        padding: 1.5rem;
+    }
+
+    .card {
+        padding: 1.4rem 1.2rem;
+    }
+
+    .table {
+        font-size: 0.82rem;
+    }
+
     .table th:nth-child(4),
     .table td:nth-child(4),
     .table th:nth-child(5),
