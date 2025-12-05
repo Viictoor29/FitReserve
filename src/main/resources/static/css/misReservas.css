@@ -393,6 +393,25 @@
         font-style: italic;
     }
 
+.btn-secondary {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #166534, #22c55e);
+    color: #ffffff;
+    border-radius: 0.6rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(22,101,52,0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #14532d, #16a34a);
+    box-shadow: 0 6px 16px rgba(22,101,52,0.4);
+    transform: translateY(-1px);
+}
+
     /* ================= RESPONSIVE ================= */
 
     @media (max-width: 768px) {
@@ -430,3 +449,4 @@
             margin: 0.2rem 0;
         }
     }
+
