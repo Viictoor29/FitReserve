@@ -429,13 +429,23 @@ public class ClienteController {
                 datosActualizados.setComentarios(comentarios);
             }
 
-            // Maquinaria
+            // Maquinaria: validar que no se solicite más de la disponible
             if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
                 List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
                 for (int i = 0; i < maquinarias.size(); i++) {
                     Maquinaria maq = maquinariaService.obtenerMaquinariaPorId(maquinarias.get(i));
+                    int cantidadSolicitada = 0;
+                    if (i < cantidades.size() && cantidades.get(i) != null) {
+                        cantidadSolicitada = cantidades.get(i);
+                    }
                     if (maq != null) {
-                        ReservaMaquinaria rm = new ReservaMaquinaria(reservaExistente, maq, cantidades.get(i));
+                        if (cantidadSolicitada > maq.getCantidadTotal()) {
+                            redirectAttributes.addFlashAttribute("error",
+                                    "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. Disponible: "
+                                            + maq.getCantidadTotal() + ", solicitado: " + cantidadSolicitada);
+                            return "redirect:/cliente/reserva/editar/" + id;
+                        }
+                        ReservaMaquinaria rm = new ReservaMaquinaria(reservaExistente, maq, cantidadSolicitada);
                         reservaMaquinarias.add(rm);
                     }
                 }

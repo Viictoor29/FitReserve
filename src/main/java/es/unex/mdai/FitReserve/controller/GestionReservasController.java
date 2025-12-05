@@ -217,13 +217,28 @@ public class GestionReservasController {
             datos.setComentarios(comentarios);
             datos.setEstado(estado);
 
-            // Maquinaria
+            // Maquinaria: validar que no se solicite más de la disponible
             if (maquinarias != null && cantidades != null && !maquinarias.isEmpty()) {
                 List<ReservaMaquinaria> reservaMaquinarias = new ArrayList<>();
                 for (int i = 0; i < maquinarias.size(); i++) {
                     Maquinaria maq = maquinariaServicio.obtenerMaquinariaPorId(maquinarias.get(i));
+                    int cantidadSolicitada = 0;
+                    if (i < cantidades.size() && cantidades.get(i) != null) {
+                        cantidadSolicitada = cantidades.get(i);
+                    }
                     if (maq != null) {
-                        ReservaMaquinaria rm = new ReservaMaquinaria(datos, maq, cantidades.get(i));
+                        // Comprueba contra la cantidad total disponible en la entidad Maquinaria.
+                        // Si su modelo usa otro nombre de getter (por ejemplo getStock o getCantidadDisponible),
+                        // sustituir getCantidad() por el getter correspondiente.
+                        if (cantidadSolicitada > maq.getCantidadTotal()) {
+                            model.addAttribute("mensajeError",
+                                    "No hay suficiente maquinaria '" + maq.getNombre() + "' disponible. Disponible: "
+                                            + maq.getCantidadTotal() + ", solicitado: " + cantidadSolicitada);
+                            model.addAttribute("reserva", existente);
+                            cargarCombos(model);
+                            return "editarReservaAdmin";
+                        }
+                        ReservaMaquinaria rm = new ReservaMaquinaria(datos, maq, cantidadSolicitada);
                         reservaMaquinarias.add(rm);
                     }
                 }
@@ -244,11 +259,11 @@ public class GestionReservasController {
             return "redirect:/admin/reservas";
 
         } catch (IllegalArgumentException ex) {
-            model.addAttribute("mensajeError", ex.getMessage());
+            model.addAttribute("mensajeError", "Error al actualizar la reserva");
             cargarCombos(model);
             return "editarReservaAdmin";
         } catch (Exception ex) {
-            model.addAttribute("mensajeError", "Error al actualizar la reserva: " + ex.getMessage());
+            model.addAttribute("mensajeError", "Error al actualizar la reserva");
             cargarCombos(model);
             return "editarReservaAdmin";
         }
