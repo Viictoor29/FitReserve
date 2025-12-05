@@ -105,21 +105,23 @@ body{
 
 /* Título y subtítulo */
 h1{
-    margin: 0;
+    margin: 0.5rem;
     font-size: 2.2rem;
     font-weight: 800;
     letter-spacing: -0.03em;
     color: var(--text-main);
 }
 
-.tagline{
-    margin-top: 0.55rem;
-    margin-bottom: 2.1rem;
-    font-size: 1.02rem;
-    color: var(--text-muted);
-    max-width: 44ch;
+.tagline {
+    margin-top: 0.6rem;
+    margin-bottom: 2rem;
+    font-size: 1.25rem;          /* más grande */
+    font-weight: 500;
+    color: var(--accent-1);      /* verde */
+    max-width: 40ch;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;          /* CENTRADO */
 }
 
 /* Layout de botones */
@@ -200,13 +202,16 @@ h1{
 }
 
 /* Texto inferior */
-.footer-text{
+.footer-text {
     margin-top: 2rem;
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     color: var(--text-muted);
     max-width: 46ch;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
+    opacity: 0.95;
+    line-height: 1.5;
 }
 
 /* Ajustes responsive pequeños */
