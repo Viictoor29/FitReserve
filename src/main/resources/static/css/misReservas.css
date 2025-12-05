@@ -79,14 +79,68 @@
 }
 
 .link {
-    color: var(--accent-1);
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
     font-weight: 600;
+    font-size: 0.875rem;
     cursor: pointer;
     text-decoration: none;
+    border: none;
+    background: none;
+    transition: all 0.2s ease;
 }
 
-.link:hover {
-    text-decoration: underline;
+/* Botón Ver */
+.link-view {
+    background: linear-gradient(135deg, #166534, #22c55e);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(22,101,52,0.3);
+}
+
+.link-view:hover {
+    background: linear-gradient(135deg, #14532d, #16a34a);
+    box-shadow: 0 6px 16px rgba(22,101,52,0.4);
+    transform: translateY(-1px);
+}
+
+/* Botón Editar */
+.link-edit {
+    background: linear-gradient(135deg, #0369a1, #0284c7);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(3,105,161,0.3);
+}
+
+.link-edit:hover {
+    background: linear-gradient(135deg, #075985, #0369a1);
+    box-shadow: 0 6px 16px rgba(3,105,161,0.4);
+    transform: translateY(-1px);
+}
+
+/* Botón Cancelar - ROJO */
+.link-delete {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+}
+
+.link-delete:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+    box-shadow: 0 6px 16px rgba(220,38,38,0.4);
+    transform: translateY(-1px);
+}
+
+/* Botón Completar - VERDE */
+.link-success {
+    background: linear-gradient(135deg, #166534, #22c55e);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(22,101,52,0.3);
+}
+
+.link-success:hover {
+    background: linear-gradient(135deg, #14532d, #16a34a);
+    box-shadow: 0 6px 16px rgba(22,101,52,0.4);
+    transform: translateY(-1px);
 }
 
 /* ================== RESPONSIVE ================== */

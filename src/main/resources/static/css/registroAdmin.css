@@ -1,101 +1,114 @@
 :root{
-    --bg-1: #0f172a;
-    --bg-2: #0ea5a4;
-    --accent-1: #16a34a;
-    --accent-2: #22c55e;
-    --accent-3: #86efac;
-    --card-bg: rgba(255,255,255,0.18);
-    --glass: rgba(255,255,255,0.22);
-    --text-dark: #071023;
-    --muted: #4b5563;
-    --shadow: 0 18px 40px rgba(2,6,23,0.45);
-    --radius-lg: 1.2rem;
-    --radius-xl: 1.6rem;
+    --accent-1: #166534;   /* verde principal */
+    --accent-2: #22c55e;   /* verde secundario */
+    --accent-soft: #bbf7d0;
+    --text-main: #020617;
+    --text-muted: #000000;
+    --bg-page: #f4f4f5;
+    --card-bg: #ffffff;
+    --border-subtle: #e5e7eb;
+    --shadow-soft: 0 18px 40px rgba(15,23,42,0.16);
+    --radius-lg: 1.4rem;
     --transition-fast: 180ms;
+    --focus-ring: #22c55e;
 }
 
+/* Reducir animaciones si el usuario lo pide */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Fondo: igual que registro.css */
 body {
     display: flex;
     min-height: 100vh;
+    margin: 0;
     align-items: center;
     justify-content: center;
-    margin: 0;
+    overflow-x: hidden;
+
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    color: var(--text-dark);
-    background: linear-gradient(135deg, rgba(6,95,70,0.95), rgba(13,148,136,0.92) 45%, rgba(134,239,172,0.9));
-    background-size: 240% 240%;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(22,101,52,0.35) 0%,
+        rgba(34,197,94,0.22) 28%,
+        rgba(255,255,255,0.95) 80%
+    );
+
+    padding: 1.5rem;
+    box-sizing: border-box;
 }
 
-@keyframes gradientMove {
-    0% { background-position: 0% 40%; }
-    50% { background-position: 100% 60%; }
-    100% { background-position: 0% 40%; }
-}
-
+/* Contenedor: misma estética que registro.css */
 .registro-container {
     position: relative;
-    text-align: center;
-    padding: 3rem 2.5rem;
     max-width: 520px;
-    width: 92%;
-    margin: 2rem auto;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    box-shadow: var(--shadow);
-    color: var(--text-dark);
-    overflow: hidden;
-    backdrop-filter: blur(10px) saturate(120%);
-    border: 1px solid rgba(255,255,255,0.06);
-    animation: floatCard 8s ease-in-out infinite;
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 2.4rem 2.4rem 2.2rem;
+    box-sizing: border-box;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
+    text-align: center;
+    margin: 0 auto;
 }
 
-.registro-container::before{
+/* Halo igual a registro.css */
+.registro-container::before {
     content: "";
     position: absolute;
-    inset: -1px;
-    background: linear-gradient(90deg, rgba(22,163,74,0.65), rgba(34,197,94,0.65), rgba(134,239,172,0.55));
-    z-index: 0;
-    border-radius: calc(var(--radius-xl) + 1px);
-    filter: blur(18px);
-    opacity: 0.85;
-    pointer-events: none;
+    inset: -14px;
+    border-radius: inherit;
+    background: radial-gradient(
+        circle at bottom,
+        rgba(34,197,94,0.28) 0%,
+        rgba(22,101,52,0.12) 45%,
+        transparent 80%
+    );
+    z-index: -1;
 }
 
-.registro-container > * { position: relative; z-index: 1; }
-
-@keyframes floatCard {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-    100% { transform: translateY(0px); }
+.registro-container > * {
+    position: relative;
+    z-index: 1;
 }
 
+/* Flecha volver */
 .back-arrow {
     position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
-    font-size: 1.5rem;
-    color: #065f46;
-    cursor: pointer;
+    top: 18px;
+    left: 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #111827;
     text-decoration: none;
-    transition: transform var(--transition-fast);
-    z-index: 2;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.15s ease;
 }
 
 .back-arrow:hover {
-    transform: translateX(-4px);
+    opacity: 1;
+    transform: translateX(-3px);
 }
 
+/* Título */
 h2 {
     margin: 0 0 2rem 0;
-    font-size: 2rem;
-    letter-spacing: -0.01em;
-    font-weight: 700;
-    color: #052e2a;
-    line-height: 1.1;
+    font-size: 2.0rem;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.15;
 }
 
+/* Campos */
 .field {
     text-align: left;
     margin-bottom: 1.5rem;
@@ -118,30 +131,31 @@ input[type="time"],
 input[type="number"],
 select,
 textarea {
+    display: block;
     width: 100%;
     padding: 0.85rem 1rem;
-    box-sizing: border-box;
     border: 1px solid rgba(6,95,70,0.2);
     border-radius: 0.75rem;
     font-size: 1rem;
     font-family: inherit;
-    background: rgba(255,255,255,0.9);
-    color: var(--text-dark);
+    background: rgba(255,255,255,0.96);
+    color: var(--text-main);
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
     outline: none;
+    box-sizing: border-box;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
     border-color: var(--accent-2);
-    box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
 }
 
 input::placeholder,
 textarea::placeholder {
-    color: var(--muted);
-    opacity: 0.7;
+    color: var(--text-muted);
+    opacity: 0.6;
 }
 
 textarea {
@@ -149,6 +163,7 @@ textarea {
     min-height: 80px;
 }
 
+/* Mensajes de error */
 .error {
     color: #dc2626;
     font-size: 0.875rem;
@@ -157,6 +172,7 @@ textarea {
     font-weight: 500;
 }
 
+/* Botón principal igual a registro.css */
 .actions {
     margin-top: 2rem;
 }
@@ -166,39 +182,47 @@ textarea {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.95rem 1.1rem;
-    border-radius: 0.9rem;
+    padding: 0.95rem 1.4rem;
+    border-radius: 999px;
     font-size: 1.02rem;
     font-weight: 600;
-    text-decoration: none;
-    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast), opacity var(--transition-fast);
-    cursor: pointer;
+    letter-spacing: 0.01em;
     border: none;
-    outline: none;
-    background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
-    color: white;
-    box-shadow: 0 10px 30px rgba(16,68,41,0.28), inset 0 -3px 8px rgba(255,255,255,0.06);
+    cursor: pointer;
+
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    color: #ffffff;
+    box-shadow: 0 14px 30px rgba(22,101,52,0.45);
+
+    transition:
+        background-color var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        opacity var(--transition-fast);
 }
 
 .btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 36px rgba(16,68,41,0.36);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(22,101,52,0.55);
 }
 
 .btn:active {
-    transform: translateY(-1px) scale(0.998);
+    transform: translateY(0) scale(0.99);
+    box-shadow: 0 8px 24px rgba(22,101,52,0.6);
 }
 
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
+    box-shadow: none;
 }
 
-.btn:focus {
-    box-shadow: 0 0 0 4px rgba(34,197,94,0.12);
+.btn:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
 }
 
+/* Link bajo el formulario */
 .footer-link {
     margin-top: 1.5rem;
     text-align: center;
@@ -209,31 +233,17 @@ textarea {
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 500;
-    transition: color var(--transition-fast), background-color var(--transition-fast), padding var(--transition-fast);
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    display: inline-block;
+    transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .footer-link a:hover {
     color: #052e2a;
-    background-color: rgba(255, 255, 255, 0.9);
-    text-decoration: none;
+    background-color: rgba(255,255,255,0.9);
 }
 
-@media (max-width: 520px) {
-    .registro-container {
-        padding: 2.5rem 1.5rem;
-        border-radius: 1.1rem;
-    }
-    h2 { font-size: 1.7rem; }
-    .back-arrow {
-        top: 1rem;
-        left: 1rem;
-    }
-}
-
-/* Contenedor de alertas */
+/* Alertas con colores consistentes */
 .alert-container {
     margin: 1.5rem 0;
     min-height: 50px;
@@ -246,18 +256,6 @@ textarea {
     box-shadow: 0 8px 20px rgba(2, 6, 23, 0.12);
     position: relative;
     z-index: 1;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 .alert-success {
@@ -270,4 +268,13 @@ textarea {
     background: linear-gradient(180deg, rgba(220, 38, 38, 0.15), rgba(220, 38, 38, 0.08));
     border: 1px solid rgba(220, 38, 38, 0.3);
     color: #991b1b;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+    .registro-container {
+        padding: 2.1rem 1.4rem 2.1rem;
+        border-radius: 1.1rem;
+    }
+    h2 { font-size: 1.7rem; }
 }
