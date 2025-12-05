@@ -1,218 +1,225 @@
 :root{
-    --bg-1: #0f172a;
-    --bg-2: #0ea5a4;
-    --accent-1: #16a34a;
-    --accent-2: #22c55e;
-    --accent-3: #86efac;
-    --card-bg: rgba(255,255,255,0.18);
-    --glass: rgba(255,255,255,0.22);
-    --text-dark: #071023;
-    --muted: #4b5563;
-    --shadow: 0 18px 40px rgba(2,6,23,0.45);
-    --radius-lg: 1.2rem;
-    --radius-xl: 1.6rem;
+    --accent-1: #166534;   /* verde principal */
+    --accent-2: #22c55e;   /* verde secundario */
+    --accent-soft: #bbf7d0;
+    --text-main: #020617;
+    --text-muted: #000000;
+    --bg-page: #f4f4f5;
+    --card-bg: #ffffff;
+    --border-subtle: #e5e7eb;
+    --shadow-soft: 0 18px 40px rgba(15,23,42,0.16);
+    --radius-lg: 1.4rem;
     --transition-fast: 180ms;
+    --focus-ring: #22c55e;
 }
 
-/* Fondo general con degradado más suave y profundidad */
-body {
+/* Reducir animaciones si el usuario lo pide */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Fondo general: claro, con halo verde arriba */
+body{
     display: flex;
     min-height: 100vh;
+    margin: 0;
     align-items: center;
     justify-content: center;
-    margin: 0;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    color: var(--text-dark);
-    background: linear-gradient(135deg, rgba(6,95,70,0.95), rgba(13,148,136,0.92) 45%, rgba(134,239,172,0.9));
-    background-size: 240% 240%;
-    animation: gradientMove 10s ease infinite;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
+
+    /* Fondo que usa exactamente los verdes del botón */
+    background: linear-gradient(
+            to bottom,
+            rgba(22, 101, 52, 0.35) 0%,   /* MISMO verde --accent-1 (#166534) */
+            rgba(34, 197, 94, 0.22) 28%,  /* MISMO verde --accent-2 (#22c55e) */
+            rgba(255,255,255,0.95) 80%   /* blanco suave */
+    );
+
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-main);
+    padding: 1.5rem;
 }
 
-/* Animación del degradado */
-@keyframes gradientMove {
-    0% { background-position: 0% 40%; }
-    50% { background-position: 100% 60%; }
-    100% { background-position: 0% 40%; }
-}
-
-/* Tarjeta principal con borde degradado sutil */
-.container {
+/* Tarjeta principal: blanca, limpia, sin efecto cristal */
+.container{
     position: relative;
+    max-width: 560px;
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 2.8rem 2.4rem 2.4rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
     text-align: center;
-    padding: 3rem 2.5rem;
-    max-width: 520px;
-    width: 92%;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-    box-shadow: var(--shadow);
-    color: var(--text-dark);
-    overflow: hidden;
-    backdrop-filter: blur(10px) saturate(120%);
-    border: 1px solid rgba(255,255,255,0.06);
 }
 
-/* Borde exterior degradado con pseudo-elemento */
+/* Halo verde muy suave alrededor de la tarjeta */
 .container::before{
     content: "";
     position: absolute;
-    inset: -1px;
-    background: linear-gradient(90deg, rgba(22,163,74,0.65), rgba(34,197,94,0.65), rgba(134,239,172,0.55));
-    z-index: 0;
-    border-radius: calc(var(--radius-xl) + 1px);
-    filter: blur(18px);
-    opacity: 0.85;
-    pointer-events: none;
+    inset: -14px;
+    border-radius: inherit;
+
+    background: radial-gradient(
+            circle at bottom,
+            rgba(34,197,94,0.28) 0%,      /* verde claro */
+            rgba(22,101,52,0.12) 45%,     /* verde más oscuro */
+            transparent 80%
+    );
+
+    z-index: -1;
 }
 
-/* Forzar que el contenido esté por encima */
-.container > * { position: relative; z-index: 1; }
-
-/* Logo mejorado */
-.logo {
-    width: 112px;
-    height: 112px;
-    display: inline-block;
-    background: #ffffff; /* fondo blanco */
+/* Logo circular tipo “badge” */
+.logo{
+    width: 104px;
+    height: 104px;
+    margin: 0 auto 1.2rem;
     border-radius: 50%;
-    padding: 0.55rem;
-    box-shadow: 0 8px 26px rgba(2,6,23,0.15), inset 0 -6px 12px rgba(0,0,0,0.03);
-    margin-bottom: 1.25rem;
-    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast);
-    border: 1px solid rgba(0,0,0,0.06); /* separador sutil del fondo */
+    padding: .55rem;
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 10px 26px rgba(15,23,42,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
 }
 
-/* Asegura que la imagen ocupe el interior circular y las transparencias muestren el fondo blanco */
-.logo img {
-    display: block;
+.logo img{
     width: 100%;
     height: 100%;
-    object-fit: contain;
     border-radius: 50%;
-    background: transparent;
+    object-fit: contain;
 }
 
 .logo:hover{
-    transform: translateY(-6px) rotate(-4deg) scale(1.02);
-    box-shadow: 0 20px 40px rgba(2,6,23,0.45);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 34px rgba(15,23,42,0.26);
 }
 
 /* Título y subtítulo */
-h1 {
+h1{
     margin: 0;
     font-size: 2.2rem;
-    letter-spacing: -0.01em;
-    font-weight: 700;
-    color: #052e2a;
-    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-main);
 }
 
-.tagline {
-    margin-top: .45rem;
-    margin-bottom: 1.8rem;
-    font-size: 1rem;
-    color: var(--muted);
+.tagline{
+    margin-top: 0.55rem;
+    margin-bottom: 2.1rem;
+    font-size: 1.02rem;
+    color: var(--text-muted);
     max-width: 44ch;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* Botones - layout adaptable */
-.buttons {
+/* Layout de botones */
+.buttons{
     width: 100%;
-    max-width: 480px; /* ajustar según el ancho visual deseado */
-    margin: 0.6rem auto 0; /* centra horizontalmente dentro de la tarjeta */
+    max-width: 460px;
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr)); /* dos columnas iguales */
-    gap: 0.9rem;
-    align-items: center;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: stretch;
 }
 
-@media (max-width: 640px) {
-    .buttons {
+@media (max-width: 640px){
+    .buttons{
         grid-template-columns: 1fr;
-        max-width: 360px;
     }
 }
 
-/* Estilos base de botones */
-.btn {
+/* Base botones: grandes, bien clicables */
+.btn{
     box-sizing: border-box;
-    min-width: 0;
-    width: 100%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.95rem 1.1rem;
-    border-radius: 0.9rem;
+    min-height: 3.1rem;
+    padding: 0.95rem 1.4rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
     font-size: 1.02rem;
     font-weight: 600;
+    letter-spacing: 0.01em;
     text-decoration: none;
-    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast), opacity var(--transition-fast);
-    cursor: pointer;
-    border: none;
-    outline: none;
+    transition:
+            background-color var(--transition-fast) ease,
+            color var(--transition-fast) ease,
+            box-shadow var(--transition-fast) ease,
+            transform var(--transition-fast) ease;
 }
 
-/* Primary: verde degradado */
-.btn-primary {
-    background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
-    color: white;
-    box-shadow: 0 10px 30px rgba(16,68,41,0.28), inset 0 -3px 8px rgba(255,255,255,0.06);
+/* Botón principal: verde sólido */
+.btn-primary{
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    color: #ffffff;
+    box-shadow: 0 14px 30px rgba(22,101,52,0.45);
 }
 
 .btn-primary:hover{
-    transform: translateY(-4px);
-    box-shadow: 0 18px 36px rgba(16,68,41,0.36);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(22,101,52,0.55);
 }
 
-.btn-primary:active{
-    transform: translateY(-1px) scale(0.998);
-}
-
-/* Secondary: vidrio con borde y efecto */
-.btn-secondary {
-    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.82));
-    color: #065f46;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.08);
-    border: 1px solid rgba(6,95,70,0.08);
+/* Botón secundario: contorno verde */
+.btn-secondary{
+    background: #ffffff;
+    color: var(--accent-1);
+    border: 1px solid rgba(22,163,74,0.7);
+    box-shadow: 0 8px 20px rgba(15,23,42,0.08);
 }
 
 .btn-secondary:hover{
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px rgba(2,6,23,0.12);
+    background: #f9fafb;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(15,23,42,0.14);
 }
 
-/* Accesibilidad: foco visible */
-.btn:focus{
-    box-shadow: 0 0 0 4px rgba(34,197,94,0.12);
+/* Estado activo */
+.btn:active{
+    transform: translateY(0) scale(0.99);
+    box-shadow: 0 8px 18px rgba(15,23,42,0.25);
+}
+
+/* Foco accesible */
+.btn:focus-visible{
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
 }
 
 /* Texto inferior */
-.footer-text {
-    margin-top: 1.5rem;
-    font-size: .86rem;
-    color: var(--muted);
-    opacity: 0.95;
+.footer-text{
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 46ch;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Pequeños refinamientos responsivos */
+/* Ajustes responsive pequeños */
 @media (max-width: 420px){
     .container{
-        padding: 2.1rem 1.2rem;
-        border-radius: 1.1rem;
+        padding: 2.1rem 1.5rem 2.2rem;
+        border-radius: 1.2rem;
     }
-    h1 { font-size: 1.6rem; }
-    .logo { width: 88px; height: 88px; }
-}
-
-/* Pequeña animación flotante de la tarjeta */
-@keyframes floatCard {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-    100% { transform: translateY(0px); }
-}
-.container {
-    animation: floatCard 8s ease-in-out infinite;
+    h1{
+        font-size: 1.8rem;
+    }
+    .logo{
+        width: 88px;
+        height: 88px;
+    }
 }
