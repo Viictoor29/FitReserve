@@ -1,48 +1,83 @@
-/* css */
+/* ================= IMPORT BASE ================= */
 @import url('index.css');
 
-/* Alineado específico para la página de error: centrado perfecto */
+/* ================= CONTENEDOR ================= */
+
 .container {
-    text-align: center; /* refuerza centrado del contenido */
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
 }
 
-/* Usamos flex para centrar uno o varios botones y mantener separación */
+/* ================= BOTONES ================= */
+
 .buttons {
     width: 100%;
     max-width: 480px;
-    margin: 1.4rem auto 0; /* aumentado desde 0.6rem para separar más el texto del botón */
+    margin: 1.6rem auto 0;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.9rem;
     flex-wrap: wrap;
-    padding: 0;
 }
 
+/* Botón coherente con el sistema global de diseño */
 .buttons .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0;
-    box-sizing: border-box;
-    min-width: 120px;        /* antes 140px */
-    width: auto;
-    padding: 0.75rem 0.9rem; /* antes 0.95rem 1.1rem */
-    border-radius: 0.8rem;
-    font-size: 0.95rem;      /* ligeramente más pequeño */
+
+    padding: 0.75rem 1rem;
+    min-width: 120px;
+    border-radius: 999px;
+
+    font-size: 0.95rem;
     font-weight: 600;
     text-decoration: none;
-    transition: transform var(--transition-fast) ease, box-shadow var(--transition-fast), opacity var(--transition-fast);
     cursor: pointer;
+
     border: none;
     outline: none;
+
+    background: linear-gradient(135deg, #166534, #22c55e); /* verde principal */
+    color: #ffffff;
+
+    box-shadow: 0 12px 26px rgba(22, 101, 52, 0.35);
+
+    transition: transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    opacity var(--transition-fast);
 }
+
+.buttons .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 38px rgba(22, 101, 52, 0.45);
+}
+
+/* Botón secundario (si usas más de uno: volver, inicio, etc.) */
+.buttons .btn-secondary {
+    background: #ffffff;
+    color: #166534;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 24px rgba(15,23,42,0.16);
+}
+
+.buttons .btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(15,23,42,0.22);
+    background: #f9fafb;
+}
+
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 640px) {
     .buttons .btn {
         width: 100%;
         min-width: 0;
-        padding: 0.7rem 0.75rem; /* ajuste para móvil */
+        padding: 0.7rem 0.85rem;
         font-size: 0.95rem;
     }
 }

@@ -1,37 +1,47 @@
-/* src/main/resources/static/css/historialCliente.css */
-/* Importa la base de estilos del panel de gestión para mantener apariencia consistente */
+/* ================= IMPORT BASE ================= */
 @import url('gestionUsuariosPage.css');
 
-/* Ajustes específicos para historial */
+/* ================= BADGES DE ESTADO ================= */
+
 .status-badge {
     display: inline-block;
-    padding: 0.35rem 0.6rem;
-    border-radius: 0.6rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 0.65rem;
     font-weight: 700;
     font-size: 0.85rem;
-    color: white;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.08);
+    color: #ffffff;
+
+    box-shadow: 0 10px 22px rgba(22, 101, 52, 0.25);
 }
 
+/* Completada → Verde consistente con la app */
 .status-completada {
-    background: linear-gradient(180deg, #16a34a, #22c55e);
+    background: linear-gradient(135deg, #166534, #22c55e);
 }
 
+/* Cancelada → Mantiene rojo pero en estilo más suave */
 .status-cancelada {
-    background: linear-gradient(180deg, #dc2626, #ef4444);
+    background: linear-gradient(135deg, #dc2626, #ef4444);
 }
 
-/* Mejorar legibilidad de tablas en este template */
+/* ================= TABLA ================= */
+
 .table thead {
-    background: rgba(6,95,70,0.9);
-    color: white;
+    background: linear-gradient(90deg, #14532d, #16a34a);
+    color: #ffffff;
 }
 
 .table tbody tr td {
     vertical-align: middle;
 }
 
-/* Responsive: reducir columnas en pantallas pequeñas */
+/* Hover consistente */
+.table tbody tr:hover {
+    background: #dcfce7;
+}
+
+/* ================= RESPONSIVE ================= */
+
 @media (max-width: 768px) {
     .table th:nth-child(4),
     .table td:nth-child(4),

@@ -1,48 +1,65 @@
 :root {
-    --bg-1: #0f172a;
-    --bg-2: #0ea5a4;
-    --accent-1: #16a34a;
-    --accent-2: #22c55e;
+    --accent-1: #166534;   /* verde principal */
+    --accent-2: #22c55e;   /* verde secundario */
+    --accent-3: #86efac;
+
     --warning: #f59e0b;
     --warning-hover: #d97706;
     --success: #10b981;
     --success-hover: #059669;
-    --text-dark: #071023;
-    --muted: #4b5563;
-    --shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
-    --radius-lg: 1.2rem;
+
+    --accent-soft: #bbf7d0;
+
+    --text-main: #020617;
+    --text-dark: #020617;
+    --muted: #166534;
+
+    --card-bg: #ffffff;
+    --border-subtle: #e5e7eb;
+    --shadow-soft: 0 18px 40px rgba(15,23,42,0.16);
+    --radius-lg: 1.4rem;
     --transition-fast: 180ms;
+    --focus-ring: #22c55e;
 }
+
+/* ================= BODY ================= */
 
 body {
     margin: 0;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(135deg, rgba(6,95,70,0.95), rgba(13,148,136,0.92) 45%, rgba(134,239,172,0.9));
-    background-attachment: fixed;
     min-height: 100vh;
-    color: var(--text-dark);
+    color: var(--text-main);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
 
+    /* mismo degradado que el resto de la app */
+    background: linear-gradient(
+            to bottom,
+            rgba(22,101,52,0.35) 0%,
+            rgba(34,197,94,0.22) 28%,
+            rgba(255,255,255,0.95) 80%
+    );
+}
 
 .page-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 1.7rem 2.3rem 2.3rem;
+    box-sizing: border-box;
 }
+
+/* ================= HEADER ================= */
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 2rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-    backdrop-filter: blur(10px) saturate(120%);
+    padding: 1.4rem 1.8rem;
+    background: var(--card-bg);
     border-radius: var(--radius-lg);
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 1.6rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
 }
 
 .logo-section {
@@ -54,18 +71,19 @@ body {
 .logo-small {
     width: 50px;
     height: 50px;
-    background: white;
+    background: #ffffff;
     border-radius: 50%;
     padding: 0.4rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 20px rgba(15,23,42,0.18);
+    border: 1px solid rgba(0,0,0,0.06);
 }
 
 .header h1 {
     margin: 0;
     font-size: 1.8rem;
-    color: #052e2a;
-    font-weight: 700;
+    color: var(--text-main);
+    font-weight: 800;
+    letter-spacing: -0.02em;
 }
 
 .user-info {
@@ -81,46 +99,69 @@ body {
 }
 
 .btn-logout {
-    padding: 0.7rem 1.3rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.82));
-    border: 1px solid rgba(6, 95, 70, 0.08);
-    border-radius: 0.6rem;
-    color: #065f46;
+    padding: 0.6rem 1.3rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    color: #b91c1c;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast);
     font-size: 0.95rem;
-    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.08);
+    box-shadow: 0 6px 16px rgba(15,23,42,0.08);
 }
 
 .btn-logout:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15,23,42,0.16);
+    background-color: #fef2f2;
 }
 
+/* ================= WELCOME CARD ================= */
+
 .welcome-card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-    backdrop-filter: blur(12px) saturate(120%);
-    padding: 2.5rem;
+    background: var(--card-bg);
+    padding: 2.4rem 2.6rem;
     border-radius: var(--radius-lg);
     text-align: center;
-    margin-bottom: 2.5rem;
-    box-shadow: 0 12px 32px rgba(2, 6, 23, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 2.3rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-subtle);
+    position: relative;
+    overflow: hidden;
+}
+
+/* halo verde suave */
+.welcome-card::before {
+    content: "";
+    position: absolute;
+    inset: 40% -40px -40px;
+    background: radial-gradient(
+            circle at bottom,
+            rgba(34,197,94,0.22),
+            transparent 70%
+    );
+    z-index: -1;
 }
 
 .welcome-card h2 {
     margin: 0 0 0.8rem 0;
     font-size: 2.2rem;
-    color: #052e2a;
-    font-weight: 700;
+    color: var(--text-main);
+    font-weight: 800;
+    letter-spacing: -0.02em;
 }
 
 .tagline {
     margin: 0;
     font-size: 1.1rem;
-    color: var(--muted);
+    color: var(--muted);   /* verde suave */
 }
+
+/* ================= GRID ACCIONES ================= */
 
 .actions-grid {
     display: grid;
@@ -128,23 +169,27 @@ body {
     gap: 1.8rem;
 }
 
+/* Tarjetas */
 .action-card {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-    backdrop-filter: blur(10px) saturate(120%);
+    background: var(--card-bg);
     padding: 2rem;
     border-radius: var(--radius-lg);
     text-decoration: none;
     color: var(--text-dark);
-    transition: all var(--transition-fast);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 8px 20px rgba(2, 6, 23, 0.15);
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 10px 24px rgba(15,23,42,0.14);
     cursor: pointer;
+    transition: transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .action-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.25);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+    transform: translateY(-6px);
+    box-shadow: 0 18px 38px rgba(15,23,42,0.18);
+    border-color: rgba(34,197,94,0.5);
+    background: #f9fafb;
 }
 
 .action-card .icon {
@@ -155,7 +200,7 @@ body {
 .action-card h3 {
     margin: 0 0 0.6rem 0;
     font-size: 1.4rem;
-    color: #052e2a;
+    color: var(--text-main);
     font-weight: 700;
 }
 
@@ -166,21 +211,25 @@ body {
     line-height: 1.5;
 }
 
+/* Tarjetas con estado (warning / success) */
+
 .action-card.warning {
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-color: rgba(245,158,11,0.4);
 }
 
 .action-card.warning:hover {
-    background: linear-gradient(180deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
+    background-color: rgba(254,243,199,0.8);
 }
 
 .action-card.success {
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-color: rgba(16,185,129,0.4);
 }
 
 .action-card.success:hover {
-    background: linear-gradient(180deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08));
+    background-color: rgba(209,250,229,0.85);
 }
+
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
     .header {
@@ -194,6 +243,6 @@ body {
     }
 
     .page-container {
-        padding: 1rem;
+        padding: 1.5rem;
     }
 }
